@@ -44,8 +44,9 @@ h2,
 h3,
 h4,
 h5,
-h6 {
-    font-family: 'Poppins', sans-serif;
+h6,
+a {
+    font-family: sans-serif;
     font-weight: 700;
     color: var(--primary);
     line-height: 1.2;
@@ -67,7 +68,7 @@ a {
 
 /* Hero */
 .hero {
-    padding: 0px 0;
+    padding: 80px 0;
     background: linear-gradient(135deg, rgba(0, 86, 179, 0.03) 0%, rgba(0, 166, 81, 0.02) 100%);
     position: relative;
     overflow: hidden;
@@ -95,6 +96,43 @@ a {
     border-radius: 50%;
     background: rgba(0, 166, 81, 0.05);
     z-index: 0;
+}
+
+.hero-inner {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-copy {
+    flex: 1 1 560px;
+    min-width: 300px;
+}
+
+.hero h1 {
+    margin: 0 0 16px 0;
+    font-size: 42px;
+    color: var(--primary);
+    line-height: 1.1;
+}
+
+.hero p {
+    margin: 0 0 24px 0;
+    color: var(--text-light);
+    font-size: 18px;
+    max-width: 56ch;
+}
+
+.hero-ctas {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
 }
 
 .btn {
@@ -243,7 +281,7 @@ section {
 .steps {
     display: flex;
     gap: 24px;
-    align-items: stretch;
+    align-items: start;
     justify-content: space-between;
     flex-wrap: wrap;
 }

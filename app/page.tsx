@@ -3,6 +3,7 @@ import "./style.css";
 import Image from "next/image";
 import { Clock, Cpu, Facebook, FileUser, HandCoins, Instagram, LifeBuoy, Linkedin, LocationEditIcon, MapPinHouse, Phone, QrCode, School, Send, ShieldHalf, Twitter } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -104,6 +105,7 @@ export default function page() {
             <div className="service-detail">
               <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><FileUser size={40} /></div> ApplySmart</h3>
               <p>Fast, easy, and reliable Post UTME, admission applications, and online registration for schools and universities.</p>
+              <div className="inline-block bg-[#ff9800] rounded-lg shadow text-white font-medium text-sm !px-5 !p-2 !mt-3"><Link href="/applysmart">Let's Go</Link></div>
             </div>
 
             <div className="service-detail">
