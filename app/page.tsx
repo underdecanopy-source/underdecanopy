@@ -111,6 +111,8 @@ export default function page() {
             <div className="service-detail">
               <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><School size={40} /></div> SchoolPay</h3>
               <p>Make school fee payments simple and secure with our trusted online solutions for students and parents.</p>
+              <div className="inline-block bg-[#ff9800] rounded-lg shadow text-white font-medium text-sm !px-5 !p-2 !mt-3"><Link href="/skoolpay">Let's Go</Link></div>
+
             </div>
 
             <div className="service-detail">
