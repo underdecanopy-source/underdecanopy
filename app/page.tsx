@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./style.css";
 import Image from "next/image";
-import { Cpu, FileUser, HandCoins, LifeBuoy, MapPinHouse, QrCode, School, ShieldHalf } from "lucide-react";
+import { Cpu, Facebook, FileUser, HandCoins, Instagram, LifeBuoy, Linkedin, MapPinHouse, QrCode, School, ShieldHalf, Twitter } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 
 export const metadata: Metadata = {
   title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -12,24 +13,7 @@ export const metadata: Metadata = {
 export default function page() {
   return (
     <>
-      <header>
-        <div className="header-container">
-          <a href="#" className="logo home-link">
-            <h1>Underdecanopy<span>Digital</span></h1>
-          </a>
-          <nav id="mainNav">
-            <a href="#" className="home-link">Home</a>
-            <a href="#services">Our Core Services</a>
-            <a href="#additional">Professional Services</a>
-            <a href="#cafe">Cafe Experience</a>
-            <a href="#podcast">Podcast</a>
-            <a href="#contact">Contact</a>
-          </nav>
-          <button className="mobile-menu-btn" id="menuToggle" aria-label="Toggle menu">
-            <i className="fas fa-bars"></i>
-          </button>
-        </div>
-      </header>
+      <Navigation />
 
       <section className="hero !py-10">
         <div className="container">
@@ -345,10 +329,10 @@ export default function page() {
               <h4>Underdecanopy Digital Hub</h4>
               <p>Your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan.</p>
               <div className="social-links">
-                <a href="https://facebook.com/underdecanopy" target="_blank" rel="noopener"><i className="fab fa-facebook-f"></i></a>
-                <a href="https://twitter.com/underdecanopy" target="_blank" rel="noopener"><i className="fab fa-twitter"></i></a>
-                <a href="https://instagram.com/underdecanopy" target="_blank" rel="noopener"><i className="fab fa-instagram"></i></a>
-                <a href="https://linkedin.com/company/underdecanopy" target="_blank" rel="noopener"><i className="fab fa-linkedin-in"></i></a>
+                <a href="https://facebook.com/underdecanopy" target="_blank" rel="noopener"><Facebook /></a>
+                <a href="https://twitter.com/underdecanopy" target="_blank" rel="noopener"><Twitter /></a>
+                <a href="https://instagram.com/underdecanopy" target="_blank" rel="noopener"><Instagram /></a>
+                <a href="https://linkedin.com/company/underdecanopy" target="_blank" rel="noopener"><Linkedin /></a>
               </div>
             </div>
 
