@@ -19,6 +19,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      border: 1px solid
   }
 
   body {
@@ -425,7 +426,7 @@
 
   .contact-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 50px;
   }
 

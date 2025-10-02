@@ -257,32 +257,32 @@ export default function page() {
             <div className="contact-info">
               <h3>Get In Touch</h3>
 
-              <div className="contact-item flex gap-3 !mb-10">
-                <LocationEditIcon size={30} />
+              <div className="contact-item flex gap-3 !mb-8">
+                <LocationEditIcon size={25} />
                 <div>
                   <h4>Location</h4>
                   <p>Love Garden, Opposite Zenith Bank, North Campus, The Polytechnic, Ibadan, Oyo State.</p>
                 </div>
               </div>
 
-              <div className="contact-item flex gap-3 !mb-10">
-                <Phone size={30} />
+              <div className="contact-item flex gap-3 !mb-8">
+                <Phone size={25} />
                 <div>
                   <h4>Phone</h4>
                   <p>+234 806 485 2108</p>
                 </div>
               </div>
 
-              <div className="contact-item flex gap-3 !mb-10">
-                <Send size={30} />
+              <div className="contact-item flex gap-3 !mb-8">
+                <Send size={25} />
                 <div>
                   <h4>Email</h4>
                   <p>underdecanopy@gmail.com</p>
                 </div>
               </div>
 
-              <div className="contact-item flex gap-3 !mb-10">
-                <Clock size={30} />
+              <div className="contact-item flex gap-3 !mb-8">
+                <Clock size={25} />
                 <div>
                   <h4>Working Hours</h4>
                   <p>Monday - Friday: 9AM - 6PM</p>
