@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./style.css";
 import { Navigation } from "./_components/Navigation";
 import StepCard from "./_components/StepCard";
+import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -79,7 +80,6 @@ export default function page() {
                                                 <option value="UNIJOS">University of Jos (UNIJOS)</option>
                                                 <option value="UNIMAID">University of Maiduguri (UNIMAID)</option>
                                             </optgroup>
-
 
                                             <optgroup label="State Universities">
                                                 <option value="LASU">Lagos State University (LASU)</option>
@@ -207,8 +207,8 @@ export default function page() {
 
                             <div id="calculator-panel" role="tabpanel" aria-labelledby="tab-calculator">
                                 <form id="admission-calculator-form">
-                                    <div className="grid two-col">
-                                        <div>
+                                    <div className="flex flex-wrap flex-col md:flex-row justify-between">
+                                        <div className="basis-[47%] !mb-3">
                                             <label >Preferred Institution</label>
                                             <select id="calc_institution" name="calc_institution" required>
                                                 <option value="">Select Institution</option>
@@ -251,7 +251,7 @@ export default function page() {
                                                 </optgroup>
                                             </select>
                                         </div>
-                                        <div>
+                                        <div className="basis-[47%] !mb-3">
                                             <label>Preferred Course</label>
                                             <select id="calc_course" name="calc_course" required>
                                                 <option value="">Select Course</option>
@@ -303,11 +303,11 @@ export default function page() {
                                                 </optgroup>
                                             </select>
                                         </div>
-                                        <div>
+                                        <div className="basis-[47%] !mb-3">
                                             <label>JAMB Score</label>
                                             <input type="number" id="calc_score" name="calc_score" min="0" max="400" placeholder="Enter your JAMB score" required />
                                         </div>
-                                        <div>
+                                        <div className="basis-[47%] !mb-3" >
                                             <label>State of Origin</label>
                                             <select id="calc_state" name="calc_state">
                                                 <option value="">Select State</option>
@@ -690,10 +690,10 @@ export default function page() {
                             <h4>ApplySmart</h4>
                             <p className="small">Your trusted partner for university admission guidance and scholarship matching in Nigeria.</p>
                             <div className="social-links">
-                                <a href="#" aria-label="Follow us on Facebook"><i className="fab fa-facebook-f"></i></a>
-                                <a href="#" aria-label="Follow us on Twitter"><i className="fab fa-twitter"></i></a>
-                                <a href="#" aria-label="Follow us on Instagram"><i className="fab fa-instagram"></i></a>
-                                <a href="#" aria-label="Connect on LinkedIn"><i className="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="Follow us on Facebook"><Facebook /></a>
+                                <a href="#" aria-label="Follow us on Twitter"><Twitter /></a>
+                                <a href="#" aria-label="Follow us on Instagram"><Instagram /></a>
+                                <a href="#" aria-label="Connect on LinkedIn"><Linkedin /></a>
                             </div>
                         </div>
 

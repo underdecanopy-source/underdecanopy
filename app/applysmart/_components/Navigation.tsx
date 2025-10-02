@@ -11,11 +11,13 @@ import { Button } from '@/components/ui/button';
 // Define the menu links
 const navItems = [
     { href: '/', label: 'Home' },
-    { href: '#servicest', label: 'Our Core Services' },
-    { href: '#additional', label: 'Professional Services' },
-    { href: '#cafe', label: 'Cafe Experience' },
-    { href: '#podcast', label: 'Podcast' },
-    { href: '#contact', label: 'Contact' },
+    { href: '/applysmart/#how-it-works', label: 'Admissions' },
+    { href: '/applysmart/#scholarships', label: 'Scholarships' },
+    { href: '/applysmart/#blog', label: 'Blog' },
+    { href: '/applysmart/#services', label: 'Our Services' },
+    { href: '/applysmart/#contact', label: 'Contact' },
+    { href: '/applysmart/#admission-form', label: 'Get Started' },
+
 ];
 
 export function Navigation() {
