@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./style.css";
 import Image from "next/image";
-import { Cpu, Facebook, FileUser, HandCoins, Instagram, LifeBuoy, Linkedin, MapPinHouse, QrCode, School, ShieldHalf, Twitter } from "lucide-react";
+import { Clock, Cpu, Facebook, FileUser, HandCoins, Instagram, LifeBuoy, Linkedin, LocationEditIcon, MapPinHouse, Phone, QrCode, School, Send, ShieldHalf, Twitter } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default function page() {
       <section className="hero !py-10">
         <div className="container">
           <div className="flex justify-between flex-wrap items-center">
-            <div className="text-left max-w-[550px]">
+            <div className="text-left max-w-[350px] md:max-w-[550px]">
               <h1 className="text-sm">Welcome to Underdecanopy Digital Hub</h1>
               <p className="text-xs">Your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan.</p>
               <a href="#contact" className="cta-animate">Get Started Today</a>
@@ -257,32 +257,32 @@ export default function page() {
             <div className="contact-info">
               <h3>Get In Touch</h3>
 
-              <div className="contact-item">
-                <i className="fas fa-map-marker-alt"></i>
+              <div className="contact-item flex gap-3 !mb-10">
+                <LocationEditIcon size={30} />
                 <div>
                   <h4>Location</h4>
                   <p>Love Garden, Opposite Zenith Bank, North Campus, The Polytechnic, Ibadan, Oyo State.</p>
                 </div>
               </div>
 
-              <div className="contact-item">
-                <i className="fas fa-phone-alt"></i>
+              <div className="contact-item flex gap-3 !mb-10">
+                <Phone size={30} />
                 <div>
                   <h4>Phone</h4>
                   <p>+234 806 485 2108</p>
                 </div>
               </div>
 
-              <div className="contact-item">
-                <i className="fas fa-envelope"></i>
+              <div className="contact-item flex gap-3 !mb-10">
+                <Send size={30} />
                 <div>
                   <h4>Email</h4>
                   <p>underdecanopy@gmail.com</p>
                 </div>
               </div>
 
-              <div className="contact-item">
-                <i className="fas fa-clock"></i>
+              <div className="contact-item flex gap-3 !mb-10">
+                <Clock size={30} />
                 <div>
                   <h4>Working Hours</h4>
                   <p>Monday - Friday: 9AM - 6PM</p>

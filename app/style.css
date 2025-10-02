@@ -442,11 +442,6 @@
       font-size: 1.8rem;
   }
 
-  .contact-item {
-      display: flex;
-      margin-bottom: 25px;
-  }
-
   .contact-item i {
       font-size: 1.5rem;
       color: var(--primary);
