@@ -27,7 +27,7 @@ export function Navigation() {
             <div className="container mx-auto flex h-20 items-center justify-between !px-6 !md:px-8 ">
                 {/* === Logo/Branding Section - Left Side === */}
                 <Link href="/skoolpay">
-                    <span className='text-2xl font-bold text-[#1a237e]'>SkoolPay</span>
+                    <span className='text-2xl font-bold text-[#1a237e]'>Underdecanopy CoopHub</span>
                 </Link>
 
                 {/* === Desktop Navigation - Right Side === */}

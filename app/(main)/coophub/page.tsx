@@ -12,7 +12,7 @@ export default function page() {
             <section className="hero" id="home">
                 <div className="container">
                     <h1>Secure Your Future, One Small Saving at a Time.</h1>
-                    <p>SkoolPay by Underdecanopy Digital Hub is the secure, transparent, and smarter way to manage your school fees.</p>
+                    <p>CoopHub by Underdecanopy Digital Hub is the secure, transparent, and smarter way to manage your school fees.</p>
                     <a href="#community" className="cta-button">Join the Community</a>
                 </div>
             </section>
@@ -20,7 +20,7 @@ export default function page() {
             {/* <!-- Benefits Section --> */}
             <section className="benefits">
                 <div className="container">
-                    <h2 className="section-title text-2xl font-bold">Why SkoolPay?</h2>
+                    <h2 className="section-title text-2xl font-bold">Why CoopHub?</h2>
                     <div className="benefits-grid">
                         <div className="benefit-card">
                             <div className="benefit-icon"><span role="img" aria-label="Lock Icon">🔒</span></div>
@@ -50,7 +50,7 @@ export default function page() {
                         <div className="step-number">1</div>
                         <div className="step-content">
                             <h3 className="font-bold text-xl">Direct Message Us</h3>
-                            <p>Send your <strong>Matric Number, Email Address, and Phone Number</strong> to our official <strong>@skoolpay</strong> channel on Instagram or WhatsApp <strong>+234 806 485 2108</strong>.</p>
+                            <p>Send your <strong>Matric Number, Email Address, and Phone Number</strong> to our official <strong>@CoopHub</strong> channel on Instagram or WhatsApp <strong>+234 806 485 2108</strong>.</p>
                         </div>
                     </div>
 
@@ -91,7 +91,7 @@ export default function page() {
                             <span>+</span>
                         </div>
                         <div className="faq-answer">
-                            <p>Yes. SkoolPay is powered by CoopHub, a platform operated by Wema Bank, a licensed financial institution. Your most sensitive data (NIN, BVN) is collected, encrypted, and stored directly by Wema Bank under their stringent security controls. Our own privacy policy excludes this data.</p>
+                            <p>Yes. CoopHub is powered by CoopHub, a platform operated by Wema Bank, a licensed financial institution. Your most sensitive data (NIN, BVN) is collected, encrypted, and stored directly by Wema Bank under their stringent security controls. Our own privacy policy excludes this data.</p>
                         </div>
                     </div>
 
@@ -101,7 +101,7 @@ export default function page() {
                             <span>+</span>
                         </div>
                         <div className="faq-answer">
-                            <p>SkoolPay is built on transparency. All applicable platform or transaction fees will be clearly displayed to you before you confirm any transaction. There are no hidden charges.</p>
+                            <p>CoopHub is built on transparency. All applicable platform or transaction fees will be clearly displayed to you before you confirm any transaction. There are no hidden charges.</p>
                         </div>
                     </div>
 
@@ -133,7 +133,7 @@ export default function page() {
                         <div className="contact-method">
                             <div className="contact-icon"><span role="img" aria-label="Email Icon">✉️</span></div>
                             <h3 className="font-bold">Email Us</h3>
-                            <p><a href="mailto:support@skoolpay.ng">support@skoolpay.ng</a></p>
+                            <p><a href="mailto:support@CoopHub.ng">support@CoopHub.ng</a></p>
                         </div>
                         <div className="contact-method">
                             <div className="contact-icon"><span role="img" aria-label="Chat Icon">💬</span></div>
@@ -143,7 +143,7 @@ export default function page() {
                         <div className="contact-method">
                             <div className="contact-icon"><span role="img" aria-label="Globe Icon">🌐</span></div>
                             <h3 className="font-bold">Follow & DM</h3>
-                            <p>Follow <strong>@skoolpay</strong> on all social media platforms</p>
+                            <p>Follow <strong>@CoopHub</strong> on all social media platforms</p>
                         </div>
                     </div>
 
@@ -157,7 +157,7 @@ export default function page() {
             <section className="community" id="community">
                 <div className="container">
                     <h2 className="!mb-3 text-xl font-bold">Ready to Take Control of Your Education Funds?</h2>
-                    <p className="!mb-5">Be among the first to experience SkoolPay. Connect with us today to get started!</p>
+                    <p className="!mb-5">Be among the first to experience CoopHub. Connect with us today to get started!</p>
 
                     <form className="community-form">
                         <div className="form-group">
@@ -212,7 +212,7 @@ export default function page() {
                 <div className="container">
                     <div className="footer-content">
                         <div>
-                            <div className="footer-logo">SkoolPay</div>
+                            <div className="footer-logo">CoopHub</div>
                             <p>A product of Underdecanopy Digital Hub</p>
                             <p>(TIK Centre).</p>
                         </div>
@@ -223,16 +223,16 @@ export default function page() {
                             <a href="#contact">Contact</a>
                         </div>
                         <div className="footer-social">
-                            <p>Follow us: @skoolpay</p>
-                            <a href="https://facebook.com/skoolpay" aria-label="Follow us on Facebook"><i className="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
-                            <a href="https://twitter.com/skoolpay" aria-label="Follow us on Twitter"><i className="fa-brands fa-twitter" aria-hidden="true"></i></a>
-                            <a href="https://instagram.com/skoolpay" aria-label="Follow us on Instagram"><i className="fa-brands fa-instagram" aria-hidden="true"></i></a>
-                            <a href="https://youtube.com/skoolpay" aria-label="Follow us on YouTube"><i className="fa-brands fa-youtube" aria-hidden="true"></i></a>
-                            <a href="https://tiktok.com/skoolpay" aria-label="Follow us on Tiktok"><i className="fa-brands fa-tiktok" aria-hidden="true"></i></a>
+                            <p>Follow us: @CoopHub</p>
+                            <a href="https://facebook.com/CoopHub" aria-label="Follow us on Facebook"><i className="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                            <a href="https://twitter.com/CoopHub" aria-label="Follow us on Twitter"><i className="fa-brands fa-twitter" aria-hidden="true"></i></a>
+                            <a href="https://instagram.com/CoopHub" aria-label="Follow us on Instagram"><i className="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                            <a href="https://youtube.com/CoopHub" aria-label="Follow us on YouTube"><i className="fa-brands fa-youtube" aria-hidden="true"></i></a>
+                            <a href="https://tiktok.com/CoopHub" aria-label="Follow us on Tiktok"><i className="fa-brands fa-tiktok" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div className="footer-copyright">
-                        <p>&copy; 2025 SkoolPay. All rights reserved.</p>
+                        <p>&copy; 2025 CoopHub. All rights reserved.</p>
                     </div>
                 </div>
             </footer>
