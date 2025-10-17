@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./style.css";
-import { Navigation } from "./_components/Navigation";
 import StepCard from "./_components/StepCard";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 
@@ -12,35 +11,6 @@ export const metadata: Metadata = {
 export default function page() {
     return (
         <>
-            {/* <header role="banner" aria-label="Top header">
-                <div className="container">
-                    <div className="navbar" role="navigation" aria-label="Primary">
-                        <div className="logo">
-                            <i className="fas fa-graduation-cap" aria-hidden="true"></i>
-                            <div>
-                                <div className="brand">ApplySmart</div>
-                                <div style={{ fontSize: "13px", color: "gray" }}>Admission & Scholarship Support</div>
-                            </div>
-                        </div>
-
-                        <nav className="nav" aria-label="Main navigation">
-                            <a href="#main">Home</a>
-                            <a href="#how-it-works">Admissions</a>
-                            <a href="#scholarships">Scholarships</a>
-                            <a href="#blog">Blog</a>
-                            <a href="#services">Our Services</a>
-                            <a href="#contact">Contact</a>
-                            <a href="#admission-form" className="btn">Get Started</a>
-                        </nav>
-
-                        <button className="hamburger" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu" type="button">
-                            <i className="fas fa-bars" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </div>
-            </header> */}
-            <Navigation />
-
             <main>
                 <section className="hero" aria-labelledby="hero-title">
                     <div className="container">

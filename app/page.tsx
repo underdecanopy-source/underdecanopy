@@ -1,406 +1,617 @@
 import type { Metadata } from "next";
-import "./style.css";
 import Image from "next/image";
-import { Clock, Cpu, Facebook, FileUser, HandCoins, Instagram, LifeBuoy, Linkedin, LocationEditIcon, MapPinHouse, Phone, QrCode, School, Send, ShieldHalf, Twitter } from "lucide-react";
+import {
+  Clock,
+  Cpu,
+  Facebook,
+  FileUser,
+  HandCoins,
+  Instagram,
+  LifeBuoy,
+  Linkedin,
+  LocationEditIcon,
+  MapPinHouse,
+  Phone,
+  QrCode,
+  School,
+  Send,
+  ShieldHalf,
+  Twitter,
+  Printer,
+  Video,
+  Headset,
+  Laptop,
+  Paintbrush,
+  Code,
+  BookOpen,
+  Map,
+  Coffee,
+  Cookie,
+  Utensils,
+  GlassWater,
+  Star,
+  Mic,
+  MessageCircle,
+  MessageSquare,
+} from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Underdecanopy Digital Hub | Business Centre & Cafe",
-  description: "Underdecanopy Digital Hub is your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan. We offer services like business registration, IT support, digital training, and more.",
+  description:
+    "Underdecanopy Digital Hub is your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan. We offer services like business registration, IT support, digital training, and more.",
 };
-
 
 export default function page() {
   return (
     <>
       <Navigation />
 
-      <section className="hero !py-10">
-        <div className="container">
+      <section className="bg-gray-100 py-10">
+        <div className="container mx-auto px-4">
           <div className="flex justify-between flex-wrap items-center">
-            <div className="text-left max-w-[350px] md:max-w-[550px]">
-              <h1 className="text-sm">Welcome to Underdecanopy Digital Hub</h1>
-              <p className="text-xs">Your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan.</p>
-              <a href="#contact" className="cta-animate">Get Started Today</a>
+            <div className="text-left max-w-lg">
+              <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Underdecanopy Digital Hub</h1>
+              <p className="text-gray-600 mb-8">
+                Your trusted center for digital solutions, business services,
+                and a relaxing cafe experience in Ibadan.
+              </p>
+              <a href="#contact" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-300">
+                Get Started Today
+              </a>
             </div>
-            <Image src="/hub.png" alt="" className="hidden md:block md:w-[50%] rounded-full" width={1000} height={1000} />
+            <Image
+              src="/hub.png"
+              alt="Underdecanopy Digital Hub"
+              className="hidden md:block w-1/2 rounded-full shadow-lg"
+              width={1000}
+              height={1000}
+            />
           </div>
         </div>
       </section>
 
-      <section className="services-section" id="services">
-        <div className="container">
-          <div className="section-header">
-            <h2>Our Core Services</h2>
-            <p className="max-w-[400px] !mx-auto">Comprehensive digital solutions tailored to meet your business and personal needs</p>
+      <section className="py-16" id="services">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800">Our Core Services</h2>
+            <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+              Comprehensive digital solutions tailored to meet your business and
+              personal needs
+            </p>
           </div>
 
-          {/* <div className="services-container">
-            <a href="#" className="service-card">
-              <div className="icon"><i className="fas fa-laptop-code"></i></div>
-              <h3>TrustFix</h3>
-              <p>Sales, Repairs & IT Support</p>
-            </a>
-
-            <a href="#" className="service-card">
-              <div className="icon"><i className="fas fa-business-time"></i></div>
-              <h3>Swift Wheel</h3>
-              <p>Business Registration, CAC Returns & Co.</p>
-            </a>
-
-            <a href="#" className="service-card">
-              <div className="icon"><i className="fas fa-graduation-cap"></i></div>
-              <h3>TechLift</h3>
-              <p>Computer & Digital Training</p>
-            </a>
-
-            <a href="#" className="service-card">
-              <div className="icon"><i className="fas fa-file-alt"></i></div>
-              <h3>ApplySmart</h3>
-              <p>Admissions & Online Registration</p>
-            </a>
-
-            <a href="#" className="service-card">
-              <div className="icon"><i className="fas fa-credit-card"></i></div>
-              <h3>SchoolPay</h3>
-              <p>School Fee Payments</p>
-            </a>
-
-            <a href="#" className="service-card">
-              <div className="icon"><i className="fas fa-hand-holding-usd"></i></div>
-              <h3>Digital Cooperative</h3>
-              <p>Cooperative Banking & Loans</p>
-            </a>
-
-            <a href="#" className="service-card">
-              <div className="icon"><i className="fas fa-baby"></i></div>
-              <h3>State of Origin</h3>
-              <p>Certificate Application</p>
-            </a>
-
-            <a href="#" className="service-card">
-              <div className="icon"><i className="fas fa-receipt"></i></div>
-              <h3>SmartTax Receipts</h3>
-              <p>Digital Receipts, Record-Keeping & Tax Reporting</p>
-            </a>
-          </div> */}
-
-          <div className="services-grid">
-            <div className="service-detail">
-              <h3 className="!gap-3"> <div className="!p-2 rounded-full bg-gray-300"><ShieldHalf size={40} /></div> TrustFix</h3>
-              <p>Discover top-notch computer and accessories sales, expert repairs, upgrades, and reliable IT support all in one place.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
+                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
+                  <ShieldHalf size={32} />
+                </span>
+                TrustFix
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Discover top-notch computer and accessories sales, expert
+                repairs, upgrades, and reliable IT support all in one place.
+              </p>
+              <Link href="/trustfix" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
-            <div className="service-detail">
-              <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><LifeBuoy size={40} /></div> Swift Wheel</h3>
-              <p>Register your business and file annual returns with ease. We handle CAC processes quickly and professionally.</p>
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
+                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
+                  <LifeBuoy size={32} />
+                </span>
+                Swift Wheel
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Register your business and file annual returns with ease. We
+                handle CAC processes quickly and professionally.
+              </p>
+              <Link href="/swiftwheel" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
-            <div className="service-detail">
-              <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><Cpu size={40} /></div> TechLift</h3>
-              <p>Advance your career with hands-on training in computers, programming, graphics, and digital technologies from certified experts.</p>
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
+                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
+                  <Cpu size={32} />
+                </span>
+                TechLift
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Advance your career with hands-on training in computers,
+                programming, graphics, and digital technologies from certified
+                experts.
+              </p>
+              <Link href="/techlift" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
-            <div className="service-detail">
-              <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><FileUser size={40} /></div> ApplySmart</h3>
-              <p>Fast, easy, and reliable Post UTME, admission applications, and online registration for schools and universities.</p>
-              <div className="inline-block bg-[#ff9800] rounded-lg shadow text-white font-medium text-sm !px-5 !p-2 !mt-3"><Link href="/applysmart">Let's Go</Link></div>
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
+                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
+                  <FileUser size={32} />
+                </span>
+                ApplySmart
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Fast, easy, and reliable Post UTME, admission applications, and
+                online registration for schools and universities.
+              </p>
+              <Link href="/applysmart" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
-            <div className="service-detail">
-              <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><School size={40} /></div> CoopHub</h3>
-              <p>Make school fee payments simple and secure with our trusted online solutions for students and parents.</p>
-              <div className="inline-block bg-[#ff9800] rounded-lg shadow text-white font-medium text-sm !px-5 !p-2 !mt-3"><Link href="/coophub">Let's Go</Link></div>
-
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
+                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
+                  <School size={32} />
+                </span>
+                CoopHub
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Simplify your school and cooperative financial life in one
+                place. Make secure fee payments, manage savings and
+                contributions, and access instant loans, all through our
+                trusted digital cooperative platform for students and parents.
+              </p>
+              <Link href="/coophub" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
-            <div className="service-detail">
-              <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><QrCode size={40} /></div> Digital Cooperative</h3>
-              <p>Enjoy secure, stress-free cooperative banking, easy savings, contributions, and instant loan access with minimal paperwork.</p>
-            </div>
-
-            <div className="service-detail">
-              <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><MapPinHouse size={40} /></div> State of Origin</h3>
-              <p>Apply for and receive official State of Origin certificates from any of the 36 states in Nigeria.</p>
-            </div>
-
-            <div className="service-detail">
-              <h3 className="!gap-3"><div className="!p-2 rounded-full bg-gray-300"><HandCoins size={40} /></div>SmartTax Receipts</h3>
-              <p>Our digital receipt system not only makes receiving receipts more convenient for your customers, it takes the stress out of customers having to hold onto their receipts when tax time rolls around.</p>
-            </div>
-          </div>
-        </div>
-      </section >
-
-      <section className="additional-services" id="additional">
-        <div className="container">
-          <div className="section-header">
-            <h2>Professional Services</h2>
-            <p className="max-w-[400px] !mx-auto">Comprehensive solutions to meet all your business and personal needs</p>
-          </div>
-
-          <div className="services-grid-alt">
-            <div className="service-alt-card">
-              <div className="icon"><i className="fas fa-print"></i></div>
-              <h3>Printing & Photocopy</h3>
-              <p>High-quality document printing, photocopying, and scanning services.</p>
-            </div>
-
-            <div className="service-alt-card">
-              <div className="icon"><i className="fas fa-video"></i></div>
-              <h3>Church Media</h3>
-              <p>Audio-visual support, live streaming, and media production for churches.</p>
-            </div>
-
-            <div className="service-alt-card">
-              <div className="icon"><i className="fas fa-headset"></i></div>
-              <h3>IT User Support</h3>
-              <p>Technical assistance, troubleshooting, and user training for IT systems.</p>
-            </div>
-
-            <div className="service-alt-card">
-              <div className="icon"><i className="fas fa-laptop"></i></div>
-              <h3>School Management</h3>
-              <p>Sales and setup of school management and e-learning software.</p>
-            </div>
-
-            <div className="service-alt-card">
-              <div className="icon"><i className="fas fa-paint-brush"></i></div>
-              <h3>Graphics Design</h3>
-              <p>Professional presentations, flyers, banners, and graphic design services.</p>
-            </div>
-
-            <div className="service-alt-card">
-              <div className="icon"><i className="fas fa-code"></i></div>
-              <h3>Web Development</h3>
-              <p>Custom websites, web apps, and online solutions for your business.</p>
-            </div>
-
-            <div className="service-alt-card">
-              <div className="icon"><i className="fas fa-book-open"></i></div>
-              <h3>Student Research Companion</h3>
-              <p>Comprehensive research assistance including project topics, materials, and 24/7 support from experienced academic writers.</p>
-            </div>
-
-            <div className="service-alt-card">
-              <div className="icon"><i className="fas fa-map-marked-alt"></i></div>
-              <h3>Space Rentals & Delivery Services</h3>
-              <p>We connect students with verified rentals and provide local delivery services across Ibadan.</p>
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
+                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
+                  <HandCoins size={32} />
+                </span>
+                SmartTax Receipts
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Our digital receipt system not only makes receiving receipts
+                more convenient for your customers, it takes the stress out of
+                customers having to hold onto their receipts when tax time
+                rolls around.
+              </p>
+              <Link href="/smarttax" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="cafe-section" id="cafe">
-        <div className="container">
-          <div className="section-header">
-            <h2 style={{ color: "orange" }}>Cafe Experience</h2>
-            <p className="max-w-[400px] !mx-auto">Enjoy snacks, meals, and beverages while you work or learn. Relax in our cozy cafe area.</p>
+      <section className="bg-gray-100 py-16" id="additional">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800">Professional Services</h2>
+            <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+              Comprehensive solutions to meet all your business and personal
+              needs
+            </p>
           </div>
 
-          <div className="menu-grid">
-            <div className="menu-card">
-              <div className="menu-icon"><i className="fas fa-coffee"></i></div>
-              <h3>Coffee & Tea</h3>
-              <p>Freshly brewed coffee, herbal teas, and hot chocolate.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
+                <Printer />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Printing & Photocopy</h3>
+              <p className="text-gray-600">
+                High-quality document printing, photocopying, and scanning
+                services.
+              </p>
             </div>
 
-            <div className="menu-card">
-              <div className="menu-icon"><i className="fas fa-cookie-bite"></i></div>
-              <h3>Pastries & Snacks</h3>
-              <p>Croissants, meat pies, doughnuts, chin-chin, and more.</p>
+            <div className="text-center">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
+                <Video />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Church Media</h3>
+              <p className="text-gray-600">
+                Audio-visual support, live streaming, and media production for
+                churches.
+              </p>
             </div>
 
-            <div className="menu-card">
-              <div className="menu-icon"><i className="fas fa-utensils"></i></div>
-              <h3>Meals</h3>
-              <p>Rice dishes, noodles, and light meals for busy days.</p>
+            <div className="text-center">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
+                <Headset />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">IT User Support</h3>
+              <p className="text-gray-600">
+                Technical assistance, troubleshooting, and user training for IT
+                systems.
+              </p>
             </div>
 
-            <div className="menu-card">
-              <div className="menu-icon"><i className="fas fa-glass-whiskey"></i></div>
-              <h3>Cold Drinks</h3>
-              <p>Soft drinks, bottled water, and fresh juices.</p>
+            <div className="text-center">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
+                <Laptop />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">School Management</h3>
+              <p className="text-gray-600">
+                Sales and setup of school management and e-learning software.
+              </p>
             </div>
 
-            <div className="menu-card">
-              <div className="menu-icon"><i className="fas fa-star"></i></div>
-              <h3>Daily Specials</h3>
-              <p>Ask for our chef's special and combo offers.</p>
+            <div className="text-center">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
+                <Paintbrush />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Graphics Design</h3>
+              <p className="text-gray-600">
+                Professional presentations, flyers, banners, and graphic design
+                services.
+              </p>
             </div>
 
-            <div className="menu-card">
-              <div className="menu-icon"><i className="fas fa-star"></i></div>
-              <h3>Café Experience</h3>
-              <p>Relax, work, or connect with others in our cozy cafe while enjoying our menu.</p>
+            <div className="text-center">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
+                <Code />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Web Development</h3>
+              <p className="text-gray-600">
+                Custom websites, web apps, and online solutions for your
+                business.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
+                <BookOpen />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Student Research Companion</h3>
+              <p className="text-gray-600">
+                Comprehensive research assistance including project topics,
+                materials, and 24/7 support from experienced academic writers.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
+                <Map />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Space Rentals & Delivery Services</h3>
+              <p className="text-gray-600">
+                We connect students with verified rentals and provide local
+                delivery services across Ibadan.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="podcast-section" id="podcast">
-        <div className="container">
-          <div className="podcast-content">
-            <h2><i className="fas fa-podcast"></i> Underdecanopy Podcast</h2>
-            <p>Tune in to our episodes for digital tips and business insights from Ibadan and beyond.</p>
-            <a href="https://example.com/podcast" className="podcast-btn">Listen to Our Podcast</a>
+      <section className="py-16" id="cafe">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-orange-500">Cafe Experience</h2>
+            <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+              Enjoy snacks, meals, and beverages while you work or learn. Relax
+              in our cozy cafe area.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
+                <Coffee />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Coffee & Tea</h3>
+              <p className="text-gray-600">Freshly brewed coffee, herbal teas, and hot chocolate.</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
+                <Cookie />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Pastries & Snacks</h3>
+              <p className="text-gray-600">Croissants, meat pies, doughnuts, chin-chin, and more.</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
+                <Utensils />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Meals</h3>
+              <p className="text-gray-600">Rice dishes, noodles, and light meals for busy days.</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
+                <GlassWater />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Cold Drinks</h3>
+              <p className="text-gray-600">Soft drinks, bottled water, and fresh juices.</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
+                <Star />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Specials</h3>
+              <p className="text-gray-600">Ask for our chef's special and combo offers.</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
+                <Star />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Café Experience</h3>
+              <p className="text-gray-600">
+                Relax, work, or connect with others in our cozy cafe while
+                enjoying our menu.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="contact-section" id="contact">
-        <div className="container">
-          <div className="section-header">
-            <h2>Contact Us</h2>
-            <p className="max-w-[400px] !mx-auto">Reach out for inquiries, support, or to schedule a visit</p>
+      <section className="bg-orange-500 text-white py-16" id="podcast">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
+            <Mic /> Underdecanopy Podcast
+          </h2>
+          <p className="max-w-2xl mx-auto mb-8">
+            Tune in to our episodes for digital tips and business insights
+            from Ibadan and beyond.
+          </p>
+          <a href="https://example.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-colors duration-300">
+            Listen to Our Podcast
+          </a>
+        </div>
+      </section>
+
+      <section className="py-16" id="contact">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800">Contact Us</h2>
+            <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+              Reach out for inquiries, support, or to schedule a visit
+            </p>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Get In Touch</h3>
 
-          <div className="contact-container">
-            <div className="contact-info">
-              <h3>Get In Touch</h3>
-
-              <div className="contact-item flex gap-3 !mb-8">
-                <LocationEditIcon size={25} />
+              <div className="flex items-start gap-4 mb-6">
+                <LocationEditIcon size={24} className="text-orange-500 mt-1" />
                 <div>
-                  <h4>Location</h4>
-                  <p>Love Garden, Opposite Zenith Bank, North Campus, The Polytechnic, Ibadan, Oyo State.</p>
+                  <h4 className="font-semibold text-gray-800">Location</h4>
+                  <p className="text-gray-600">
+                    Love Garden, Opposite Zenith Bank, North Campus, The
+                    Polytechnic, Ibadan, Oyo State.
+                  </p>
                 </div>
               </div>
 
-              <div className="contact-item flex gap-3 !mb-8">
-                <Phone size={25} />
+              <div className="flex items-start gap-4 mb-6">
+                <Phone size={24} className="text-orange-500 mt-1" />
                 <div>
-                  <h4>Phone</h4>
-                  <p>+234 806 485 2108</p>
+                  <h4 className="font-semibold text-gray-800">Phone</h4>
+                  <p className="text-gray-600">+234 806 485 2108</p>
                 </div>
               </div>
 
-              <div className="contact-item flex gap-3 !mb-8">
-                <Send size={25} />
+              <div className="flex items-start gap-4 mb-6">
+                <Send size={24} className="text-orange-500 mt-1" />
                 <div>
-                  <h4>Email</h4>
-                  <p>underdecanopy@gmail.com</p>
+                  <h4 className="font-semibold text-gray-800">Email</h4>
+                  <p className="text-gray-600">underdecanopy@gmail.com</p>
                 </div>
               </div>
 
-              <div className="contact-item flex gap-3 !mb-8">
-                <Clock size={25} />
+              <div className="flex items-start gap-4">
+                <Clock size={24} className="text-orange-500 mt-1" />
                 <div>
-                  <h4>Working Hours</h4>
-                  <p>Monday - Friday: 9AM - 6PM</p>
-                  <p>Saturday: 10AM - 4PM</p>
+                  <h4 className="font-semibold text-gray-800">Working Hours</h4>
+                  <p className="text-gray-600">Monday - Friday: 9AM - 6PM</p>
+                  <p className="text-gray-600">Saturday: 10AM - 4PM</p>
                 </div>
               </div>
             </div>
 
-            <div className="contact-form">
-              <h3>Send a Message</h3>
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Send a Message</h3>
               <form id="contactForm">
-                <div className="form-group">
-                  <label >Full Name</label>
-                  <input type="text" id="name" placeholder="Enter your name" required />
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter your name"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
                 </div>
 
-                <div className="form-group">
-                  <label>Email Address</label>
-                  <input type="email" id="email" placeholder="Enter your email" required />
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
                 </div>
 
-                <div className="form-group">
-                  <label>Subject</label>
-                  <input type="text" id="subject" placeholder="Enter subject" />
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-2">Subject</label>
+                  <input type="text" id="subject" placeholder="Enter subject" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
                 </div>
 
-                <div className="form-group">
-                  <label>Message</label>
-                  <textarea id="message" placeholder="Enter your message" required></textarea>
+                <div className="mb-6">
+                  <label className="block text-gray-700 font-semibold mb-2">Message</label>
+                  <textarea
+                    id="message"
+                    placeholder="Enter your message"
+                    required
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  ></textarea>
                 </div>
 
-                <button type="submit" className="submit-btn">Send Message</button>
+                <button type="submit" className="w-full bg-orange-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition-colors duration-300">
+                  Send Message
+                </button>
               </form>
             </div>
           </div>
         </div>
       </section>
 
-
-      <footer>
-        <div className="container">
-          <div className="footer-container">
+      <footer className="bg-gray-800 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div className="footer-col">
-              <h4>Underdecanopy Digital Hub</h4>
-              <p>Your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan.</p>
-              <div className="social-links">
-                <a href="https://facebook.com/underdecanopy" target="_blank" rel="noopener"><Facebook /></a>
-                <a href="https://twitter.com/underdecanopy" target="_blank" rel="noopener"><Twitter /></a>
-                <a href="https://instagram.com/underdecanopy" target="_blank" rel="noopener"><Instagram /></a>
-                <a href="https://linkedin.com/company/underdecanopy" target="_blank" rel="noopener"><Linkedin /></a>
+              <h4 className="text-lg font-bold mb-4">Underdecanopy Digital Hub</h4>
+              <p className="text-gray-400">
+                Your trusted center for digital solutions, business services,
+                and a relaxing cafe experience in Ibadan.
+              </p>
+              <div className="flex gap-4 mt-4">
+                <a
+                  href="https://facebook.com/underdecanopy"
+                  target="_blank"
+                  rel="noopener"
+                  aria-label="Facebook"
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Facebook />
+                </a>
+                <a
+                  href="https://twitter.com/underdecanopy"
+                  target="_blank"
+                  rel="noopener"
+                  aria-label="Twitter"
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Twitter />
+                </a>
+                <a
+                  href="https://instagram.com/underdecanopy"
+                  target="_blank"
+                  rel="noopener"
+                  aria-label="Instagram"
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Instagram />
+                </a>
+                <a
+                  href="https://linkedin.com/company/underdecanopy"
+                  target="_blank"
+                  rel="noopener"
+                  aria-label="LinkedIn"
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Linkedin />
+                </a>
               </div>
             </div>
 
-            <div className="footer-col">
-              <h4>Quick Links</h4>
-              <ul className="footer-links">
-                <li><a href="#" className="home-link">Home</a></li>
-                <li><a href="#additional">Professional Services</a></li>
-                <li><a href="#services">Core Services</a></li>
-                <li><a href="#cafe">Cafe Experience</a></li>
-                <li><a href="#podcast">Podcast</a></li>
-                <li><a href="#contact">Contact</a></li>
+            <div>
+              <h4 className="text-lg font-bold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="#additional" className="text-gray-400 hover:text-white">Professional Services</a>
+                </li>
+                <li>
+                  <a href="#services" className="text-gray-400 hover:text-white">Core Services</a>
+                </li>
+                <li>
+                  <a href="#cafe" className="text-gray-400 hover:text-white">Cafe Experience</a>
+                </li>
+                <li>
+                  <a href="#podcast" className="text-gray-400 hover:text-white">Podcast</a>
+                </li>
+                <li>
+                  <a href="#contact" className="text-gray-400 hover:text-white">Contact</a>
+                </li>
               </ul>
             </div>
 
-            <div className="footer-col">
-              <h4>Our Services</h4>
-              <ul className="footer-links">
-                <li><a href="#">TrustFix</a></li>
-                <li><a href="#">Swift Wheel</a></li>
-                <li><a href="#">TechLift</a></li>
-                <li><a href="#">ApplySmart</a></li>
-                <li><a href="#">SchoolPay</a></li>
-                <li><a href="#">Digital Cooperative</a></li>
-                <li><a href="#">State of Origin</a></li>
-                <li><a href="#">SmartTax Receipts</a></li>
+            <div>
+              <h4 className="text-lg font-bold mb-4">Our Services</h4>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">TrustFix</a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">Swift Wheel</a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">TechLift</a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">ApplySmart</a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">SchoolPay</a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">SmartTax Receipts</a>
+                </li>
               </ul>
             </div>
 
-            <div className="footer-col">
-              <h4>Newsletter</h4>
-              <p>Subscribe for updates and offers.</p>
+            <div>
+              <h4 className="text-lg font-bold mb-4">Newsletter</h4>
+              <p className="text-gray-400 mb-4">Subscribe for updates and offers.</p>
               <form id="newsletterForm">
-                <div className="form-group">
-                  <input type="email" placeholder="Enter your email" required style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "none" }} />
+                <div className="flex">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    required
+                    className="w-full px-4 py-2 text-gray-800 border border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-orange-500 text-white px-4 rounded-r-lg hover:bg-orange-600 transition-colors duration-300"
+                  >
+                    Subscribe
+                  </button>
                 </div>
-                <button type="submit" className="submit-btn" style={{ marginTop: "10px" }}>Subscribe</button>
               </form>
             </div>
           </div>
 
-          <div className="copyright">
+          <div className="border-t border-gray-700 pt-8 text-center text-gray-400">
             <p>&copy; 2025 Underdecanopy Digital Hub. All Rights Reserved.</p>
           </div>
         </div>
       </footer>
 
-      <div className="chatbot-widget" id="chatbotWidget">
-        <div className="chatbot-header">
-          <span>Chat with us</span>
+      <div className="fixed bottom-4 right-4 z-50">
+        <div id="chatbotWidget" className="hidden bg-white w-80 h-96 rounded-lg shadow-lg flex flex-col">
+          <div className="bg-orange-500 text-white p-4 rounded-t-lg flex justify-between items-center">
+            <h3 className="font-semibold">Chat with us</h3>
+          </div>
+          <div id="chat-box" className="flex-grow p-4 overflow-y-auto"></div>
+          <div className="p-4 border-t border-gray-200">
+            <div className="flex gap-2">
+              <input type="text" id="chat-input" placeholder="Type a message..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              <button id="chat-send" className="bg-orange-500 text-white p-2 rounded-lg">
+                <Send />
+              </button>
+            </div>
+          </div>
         </div>
-        <div id="chat-box" className="chat-box"></div>
-        <div className="chatbot-input">
-          <input type="text" id="chat-input" placeholder="Type a message..." />
-          <button id="chat-send"><i className="fas fa-paper-plane"></i></button>
-        </div>
-      </div>
-      <div className="chat-toggle" id="chatToggle">
-        <i className="fas fa-comment"></i>
+        <button id="chatToggle" className="bg-orange-500 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center">
+          <MessageCircle size={32} />
+        </button>
       </div>
 
-      <a href="https://wa.me/2348064852108?text=Hello%20Underdecanopy%20Digital%20Hub!%20I%20have%20an%20enquiry." className="whatsapp-float" aria-label="Chat on WhatsApp" target="_blank" rel="noopener">
-        <i className="fab fa-whatsapp"></i>
+      <a
+        href="https://wa.me/2348064852108?text=Hello%20Underdecanopy%20Digital%20Hub!%20I%20have%20an%20enquiry."
+        className="fixed bottom-24 right-4 z-50 bg-green-500 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center"
+        aria-label="Chat on WhatsApp"
+        target="_blank"
+        rel="noopener"
+      >
+        <MessageSquare size={32} />
       </a>
     </>
-  )
+  );
 }
