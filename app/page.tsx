@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
-import Image from "next/image";
+'use client';
+
+import Image from 'next/image';
 import {
   Clock,
   Cpu,
@@ -33,17 +34,160 @@ import {
   Mic,
   MessageCircle,
   MessageSquare,
-} from "lucide-react";
-import { Navigation } from "@/components/Navigation";
-import Link from "next/link";
+} from 'lucide-react';
+import { useFormState, useFormStatus } from 'react-dom';
+import { Navigation } from '@/components/Navigation';
+import Link from 'next/link';
+import { submitContactForm, type State } from '@/lib/actions/contact';
+import {
+  subscribeToNewsletter,
+  type NewsletterState,
+} from '@/lib/actions/newsletter';
 
-export const metadata: Metadata = {
-  title: "Underdecanopy Digital Hub | Business Centre & Cafe",
-  description:
-    "Underdecanopy Digital Hub is your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan. We offer services like business registration, IT support, digital training, and more.",
-};
+function SubmitButton() {
+  const { pending } = useFormStatus();
 
-export default function page() {
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full bg-orange-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition-colors duration-300 disabled:bg-gray-400"
+    >
+      {pending ? 'Sending...' : 'Send Message'}
+    </button>
+  );
+}
+
+function ContactForm() {
+  const initialState: State = { message: null, errors: {} };
+  const [state, dispatch] = useFormState(submitContactForm, initialState);
+
+  return (
+    <div className="bg-white p-8 rounded-lg shadow-md">
+      <h3 className="text-2xl font-bold text-gray-800 mb-6">Send a Message</h3>
+      <form action={dispatch}>
+        <div className="mb-4">
+          <label htmlFor="name" className="block text-gray-700 font-semibold mb-2">
+            Full Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter your name"
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+          {state.errors?.name && (
+            <p className="text-red-500 text-sm mt-1">{state.errors.name[0]}</p>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-gray-700 font-semibold mb-2">
+            Email Address
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+          {state.errors?.email && (
+            <p className="text-red-500 text-sm mt-1">{state.errors.email[0]}</p>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="subject" className="block text-gray-700 font-semibold mb-2">
+            Subject
+          </label>
+          <input
+            type="text"
+            id="subject"
+            name="subject"
+            placeholder="Enter subject"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label htmlFor="message" className="block text-gray-700 font-semibold mb-2">
+            Message
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            placeholder="Enter your message"
+            required
+            rows={4}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          ></textarea>
+          {state.errors?.message && (
+            <p className="text-red-500 text-sm mt-1">
+              {state.errors.message[0]}
+            </p>
+          )}
+        </div>
+
+        <SubmitButton />
+
+        {state.message && (
+          <p
+            className={`mt-4 text-sm ${
+              state.errors ? 'text-red-500' : 'text-green-500'
+            }`}
+          >
+            {state.message}
+          </p>
+        )}
+      </form>
+    </div>
+  );
+}
+
+function NewsletterSubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="bg-orange-500 text-white px-4 rounded-r-lg hover:bg-orange-600 transition-colors duration-300 disabled:bg-gray-400"
+    >
+      {pending ? 'Subscribing...' : 'Subscribe'}
+    </button>
+  );
+}
+
+function NewsletterForm() {
+  const initialState: NewsletterState = { message: null, errors: {} };
+  const [state, dispatch] = useFormState(subscribeToNewsletter, initialState);
+
+  return (
+    <form action={dispatch}>
+      <div className="flex">
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+          className="w-full px-4 py-2 text-gray-800 border border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
+        <NewsletterSubmitButton />
+      </div>
+      {state.errors?.email && (
+        <p className="text-red-500 text-sm mt-1">{state.errors.email[0]}</p>
+      )}
+      {state.message && !state.errors && (
+        <p className="text-green-500 text-sm mt-1">{state.message}</p>
+      )}
+    </form>
+  );
+}
+
+export default function Page() {
   return (
     <>
       <Navigation />
@@ -406,52 +550,7 @@ export default function page() {
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">Send a Message</h3>
-              <form id="contactForm">
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-semibold mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    id="name"
-                    placeholder="Enter your name"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-semibold mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter your email"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-semibold mb-2">Subject</label>
-                  <input type="text" id="subject" placeholder="Enter subject" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-gray-700 font-semibold mb-2">Message</label>
-                  <textarea
-                    id="message"
-                    placeholder="Enter your message"
-                    required
-                    rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  ></textarea>
-                </div>
-
-                <button type="submit" className="w-full bg-orange-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition-colors duration-300">
-                  Send Message
-                </button>
-              </form>
-            </div>
+            <ContactForm />
           </div>
         </div>
       </section>
@@ -558,22 +657,7 @@ export default function page() {
             <div>
               <h4 className="text-lg font-bold mb-4">Newsletter</h4>
               <p className="text-gray-400 mb-4">Subscribe for updates and offers.</p>
-              <form id="newsletterForm">
-                <div className="flex">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    required
-                    className="w-full px-4 py-2 text-gray-800 border border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-orange-500 text-white px-4 rounded-r-lg hover:bg-orange-600 transition-colors duration-300"
-                  >
-                    Subscribe
-                  </button>
-                </div>
-              </form>
+              <NewsletterForm />
             </div>
           </div>
 
