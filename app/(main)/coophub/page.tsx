@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HandHoldingUsd, GraduationCap, Users, ShieldAlt, ChartLine, MobileAlt, UserCheck, Clock, Lock, UserShield, Fingerprint, ShieldCheck, Envelope, Globe, PhoneAlt, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
+import { HandHelping, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Shield, Fingerprint, ShieldCheck, Mail, Globe, Phone, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
 
 const config = {
     whatsAppNumber: "+2348064852108",
@@ -114,7 +114,7 @@ export default function Page() {
                         <div className="features-grid">
                             <div className="feature-card">
                                 <div className="feature-icon" aria-hidden="true">
-                                    <ShieldAlt />
+                                    <Shield />
                                 </div>
                                 <h3>Bank-Grade Security</h3>
                                 <p>Your data is protected with full digital footprints. Sensitive information is handled directly by Wema Bank.</p>
@@ -130,7 +130,7 @@ export default function Page() {
 
                             <div className="feature-card">
                                 <div className="feature-icon" aria-hidden="true">
-                                    <HandHoldingUsd />
+                                    <HandHelping />
                                 </div>
                                 <h3>Loan Access</h3>
                                 <p>Quick access to loans based on your contributions without lengthy paperwork.</p>
@@ -138,7 +138,7 @@ export default function Page() {
 
                             <div className="feature-card">
                                 <div className="feature-icon" aria-hidden="true">
-                                    <MobileAlt />
+                                    <Smartphone />
                                 </div>
                                 <h3>100% Digital</h3>
                                 <p>Complete digital experience accessible from anywhere on your mobile device.</p>
@@ -256,7 +256,7 @@ export default function Page() {
 
                             <div className="security-card">
                                 <div className="security-icon" aria-hidden="true">
-                                    <UserShield />
+                                    <Shield />
                                 </div>
                                 <h3>Wema Bank Backed</h3>
                                 <p>Powered by CoopHub, a platform operated by Wema Bank.</p>
@@ -299,12 +299,12 @@ export default function Page() {
 
                 <section className="contact" id="contact">
                     <div className="container">
-                        <h2 className="section-title section-title-light">We're Here to Help</h2>
-                        <p style={{ textAlign: 'center', marginBottom: '3rem', color: 'var(--gray)' }}>Can't find what you're looking for? Reach out to our support team.</p>
+                        <h2 className="section-title section-title-light">We&apos;re Here to Help</h2>
+                        <p style={{ textAlign: 'center', marginBottom: '3rem', color: 'var(--gray)' }}>Can&apos;t find what you&apos;re looking for? Reach out to our support team.</p>
 
                         <div className="contact-methods">
                             <div className="contact-method">
-                                <div className="contact-icon" aria-hidden="true"><Envelope /></div>
+                                <div className="contact-icon" aria-hidden="true"><Mail /></div>
                                 <h3>Email Us</h3>
                                 <p><a href={`mailto:${config.email}`}>{config.email}</a></p>
                             </div>
@@ -329,13 +329,13 @@ export default function Page() {
                 <section className="get-started" id="get-started">
                     <div className="container">
                         <div className="section-header">
-                            <h2><PhoneAlt /> Get Started Today</h2>
+                            <h2><Phone /> Get Started Today</h2>
                             <p>Join thousands of people who are enjoying stress-free financial management.</p>
                         </div>
 
                         <div className="cta-buttons">
                             <a href={`tel:${config.phone}`} className="cta-button-large phone-button">
-                                <PhoneAlt /> Call: {config.phone}
+                                <Phone /> Call: {config.phone}
                             </a>
                             <span className="separator" role="separator">OR</span>
                             <a href={`https://wa.me/${config.whatsAppNumber.replace('+', '')}`} className="cta-button-large whatsapp-button">
@@ -367,7 +367,7 @@ export default function Page() {
                         <div>
                             <div className="footer-logo">
                                 <div className="logo-icon" aria-hidden="true">
-                                    <HandHoldingUsd />
+                                    <HandHelping />
                                 </div>
                                 CoopHub
                             </div>

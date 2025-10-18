@@ -1,4 +1,5 @@
 import Script from 'next/script';
+import Link from 'next/link';
 
 export default function TrustFixPage() {
   return (
@@ -181,13 +182,13 @@ export default function TrustFixPage() {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
-              <a href="/" className="flex items-center space-x-2" aria-label="TrustFix Home">
+              <Link href="/" className="flex items-center space-x-2" aria-label="TrustFix Home">
                 <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" role="img" aria-labelledby="footer-logo-title">
                   <title id="footer-logo-title">TrustFix Logo</title>
                   <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"></path>
                 </svg>
                 <span className="text-xl font-bold">TrustFix</span>
-              </a>
+              </Link>
               <p className="mt-2 text-gray-400">Smart. Trustworthy. Fast.</p>
             </div>
             <div className="flex space-x-6">

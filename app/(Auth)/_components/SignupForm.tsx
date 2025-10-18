@@ -22,7 +22,7 @@ export default function SignupForm() {
             toast.success("Signed Up, Please check your email")
             router.replace("/")
         }
-    }, [state])
+    }, [state, router])
 
     return (
         <form action={signUpAction}>

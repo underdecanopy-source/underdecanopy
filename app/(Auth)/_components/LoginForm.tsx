@@ -22,7 +22,7 @@ export default function LoginForm() {
             toast.success("Logged In")
             router.replace("/")
         }
-    }, [state])
+    }, [state, router])
 
     return (
         <form action={loginAction}>

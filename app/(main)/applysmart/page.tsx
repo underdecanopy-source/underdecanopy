@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./style.css";
 import StepCard from "./_components/StepCard";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import Image from "next/image";
 
 export const metadata: Metadata = {
     title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -140,7 +141,7 @@ export default function page() {
                             </div>
 
                             <div className="hero-image">
-                                <img loading="lazy" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='480' viewBox='0 0 640 480'%3E%3Crect width='100%25' height='100%25' fill='%230056b3'/%3E%3Cpath d='M320,120 L440,200 L440,360 L200,360 L200,200 Z' fill='%23ff6b00'/%3E%3Ccircle cx='320' cy='240' r='60' fill='%2300a651'/%3E%3Cpath d='M240,360 L400,360 L400,400 L240,400 Z' fill='%2300a651'/%3E%3Cpath d='M280,120 L360,120 L360,160 L280,160 Z' fill='%2300a651'/%3E%3Ctext x='320' y='420' text-anchor='middle' fill='white' font-family='Poppins' font-size='24' font-weight='bold'%3EApplySmart%3C/text%3E%3C/svg%3E" alt="Illustration of ApplySmart service helping students with university admissions" />
+                                <Image loading="lazy" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='480' viewBox='0 0 640 480'%3E%3Crect width='100%25' height='100%25' fill='%230056b3'/%3E%3Cpath d='M320,120 L440,200 L440,360 L200,360 L200,200 Z' fill='%23ff6b00'/%3E%3Ccircle cx='320' cy='240' r='60' fill='%2300a651'/%3E%3Cpath d='M240,360 L400,360 L400,400 L240,400 Z' fill='%2300a651'/%3E%3Cpath d='M280,120 L360,120 L360,160 L280,160 Z' fill='%2300a651'/%3E%3Ctext x='320' y='420' text-anchor='middle' fill='white' font-family='Poppins' font-size='24' font-weight='bold'%3EApplySmart%3C/text%3E%3C/svg%3E" alt="Illustration of ApplySmart service helping students with university admissions" width={640} height={480} />
                             </div>
                         </div>
                     </div>
@@ -598,7 +599,7 @@ export default function page() {
                         </div>
 
                         <div className="testimonial" role="article" aria-label="Testimonial from Chinedu">
-                            <p>"ApplySmart helped me realize that my JAMB score of 248 was competitive for Computer Science at UNILAG. Their analysis was spot on, and I got admitted! They also matched me with two scholarships I qualified for."</p>
+                            <p>&quot;ApplySmart helped me realize that my JAMB score of 248 was competitive for Computer Science at UNILAG. Their analysis was spot on, and I got admitted! They also matched me with two scholarships I qualified for.&quot;</p>
                             <div className="author">
                                 <i className="fas fa-user-graduate" aria-hidden="true"></i>
                                 <span>Chinedu Okoro - UNILAG, Computer Science</span>
