@@ -36,6 +36,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import Link from 'next/link';
 import { submitContactForm, type State } from '@/lib/actions/contact';
@@ -667,25 +668,7 @@ export default function Page() {
         </div>
       </footer>
 
-      <div className="fixed bottom-4 right-4 z-50">
-        <div id="chatbotWidget" className="hidden bg-white w-80 h-96 rounded-lg shadow-lg flex flex-col">
-          <div className="bg-orange-500 text-white p-4 rounded-t-lg flex justify-between items-center">
-            <h3 className="font-semibold">Chat with us</h3>
-          </div>
-          <div id="chat-box" className="flex-grow p-4 overflow-y-auto"></div>
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex gap-2">
-              <input type="text" id="chat-input" placeholder="Type a message..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
-              <button id="chat-send" className="bg-orange-500 text-white p-2 rounded-lg">
-                <Send />
-              </button>
-            </div>
-          </div>
-        </div>
-        <button id="chatToggle" className="bg-orange-500 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center">
-          <MessageCircle size={32} />
-        </button>
-      </div>
+      <ChatWidget />
 
       <a
         href="https://wa.me/2348064852108?text=Hello%20Underdecanopy%20Digital%20Hub!%20I%20have%20an%20enquiry."
