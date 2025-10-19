@@ -25,6 +25,7 @@ import {
     Paintbrush,
     Code,
     BookOpen,
+    Cookie,
     Coffee,
     Map,
 } from 'lucide-react';
