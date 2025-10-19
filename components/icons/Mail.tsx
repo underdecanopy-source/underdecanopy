@@ -1,10 +1,11 @@
-import * as React from 'react';
-import type { SVGProps } from 'react';
+// components/icons/Mail.tsx
+import React from 'react';
 
-const Mail = (props: SVGProps<SVGSVGElement>) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
-    <rect width={20} height={16} x={2} y={4} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} rx={2} />
-    <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-  </svg>
-);
-export default Mail;
+export default function MailIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" {...props} aria-hidden>
+      <rect x="2" y="4" width="20" height="16" rx="2" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 6l9 7 9-7" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
