@@ -472,16 +472,6 @@ export default function Page() {
               <p className="text-gray-600">Ask for our chef&apos;s special and combo offers.</p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <StarIcon />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Café Experience</h3>
-              <p className="text-gray-600">
-                Relax, work, or connect with others in our cozy cafe while 
-                enjoying our menu.
-              </p>
-            </div>
           </div>
         </div>
       </section>
