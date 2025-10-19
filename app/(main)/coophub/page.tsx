@@ -1,7 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { HandHelping, GraduationCap, Users, Shield, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Mail, Globe, Phone, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle, Store, Music } from 'lucide-react';
+import { GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle, Store, Music } from 'lucide-react';
+
+// Local icon fallbacks to prevent build failures from missing lucide-react exports
+import HandHelping from '@/components/icons/HandHelping';
+import Shield from '@/components/icons/Shield';
+import Mail from '@/components/icons/Mail';
+import Phone from '@/components/icons/Phone';
 
 const config = {
     whatsAppNumber: "+2348064852108",
@@ -32,11 +38,17 @@ const faqData = [
     },
     {
         question: "Can I get my money back if I need it?",
-        answer: "Yes. You have two levels of access:<br />1. <strong>Wallet Savings:</strong> You can withdraw these at any time, no permission needed.<br />2. <strong>Fee Contributions:</strong> You can submit a refund request, which we process back to your wallet within <strong>24-48 business hours.</strong> You can then withdraw it."
+        answer: [
+            "Yes. You have two levels of access:",
+            "1. <strong>Wallet Savings:</strong> You can withdraw these at any time, no permission needed.",
+            "2. <strong>Fee Contributions:</strong> You can submit a refund request, which we process back to your wallet within <strong>24-48 business hours.</strong> You can then withdraw it."
+        ]
     },
     {
         question: "Who can join CoopHub?",
-        answer: "CoopHub is open to everyone! Students, entrepreneurs, salary earners, and anyone who believes in community savings and digital transformation. Our platform is designed to be inclusive and accessible to all."
+        answer: [
+            "CoopHub is open to everyone! Students, entrepreneurs, salary earners, and anyone who believes in community savings and digital transformation. Our platform is designed to be inclusive and accessible to all."
+        ]
     },
     {
         question: "How quickly can I access loans?",
@@ -286,11 +298,15 @@ export default function Page() {
                         <h2 className="section-title">Frequently Asked Questions</h2>
                         {faqData.map((faq, index) => (
                             <div className={`faq-item ${openFaq === index ? 'active' : ''}`} key={index}>
-                                <div className="faq-question" onClick={() => toggleFaq(index)}>
+                                <button className="faq-question" onClick={() => toggleFaq(index)} aria-expanded={openFaq === index}>
                                     {faq.question}
-                                </div>
+                                </button>
                                 <div className="faq-answer">
-                                    <p dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                                    {Array.isArray(faq.answer) ? (
+                                        faq.answer.map((line, i) => <p key={i} dangerouslySetInnerHTML={{ __html: line }} />)
+                                    ) : (
+                                        <p dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                                    )}
                                 </div>
                             </div>
                         ))}

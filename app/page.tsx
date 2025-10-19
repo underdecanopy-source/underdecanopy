@@ -14,7 +14,6 @@ import {
     // LocationEditIcon, (kept if used elsewhere)
     MapPinHouse,
     Phone,
-    QrCode,
     School,
     Send,
     ShieldHalf,
@@ -29,7 +28,6 @@ import {
     Map,
 } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
-import { useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import Link from 'next/link';
 import { submitContactForm, type State } from '@/lib/actions/contact';
@@ -201,7 +199,7 @@ export default function Page() {
             <div className="text-left max-w-lg">
               <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Underdecanopy Digital Hub</h1>
               <p className="text-gray-600 mb-8">
-                Your trusted center for digital solutions, business services,
+                Your trusted center for digital solutions, business services, 
                 and a relaxing cafe experience in Ibadan.
               </p>
               <a href="#contact" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-300">
@@ -224,7 +222,7 @@ export default function Page() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800">Our Core Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-              Comprehensive digital solutions tailored to meet your business and
+              Comprehensive digital solutions tailored to meet your business and 
               personal needs
             </p>
           </div>
@@ -311,8 +309,8 @@ export default function Page() {
                 SmartTax Receipts
               </h3>
               <p className="text-gray-600 mb-6">
-                Our digital receipt system not only makes receiving receipts
-                more convenient for your customers, it takes the stress out of
+                Our digital receipt system not only makes receiving receipts 
+                more convenient for your customers, it takes the stress out of 
                 customers having to hold onto their receipts when tax time
                 rolls around.
               </p>
@@ -327,13 +325,13 @@ export default function Page() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800">Professional Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-              Comprehensive solutions to meet your business and personal
+              Comprehensive solutions to meet your business and personal 
               needs
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
+            <div key="printing" className="text-center">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
                 <Printer />
               </div>
@@ -344,7 +342,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="text-center">
+            <div key="media" className="text-center">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
                 <Video />
               </div>
@@ -355,7 +353,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="text-center">
+            <div key="support" className="text-center">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
                 <Headset />
               </div>
@@ -366,7 +364,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="text-center">
+            <div key="school-management" className="text-center">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
                 <Laptop />
               </div>
@@ -376,7 +374,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="text-center">
+            <div key="design" className="text-center">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
                 <Paintbrush />
               </div>
@@ -387,7 +385,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="text-center">
+            <div key="web-dev" className="text-center">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
                 <Code />
               </div>
@@ -398,7 +396,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="text-center">
+            <div key="research" className="text-center">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
                 <BookOpen />
               </div>
@@ -409,7 +407,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="text-center">
+            <div key="rentals" className="text-center">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
                 <Map />
               </div>
@@ -428,7 +426,7 @@ export default function Page() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-orange-500">Cafe Experience</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-              Enjoy snacks, meals, and beverages while you work or learn. Relax
+              Enjoy snacks, meals, and beverages while you work or learn. Relax 
               in our cozy cafe area.
             </p>
           </div>
@@ -471,7 +469,7 @@ export default function Page() {
                 <StarIcon />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Specials</h3>
-              <p className="text-gray-600">Ask for our chef's special and combo offers.</p>
+              <p className="text-gray-600">Ask for our chef&apos;s special and combo offers.</p>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
@@ -480,7 +478,7 @@ export default function Page() {
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Café Experience</h3>
               <p className="text-gray-600">
-                Relax, work, or connect with others in our cozy cafe while
+                Relax, work, or connect with others in our cozy cafe while 
                 enjoying our menu.
               </p>
             </div>
@@ -494,7 +492,7 @@ export default function Page() {
             <MicIcon /> Underdecanopy Podcast
           </h2>
           <p className="max-w-2xl mx-auto mb-8">
-            Tune in to our episodes for digital tips and business insights
+            Tune in to our episodes for digital tips and business insights 
             from Ibadan and beyond.
           </p>
           <a href="https://example.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-colors duration-300">
@@ -508,7 +506,7 @@ export default function Page() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800">Contact Us</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-              Reach out for inquiries, support, or to schedule a visit
+              Reach out for inquiries, support, or to schedule a visit 
             </p>
           </div>
 
@@ -564,7 +562,7 @@ export default function Page() {
             <div className="footer-col">
               <h4 className="text-lg font-bold mb-4">Underdecanopy Digital Hub</h4>
               <p className="text-gray-400">
-                Your trusted center for digital solutions, business services,
+                Your trusted center for digital solutions, business services, 
                 and a relaxing cafe experience in Ibadan.
               </p>
               <div className="flex gap-4 mt-4">
