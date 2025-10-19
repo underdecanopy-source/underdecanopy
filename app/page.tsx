@@ -11,7 +11,9 @@ import {
   LifeBuoy,
   Linkedin,
   LocationEditIcon,
+  MapPinHouse,
   Phone,
+  QrCode,
   School,
   Send,
   ShieldHalf,
@@ -30,9 +32,11 @@ import {
   GlassWater,
   Star,
   Mic,
+  MessageCircle,
   MessageSquare,
 } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import Link from 'next/link';
 import { submitContactForm, type State } from '@/lib/actions/contact';
@@ -235,7 +239,7 @@ export default function Page() {
                 Discover top-notch computer and accessories sales, expert
                 repairs, upgrades, and reliable IT support all in one place.
               </p>
-              <Link href="/trustfix" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
+              <Link href="/trustfix" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -249,7 +253,7 @@ export default function Page() {
                 Register your business and file annual returns with ease. We
                 handle CAC processes quickly and professionally.
               </p>
-              <Link href="/swiftwheel" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
+              <Link href="/swiftwheel" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -264,7 +268,7 @@ export default function Page() {
                 programming, graphics, and digital technologies from certified
                 experts.
               </p>
-              <Link href="/techlift" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
+              <Link href="/techlift" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -278,7 +282,7 @@ export default function Page() {
                 Fast, easy, and reliable Post UTME, admission applications, and
                 online registration for schools and universities.
               </p>
-              <Link href="/applysmart" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
+              <Link href="/applysmart" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -294,7 +298,7 @@ export default function Page() {
                 contributions, and access instant loans, all through our
                 trusted digital cooperative platform for students and parents.
               </p>
-              <Link href="/coophub" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
+              <Link href="/coophub" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -310,7 +314,7 @@ export default function Page() {
                 customers having to hold onto their receipts when tax time
                 rolls around.
               </p>
-              <Link href="/smarttax" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
+              <Link href="/smarttax" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
           </div>
         </div>
@@ -465,7 +469,7 @@ export default function Page() {
                 <Star />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Specials</h3>
-              <p className="text-gray-600">Ask for our chef&apos;s special and combo offers.</p>
+              <p className="text-gray-600">Ask for our chef's special and combo offers.</p>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
@@ -664,7 +668,7 @@ export default function Page() {
         </div>
       </footer>
 
-      {/* <ChatWidget /> */}
+      <ChatWidget />
 
       <a
         href="https://wa.me/2348064852108?text=Hello%20Underdecanopy%20Digital%20Hub!%20I%20have%20an%20enquiry."
