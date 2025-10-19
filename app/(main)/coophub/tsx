@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HandHelping, GraduationCap, Users, Shield, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Mail, Globe, Phone, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
+import { HandHelping, GraduationCap, Users, Shield, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Mail, Globe, Phone, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle, Store, Music } from 'lucide-react';
 
 const config = {
     whatsAppNumber: "+2348064852108",
@@ -201,7 +201,7 @@ export default function Page() {
                                 <div className="step-number">4</div>
                                 <div className="step-content">
                                     <h3>Complete Your KYC</h3>
-                                    <p>Finalize your setup on the CoopHub platform. <strong className="text-red-500">For your security, we never see or store your NIN, BVN, or PIN.</strong> These are handled directly and securely by Wema Bank.</p>
+                                    <p>Finalize your setup on the CoopHub platform. <strong style={{ color: "#FF0000" }}>For your security, we never see or store your NIN, BVN, or PIN.</strong> These are handled directly and securely by Wema Bank.</p>
                                 </div>
                             </div>
                         </div>
@@ -300,7 +300,7 @@ export default function Page() {
                 <section className="contact" id="contact">
                     <div className="container">
                         <h2 className="section-title section-title-light">We&apos;re Here to Help</h2>
-                        <p className="text-center mb-12 text-[var(--gray)]">Can&apos;t find what you&apos;re looking for? Reach out to our support team.</p>
+                        <p style={{ textAlign: 'center', marginBottom: '3rem', color: 'var(--gray)' }}>Can&apos;t find what you&apos;re looking for? Reach out to our support team.</p>
 
                         <div className="contact-methods">
                             <div className="contact-method">
@@ -320,8 +320,8 @@ export default function Page() {
                             </div>
                         </div>
 
-                        <div className="bg-[#222222] p-6 rounded-md border-l-4 border-[var(--primary)]">
-                            <p className="text-[var(--gray)] m-0"><strong>Security Note:</strong> For your protection, please never send sensitive information like your NIN, BVN, or wallet PIN via email or social media. These details are only collected securely within the CoopHub app.</p>
+                        <div style={{ backgroundColor: '#222222', padding: '1.5rem', borderRadius: '5px', borderLeft: '4px solid var(--primary)' }}>
+                            <p style={{ color: 'var(--gray)', margin: 0 }}><strong>Security Note:</strong> For your protection, please never send sensitive information like your NIN, BVN, or wallet PIN via email or social media. These details are only collected securely within the CoopHub app.</p>
                         </div>
                     </div>
                 </section>
@@ -350,7 +350,7 @@ export default function Page() {
                                     <Apple /> App Store
                                 </a>
                                 <a href={config.appLinks.google} className="download-button play-store">
-                                    <Globe /> Play Store
+                                    <Store /> Play Store
                                 </a>
                                 <a href={config.appLinks.web} className="download-button web-app">
                                     <Globe /> Web App
@@ -371,7 +371,7 @@ export default function Page() {
                                 </div>
                                 CoopHub
                             </div>
-                            <p>A product of <a href="http://www.underdecanopy.com" target="_blank" rel="noopener noreferrer" className="text-[var(--gray)] underline">Underdecanopy Digital Hub</a></p>
+                            <p>A product of <a href="http://www.underdecanopy.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gray)', textDecoration: 'underline' }}>Underdecanopy Digital Hub</a></p>
                             <p>(TIK Centre).</p>
                         </div>
                         <div className="footer-links">
@@ -388,7 +388,7 @@ export default function Page() {
                             <a href={config.socials.twitter} aria-label="Follow us on Twitter"><Twitter /></a>
                             <a href={config.socials.instagram} aria-label="Follow us on Instagram"><Instagram /></a>
                             <a href={config.socials.youtube} aria-label="Follow us on YouTube"><Youtube /></a>
-                            <a href={config.socials.tiktok} aria-label="Follow us on Tiktok"><Globe /></a>
+                            <a href={config.socials.tiktok} aria-label="Follow us on Tiktok"><Music /></a>
                         </div>
                     </div>
                     <div className="footer-copyright">
