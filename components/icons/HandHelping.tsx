@@ -1,12 +1,10 @@
-// components/icons/HandHelping.tsx
-import React from 'react';
+import * as React from 'react';
+import type { SVGProps } from 'react';
 
-export default function HandHelpingIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" {...props} aria-hidden>
-      <path d="M2 12c0 5 4 9 9 9h2" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M21 10c0-3-3-5-6-4-1 0-2 1-3 2" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7 12c1.5-1 3-1 4 0" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+const HandHelping = (props: SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
+    <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 12h2a2 2 0 1 0 0-4h-3c-1.1 0-2 .9-2 2v1a2 2 0 1 0 4 0v-1m-6 8a2 2 0 1 1 4 0v-6H6z" />
+    <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 19a2 2 0 1 0 4 0v-8.5a2 2 0 0 0-2-2h-6V16" />
+  </svg>
+);
+export default HandHelping;
