@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HandHelping, GraduationCap, Users, Shield, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Mail, Globe, Phone, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
+import { HandHelping, GraduationCap, Users, Shield, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Mail, Globe, Phone, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle, Store, Music } from 'lucide-react';
 
 const config = {
     whatsAppNumber: "+2348064852108",
@@ -350,7 +350,7 @@ export default function Page() {
                                     <Apple /> App Store
                                 </a>
                                 <a href={config.appLinks.google} className="download-button play-store">
-                                    <Globe /> Play Store
+                                    <Store /> Play Store
                                 </a>
                                 <a href={config.appLinks.web} className="download-button web-app">
                                     <Globe /> Web App
@@ -388,7 +388,7 @@ export default function Page() {
                             <a href={config.socials.twitter} aria-label="Follow us on Twitter"><Twitter /></a>
                             <a href={config.socials.instagram} aria-label="Follow us on Instagram"><Instagram /></a>
                             <a href={config.socials.youtube} aria-label="Follow us on YouTube"><Youtube /></a>
-                            <a href={config.socials.tiktok} aria-label="Follow us on Tiktok"><Globe /></a>
+                            <a href={config.socials.tiktok} aria-label="Follow us on Tiktok"><Music /></a>
                         </div>
                     </div>
                     <div className="footer-copyright">
