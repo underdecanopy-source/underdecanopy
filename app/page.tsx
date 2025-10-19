@@ -1,3 +1,4 @@
+// app/page.tsx
 'use client';
 
 import Image from 'next/image';
@@ -10,7 +11,7 @@ import {
     Instagram,
     LifeBuoy,
     Linkedin,
-    LocationEditIcon,
+    // LocationEditIcon, (kept if used elsewhere)
     MapPinHouse,
     Phone,
     QrCode,
@@ -25,8 +26,6 @@ import {
     Paintbrush,
     Code,
     BookOpen,
-    Cookie,
-    Coffee,
     Map,
 } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
@@ -38,6 +37,15 @@ import {
   subscribeToNewsletter,
   type NewsletterState,
 } from '@/lib/actions/newsletter';
+
+// LOCAL ICON COMPONENTS (fallbacks to avoid missing-library-exports)
+import CoffeeIcon from '@/components/icons/Coffee';
+import CookieIcon from '@/components/icons/Cookie';
+import UtensilsIcon from '@/components/icons/Utensils';
+import GlassWaterIcon from '@/components/icons/GlassWater';
+import StarIcon from '@/components/icons/Star';
+import MicIcon from '@/components/icons/Mic';
+import MessageSquareIcon from '@/components/icons/MessageSquare';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -319,7 +327,7 @@ export default function Page() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800">Professional Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-              Comprehensive solutions to meet all your business and personal
+              Comprehensive solutions to meet your business and personal
               needs
             </p>
           </div>
@@ -428,7 +436,7 @@ export default function Page() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <Coffee />
+                <CoffeeIcon />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Coffee & Tea</h3>
               <p className="text-gray-600">Freshly brewed coffee, herbal teas, and hot chocolate.</p>
@@ -436,7 +444,7 @@ export default function Page() {
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <Cookie />
+                <CookieIcon />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Pastries & Snacks</h3>
               <p className="text-gray-600">Croissants, meat pies, doughnuts, chin-chin, and more.</p>
@@ -444,7 +452,7 @@ export default function Page() {
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <Utensils />
+                <UtensilsIcon />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Meals</h3>
               <p className="text-gray-600">Rice dishes, noodles, and light meals for busy days.</p>
@@ -452,7 +460,7 @@ export default function Page() {
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <GlassWater />
+                <GlassWaterIcon />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Cold Drinks</h3>
               <p className="text-gray-600">Soft drinks, bottled water, and fresh juices.</p>
@@ -460,7 +468,7 @@ export default function Page() {
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <Star />
+                <StarIcon />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Specials</h3>
               <p className="text-gray-600">Ask for our chef's special and combo offers.</p>
@@ -468,7 +476,7 @@ export default function Page() {
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <Star />
+                <StarIcon />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Café Experience</h3>
               <p className="text-gray-600">
@@ -483,7 +491,7 @@ export default function Page() {
       <section className="bg-orange-500 text-white py-16" id="podcast">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
-            <Mic /> Underdecanopy Podcast
+            <MicIcon /> Underdecanopy Podcast
           </h2>
           <p className="max-w-2xl mx-auto mb-8">
             Tune in to our episodes for digital tips and business insights
@@ -509,7 +517,7 @@ export default function Page() {
               <h3 className="text-2xl font-bold text-gray-800 mb-6">Get In Touch</h3>
 
               <div className="flex items-start gap-4 mb-6">
-                <LocationEditIcon size={24} className="text-orange-500 mt-1" />
+                <MapPinHouse size={24} className="text-orange-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Location</h4>
                   <p className="text-gray-600">
@@ -669,7 +677,7 @@ export default function Page() {
         target="_blank"
         rel="noopener"
       >
-        <MessageSquare size={32} />
+        <MessageSquareIcon />
       </a>
     </>
   );
