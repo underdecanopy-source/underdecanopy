@@ -25,6 +25,7 @@ import {
     Paintbrush,
     Code,
     BookOpen,
+    Coffee,
     Map,
 } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
