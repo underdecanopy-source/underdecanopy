@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-// import { Toaster } from "sonner";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -21,6 +21,7 @@ export default function RootLayout({
       <body>
         <main>
           {children}
+          <Toaster />
         </main>
       </body>
     </html>

@@ -41,9 +41,10 @@ import CoffeeIcon from '@/components/icons/Coffee';
 import CookieIcon from '@/components/icons/Cookie';
 import UtensilsIcon from '@/components/icons/Utensils';
 import GlassWaterIcon from '@/components/icons/GlassWater';
-import StarIcon from '@/components/icons/Star';
+
 import MicIcon from '@/components/icons/Mic';
 import MessageSquareIcon from '@/components/icons/MessageSquare';
+import CafeItem from '@/app/(main)/_components/CafeItem';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -239,7 +240,7 @@ export default function Page() {
                 Discover top-notch computer and accessories sales, expert
                 repairs, upgrades, and reliable IT support all in one place.
               </p>
-              <Link Let's Go</Link>
+              <Link href="/trustfix" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
