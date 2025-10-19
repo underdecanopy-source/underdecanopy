@@ -26,6 +26,7 @@ import {
     Code,
     BookOpen,
     Map,
+    Star,
 } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { Navigation } from '@/components/Navigation';
@@ -42,9 +43,10 @@ import CookieIcon from '@/components/icons/Cookie';
 import UtensilsIcon from '@/components/icons/Utensils';
 import GlassWaterIcon from '@/components/icons/GlassWater';
 
+
+
 import MicIcon from '@/components/icons/Mic';
 import MessageSquareIcon from '@/components/icons/MessageSquare';
-import CafeItem from '@/app/(main)/_components/CafeItem';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -240,7 +242,7 @@ export default function Page() {
                 Discover top-notch computer and accessories sales, expert
                 repairs, upgrades, and reliable IT support all in one place.
               </p>
-              <Link href="/trustfix" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
+              <Link href="/trustfix" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -254,7 +256,7 @@ export default function Page() {
                 Register your business and file annual returns with ease. We
                 handle CAC processes quickly and professionally.
               </p>
-              <Link href="/swiftwheel" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
+              <Link href="/swiftwheel" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -269,7 +271,7 @@ export default function Page() {
                 programming, graphics, and digital technologies from certified
                 experts.
               </p>
-              <Link href="/techlift" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
+              <Link href="/techlift" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -283,7 +285,7 @@ export default function Page() {
                 Fast, easy, and reliable Post UTME, admission applications, and
                 online registration for schools and universities.
               </p>
-              <Link href="/applysmart" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
+              <Link href="/applysmart" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -299,7 +301,7 @@ export default function Page() {
                 contributions, and access instant loans, all through our
                 trusted digital cooperative platform for students and parents.
               </p>
-              <Link href="/coophub" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
+              <Link href="/coophub" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -315,7 +317,7 @@ export default function Page() {
                 customers having to hold onto their receipts when tax time
                 rolls around.
               </p>
-              <Link href="/smarttax" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
+              <Link href="/smarttax" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
             </div>
           </div>
         </div>
@@ -467,7 +469,7 @@ export default function Page() {
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <StarIcon />
+                <Star />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Specials</h3>
               <p className="text-gray-600">Ask for our chef&apos;s special and combo offers.</p>
@@ -475,7 +477,7 @@ export default function Page() {
 
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <StarIcon />
+                <Star />
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Café Experience</h3>
               <p className="text-gray-600">
@@ -496,7 +498,7 @@ export default function Page() {
             Tune in to our episodes for digital tips and business insights 
             from Ibadan and beyond.
           </p>
-          <a href="https://example.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-colors duration-300">
+          <a href="https://underdecanopy.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-colors duration-300">
             Listen to Our Podcast
           </a>
         </div>
