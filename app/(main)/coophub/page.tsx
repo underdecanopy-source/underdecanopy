@@ -3,12 +3,6 @@
 import { useState } from 'react';
 import { Shield, HandHelping, Mail, Phone, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle, Store, Music } from 'lucide-react';
 
-// Local icon fallbacks to prevent build failures from missing lucide-react exports
-import HandHelpingIcon from '@/components/icons/HandHelping';
-import ShieldIcon from '@/components/icons/Shield';
-import MailIcon from '@/components/icons/Mail';
-import PhoneIcon from '@/components/icons/Phone';
-
 const config = {
     whatsAppNumber: "+2348064852108",
     email: "support@coophub.ng",
