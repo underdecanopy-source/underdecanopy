@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HandHelping, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Shield, Fingerprint, ShieldCheck, Mail, Globe, Phone, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
+import { HandHelping, GraduationCap, Users, Shield, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Mail, Globe, Phone, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
 
 const config = {
     whatsAppNumber: "+2348064852108",
@@ -146,7 +146,7 @@ export default function Page() {
 
                             <div className="feature-card">
                                 <div className="feature-icon" aria-hidden="true">
-                                    <UserCheck />
+                                    <UserCheck/>
                                 </div>
                                 <h3>KYC Compliant</h3>
                                 <p>Fully regulated and compliant with all financial regulations for your peace of mind.</p>
