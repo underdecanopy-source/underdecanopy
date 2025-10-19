@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, HandHelping } from 'lucide-react';
-import { GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle, Store, Music } from 'lucide-react';
+import { Shield, HandHelping, Mail, Phone, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle, Store, Music } from 'lucide-react';
 
 // Local icon fallbacks to prevent build failures from missing lucide-react exports
 import HandHelpingIcon from '@/components/icons/HandHelping';
