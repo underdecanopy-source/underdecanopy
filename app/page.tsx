@@ -239,7 +239,7 @@ export default function Page() {
                 Discover top-notch computer and accessories sales, expert
                 repairs, upgrades, and reliable IT support all in one place.
               </p>
-              <Link href="/trustfix" className="text-orange-500 font-semibold hover:underline">Let's Go</Link>
+              <Link Let's Go</Link>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
