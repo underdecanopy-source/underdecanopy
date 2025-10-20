@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
+import { toast } from 'sonner'
 
 function SubmitButton() {
     const { pending } = useFormStatus()
@@ -22,12 +23,14 @@ export default function LoginForm() {
     const [state, loginAction] = useFormState(login, null)
 
     useEffect(() => {
-        if (state?.errorMessage) {
-            toast.error(state.errorMessage)
-        }
-        else if (state?.errorMessage === null) {
-            toast.success("Logged In")
-            router.replace("/")
+        if (typeof window !== 'undefined') {
+            if (state?.errorMessage) {
+                toast.error(state.errorMessage)
+            }
+            else if (state?.errorMessage === null) {
+                toast.success("Logged In")
+                router.replace("/")
+            }
         }
     }, [state, router])
 
@@ -52,3 +55,5 @@ export default function LoginForm() {
                 </p>
             </CardFooter>
         </form>
+    )
+}

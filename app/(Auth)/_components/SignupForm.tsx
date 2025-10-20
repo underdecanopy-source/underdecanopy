@@ -1,5 +1,15 @@
+'use client'
+import { Button } from '@/components/ui/button'
+import { CardContent, CardFooter } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { signUp } from '@/lib/actions/auth'
+import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
+import { toast } from 'sonner'
 
 function SubmitButton() {
     const { pending } = useFormStatus()
@@ -13,12 +23,14 @@ export default function SignupForm() {
     const [state, signUpAction] = useFormState(signUp, null)
 
     useEffect(() => {
-        if (state?.errorMessage) {
-            toast.error(state.errorMessage)
-        }
-        else if (state?.errorMessage === null) {
-            toast.success("Signed Up, Please check your email")
-            router.replace("/")
+        if (typeof window !== 'undefined') {
+            if (state?.errorMessage) {
+                toast.error(state.errorMessage)
+            }
+            else if (state?.errorMessage === null) {
+                toast.success("Signed Up, Please check your email")
+                router.replace("/")
+            }
         }
     }, [state, router])
 
@@ -33,7 +45,7 @@ export default function SignupForm() {
                 <div className='flex flex-col space-y-1.5'>
                     <Label htmlFor='password'>Password</Label>
                     <Input type='password' name='password' placeholder='Enter your password' required />
-                }
+                </div>
 
             </CardContent>
             <CardFooter className='flex flex-col gap-6 mt-4'>
@@ -43,3 +55,5 @@ export default function SignupForm() {
                 </p>
             </CardFooter>
         </form>
+    )
+}
