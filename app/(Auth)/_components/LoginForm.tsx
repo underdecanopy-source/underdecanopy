@@ -7,12 +7,19 @@ import { login } from '@/lib/actions/auth'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { useActionState, useEffect } from 'react'
-import { toast } from 'sonner'
+import { useEffect } from 'react'
+import { useFormState, useFormStatus } from 'react-dom'
+
+function SubmitButton() {
+    const { pending } = useFormStatus()
+    return (
+        <Button className='w-full'>{pending && <Loader2 className='animate-spin' />}Login</Button>
+    )
+}
 
 export default function LoginForm() {
     const router = useRouter()
-    const [state, loginAction, isPending] = useActionState(login, null)
+    const [state, loginAction] = useFormState(login, null)
 
     useEffect(() => {
         if (state?.errorMessage) {
@@ -39,11 +46,9 @@ export default function LoginForm() {
 
             </CardContent>
             <CardFooter className='flex flex-col gap-6 mt-4'>
-                <Button className='w-full'>{isPending && <Loader2 className='animate-spin' />}Login</Button>
+                <SubmitButton />
                 <p className='text-xs'>
                     Dont have an account? <Link href="/signup" className='text-blue-500 cursor-pointer'>Signup</Link>
                 </p>
             </CardFooter>
         </form>
-    )
-}
