@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 // Define the menu links
 const navItems = [
     { href: '/', label: 'Home' },
-    { href: '#servicest', label: 'Our Core Services' },
+    { href: '#services', label: 'Our Core Services' },
     { href: '#additional', label: 'Professional Services' },
     { href: '#cafe', label: 'Cafe Experience' },
     { href: '#podcast', label: 'Podcast' },

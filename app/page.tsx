@@ -572,7 +572,7 @@ export default function Page() {
                 <a
                   href="https://facebook.com/underdecanopy"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   aria-label="Facebook"
                   className="text-gray-400 hover:text-white"
                 >
@@ -581,7 +581,7 @@ export default function Page() {
                 <a
                   href="https://twitter.com/underdecanopy"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   aria-label="Twitter"
                   className="text-gray-400 hover:text-white"
                 >
@@ -590,7 +590,7 @@ export default function Page() {
                 <a
                   href="https://instagram.com/underdecanopy"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   aria-label="Instagram"
                   className="text-gray-400 hover:text-white"
                 >
@@ -599,7 +599,7 @@ export default function Page() {
                 <a
                   href="https://linkedin.com/company/underdecanopy"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   aria-label="LinkedIn"
                   className="text-gray-400 hover:text-white"
                 >
