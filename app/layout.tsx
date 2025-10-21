@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { ContactBar } from "@/components/contact/ContactBar";
 
 export const metadata: Metadata = {
   title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -23,6 +24,7 @@ export default function RootLayout({
           {children}
           <Toaster />
         </main>
+        <ContactBar />
       </body>
     </html>
   );

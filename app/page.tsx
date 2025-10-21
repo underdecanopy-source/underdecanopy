@@ -36,6 +36,8 @@ import {
   subscribeToNewsletter,
   type NewsletterState,
 } from '@/lib/actions/newsletter';
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 
 // LOCAL ICON COMPONENTS (fallbacks to avoid missing-library-exports)
 import CoffeeIcon from '@/components/icons/Coffee';
@@ -671,15 +673,12 @@ export default function Page() {
         </div>
       </footer>
 
-      <a
-        href="https://wa.me/2348064852108?text=Hello%20Underdecanopy%20Digital%20Hub!%20I%20have%20an%20enquiry."
-        className="fixed bottom-8 right-6 z-50 bg-green-500 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center"
-        aria-label="Chat on WhatsApp"
-        target="_blank"
-        rel="noopener"
-      >
-        <MessageSquareIcon />
-      </a>
+      <ContactSection
+        title="Get in Touch"
+        subtitle="We're here to help. Reach out to us today!"
+      />
+
+      <MobileOptimizedFooter serviceName="Underdecanopy" />
     </>
   );
 }

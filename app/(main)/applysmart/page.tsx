@@ -4,6 +4,8 @@ import StepCard from "./_components/StepCard";
 import AdmissionCalculator from "./_components/AdmissionCalculator";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
+import { ContactSection } from "@/components/contact/ContactSection";
+import { MobileOptimizedFooter } from "@/components/contact/MobileOptimizedFooter";
 
 export const metadata: Metadata = {
     title: "ApplySmart - Nigerian Admission & Scholarship Support | Underdecanopy",
@@ -488,57 +490,12 @@ export default function page() {
                 </section>
             </main >
 
-            <footer role="contentinfo">
-                <div className="container">
-                    <div className="footer-grid">
-                        <div>
-                            <h4>ApplySmart</h4>
-                            <p className="small">Your trusted partner for university admission guidance and scholarship matching in Nigeria.</p>
-                            <div className="social-links">
-                                <a href="#" aria-label="Follow us on Facebook"><Facebook /></a>
-                                <a href="#" aria-label="Follow us on Twitter"><Twitter /></a>
-                                <a href="#" aria-label="Follow us on Instagram"><Instagram /></a>
-                                <a href="#" aria-label="Connect on LinkedIn"><Linkedin /></a>
-                            </div>
-                        </div>
+            <ContactSection
+                title="Ready to Get Started?"
+                subtitle="Contact us for more information about ApplySmart"
+            />
 
-                        <div>
-                            <h4>Quick Links</h4>
-                            <ul className="footer-links">
-                                <li><a href="#main">Home</a></li>
-                                <li><a href="#how-it-works">How It Works</a></li>
-                                <li><a href="#admission-calculator">Admission Calculator</a></li>
-                                <li><a href="#scholarships">Scholarships</a></li>
-                                <li><a href="#blog">Blog</a></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4>Resources</h4>
-                            <ul className="footer-links">
-                                <li><a href="#">JAMB Updates</a></li>
-                                <li><a href="#">Cut-off Marks</a></li>
-                                <li><a href="#">Admission Tips</a></li>
-                                <li><a href="#">Scholarship Database</a></li>
-                                <li><a href="#">FAQs</a></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4>Contact Us</h4>
-                            <ul className="footer-links">
-                                <li><i className="fas fa-envelope" aria-hidden="true"></i> info@applysmart.ng</li>
-                                <li><i className="fas fa-phone" aria-hidden="true"></i> +234 812 345 6789</li>
-                                <li><i className="fas fa-map-marker-alt" aria-hidden="true"></i> Lagos, Nigeria</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div className="footer-bottom">
-                        <p>&copy; 2023 ApplySmart. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
-                    </div>
-                </div>
-            </footer>
+            <MobileOptimizedFooter serviceName="ApplySmart" />
         </>
     )
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 
 export default function SwiftWheelPage() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -459,14 +461,12 @@ export default function SwiftWheelPage() {
                     </div>
                 </section>
 
-                {/* Footer */}
-                <footer className="bg-blue-900 text-white py-2 px-4 md:px-8">
-                    <div className="container mx-auto">
-                        <div className="text-center">
-                            <p>© 2024 Swift Wheel Services. All rights reserved.</p>
-                        </div>
-                    </div>
-                </footer>
+                <ContactSection
+                    title="Register Your Business Today"
+                    subtitle="Professional CAC services"
+                />
+
+                <MobileOptimizedFooter serviceName="SwiftWheel" />
 
             </div>
         </>

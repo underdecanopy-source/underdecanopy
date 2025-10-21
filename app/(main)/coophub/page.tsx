@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Shield, HandHelping, Mail, Phone, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Send, Heart, Share2, Play, MessageCircle, Store, Music, Menu, X } from 'lucide-react';
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 
 const config = {
     whatsAppNumber: "+2348064852108",
@@ -508,9 +510,12 @@ export default function Page() {
                 </div>
             </footer>
 
-            <a href={`https://wa.me/${config.whatsAppNumber.replace('+', '')}?text=Hello%20CoopHub!%20I%20have%20an%20enquiry.`} className="whatsapp-float" aria-label="Chat on WhatsApp" target="_blank" rel="noopener">
-                <MessageCircle />
-            </a>
+            <ContactSection
+                title="Join CoopHub Today"
+                subtitle="Start your journey to financial freedom"
+            />
+
+            <MobileOptimizedFooter serviceName="CoopHub" />
         </>
     );
 }

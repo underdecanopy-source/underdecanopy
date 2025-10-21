@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 
 export default function SmartTaxPage() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -710,45 +712,12 @@ export default function SmartTaxPage() {
                     </div>
                 </section>
 
-                <footer>
-                    <div className="container">
-                        <div className="footer-content">
-                            <div className="footer-column">
-                                <h3>SmartTax</h3>
-                                <p>Making tax compliance simple for Nigerian businesses since 2024.</p>
-                            </div>
-                            <div className="footer-column">
-                                <h3>Quick Links</h3>
-                                <ul>
-                                    <li><a href="#features">Features</a></li>
-                                    <li><a href="#pricing">Pricing</a></li>
-                                    <li><a href="#">Documentation</a></li>
-                                    <li><a href="#">API</a></li>
-                                </ul>
-                            </div>
-                            <div className="footer-column">
-                                <h3>Support</h3>
-                                <ul>
-                                    <li><a href="#">Help Center</a></li>
-                                    <li><a href="#">Contact Us</a></li>
-                                    <li><a href="#">Privacy Policy</a></li>
-                                    <li><a href="#">Terms of Service</a></li>
-                                </ul>
-                            </div>
-                            <div className="footer-column">
-                                <h3>Contact</h3>
-                                <ul>
-                                    <li>Email: support@esmarttax.ng</li>
-                                    <li>Phone: +234 (0) 700-ERECEIPT</li>
-                                    <li>Address: 123 Tech Street, Lagos, Nigeria</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="copyright">
-                            <p>&copy; 2025 SmartTax. All rights reserved. Compliant with Nigerian Tax Law 2025 and CAC regulations.</p>
-                        </div>
-                    </div>
-                </footer>
+                <ContactSection
+                    title="Simplify Your Tax Management"
+                    subtitle="Get started with SmartTax today"
+                />
+
+                <MobileOptimizedFooter serviceName="SmartTax" />
             </main>
         </>
     );
