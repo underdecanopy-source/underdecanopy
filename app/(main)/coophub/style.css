@@ -564,6 +564,144 @@ footer {
     color: white;
 }
 
+/* === ANIMATIONS === */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Apply animations to elements */
+[data-animate] {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slideIn {
+    animation: slideIn 0.5s ease-out forwards;
+}
+
+.animate-slideInLeft {
+    animation: slideInLeft 0.5s ease-out forwards;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.5s ease-out forwards;
+}
+
+/* Stagger animations for multiple elements */
+[data-animate]:nth-child(1) { animation-delay: 0.1s; }
+[data-animate]:nth-child(2) { animation-delay: 0.2s; }
+[data-animate]:nth-child(3) { animation-delay: 0.3s; }
+[data-animate]:nth-child(4) { animation-delay: 0.4s; }
+[data-animate]:nth-child(5) { animation-delay: 0.5s; }
+[data-animate]:nth-child(6) { animation-delay: 0.6s; }
+
+/* Smooth transitions for interactive elements */
+button, a {
+    transition: all 0.3s ease;
+}
+
+/* FAQ animations */
+.faq-item {
+    transition: all 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 500px;
+    opacity: 1;
+    visibility: visible;
+}
+
+.faq-answer {
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Mobile menu animations */
+.animate-slideIn {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Hover effects */
+.product-card:hover,
+.feature-card:hover,
+.security-card:hover,
+.contact-method:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Button hover effects */
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Link hover effects */
+a:hover {
+    opacity: 0.8;
+}
+
 /* === RESPONSIVE DESIGN === */
 @media (max-width: 768px) {
     .nav-links {

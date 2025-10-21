@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import "./style.css";
 import StepCard from "./_components/StepCard";
+import AdmissionCalculator from "./_components/AdmissionCalculator";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-    title: "Underdecanopy Digital Hub | Business Centre & Cafe",
-    description: "Underdecanopy Digital Hub is your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan. We offer services like business registration, IT support, digital training, and more.",
+    title: "ApplySmart - Nigerian Admission & Scholarship Support | Underdecanopy",
+    description: "ApplySmart helps Nigerian applicants find admission options and scholarships. Submit your top 3 choices for a tailored admission report and scholarship matches. Get instant admission chance calculations based on JAMB scores.",
 };
 
 export default function page() {
@@ -171,175 +172,8 @@ export default function page() {
                         </div>
 
                         <div className="form-wrap">
-                            <div className="tabs" role="tablist" aria-label="Admission calculator tabs">
-                                <button className="tab active" id="tab-calculator" role="tab" aria-selected="true" aria-controls="calculator-panel">Instant Admission Chance Calculator</button>
-                                <button className="tab" id="tab-full-form" role="tab" aria-selected="false" aria-controls="full-form-panel">Full Analysis Request</button>
-                            </div>
-
                             <div id="calculator-panel" role="tabpanel" aria-labelledby="tab-calculator">
-                                <form id="admission-calculator-form">
-                                    <div className="flex flex-wrap flex-col md:flex-row justify-between">
-                                        <div className="basis-[47%] !mb-3">
-                                            <label >Preferred Institution</label>
-                                            <select id="calc_institution" name="calc_institution" required>
-                                                <option value="">Select Institution</option>
-
-                                                <optgroup label="Federal Universities">
-                                                    <option value="UNILAG">University of Lagos (UNILAG)</option>
-                                                    <option value="UI">University of Ibadan (UI)</option>
-                                                    <option value="OAU">Obafemi Awolowo University (OAU)</option>
-                                                    <option value="UNIBEN">University of Benin (UNIBEN)</option>
-                                                    <option value="UNN">University of Nigeria, Nsukka (UNN)</option>
-                                                    <option value="ABU">Ahmadu Bello University (ABU)</option>
-                                                    <option value="BUK">Bayero University Kano (BUK)</option>
-                                                    <option value="FUTA">Federal University of Technology, Akure (FUTA)</option>
-                                                    <option value="FUTO">Federal University of Technology, Owerri (FUTO)</option>
-                                                    <option value="UNIPORT">University of Port Harcourt (UNIPORT)</option>
-                                                    <option value="UNILORIN">University of Ilorin (UNILORIN)</option>
-                                                    <option value="UNICAL">University of Calabar (UNICAL)</option>
-                                                    <option value="FUNAAB">Federal University of Agriculture, Abeokuta (FUNAAB)</option>
-                                                    <option value="UNIJOS">University of Jos (UNIJOS)</option>
-                                                    <option value="UNIMAID">University of Maiduguri (UNIMAID)</option>
-                                                </optgroup>
-
-
-                                                <optgroup label="State Universities">
-                                                    <option value="LASU">Lagos State University (LASU)</option>
-                                                    <option value="EKSU">Ekiti State University (EKSU)</option>
-                                                    <option value="AAU">Ambrose Alli University (AAU)</option>
-                                                    <option value="OOU">Olabisi Onabanjo University (OOU)</option>
-                                                    <option value="RSU">Rivers State University (RSU)</option>
-                                                    <option value="PLASU">Plateau State University (PLASU)</option>
-                                                    <option value="KSU">Prince Abubakar Audu University (KSU)</option>
-                                                </optgroup>
-
-
-                                                <optgroup label="Polytechnics">
-                                                    <option value="YABATECH">Yaba College of Technology (YABATECH)</option>
-                                                    <option value="FEDPOLYNEKEDE">Federal Polytechnic, Nekede</option>
-                                                    <option value="FEDPOLYILARO">Federal Polytechnic, Ilaro</option>
-                                                    <option value="MAPOLY">Moshood Abiola Polytechnic (MAPOLY)</option>
-                                                </optgroup>
-                                            </select>
-                                        </div>
-                                        <div className="basis-[47%] !mb-3">
-                                            <label>Preferred Course</label>
-                                            <select id="calc_course" name="calc_course" required>
-                                                <option value="">Select Course</option>
-                                                <optgroup label="First Tier (Cutoff: 240+)">
-                                                    <option value="medicine">Medicine and Surgery</option>
-                                                    <option value="dentistry">Dentistry (BDS)</option>
-                                                    <option value="pharmacy">Pharmacy (Pharm.D)</option>
-                                                    <option value="law">Law (LL.B)</option>
-                                                    <option value="nursing">Nursing Science (B.N.Sc.)</option>
-                                                    <option value="medical_lab">Medical Laboratory Science (B.MLS)</option>
-                                                    <option value="physiotherapy">Physiotherapy</option>
-                                                    <option value="radiography">Radiography</option>
-                                                    <option value="vet_med">Veterinary Medicine (DVM)</option>
-                                                    <option value="optometry">Optometry</option>
-                                                    <option value="anatomy">Anatomy</option>
-                                                    <option value="physiology">Physiology</option>
-                                                </optgroup>
-                                                <optgroup label="Second Tier (Cutoff: 200-239)">
-                                                    <option value="accounting">Accounting</option>
-                                                    <option value="banking_finance">Banking and Finance</option>
-                                                    <option value="business_admin">Business Administration</option>
-                                                    <option value="economics">Economics</option>
-                                                    <option value="mass_comm">Mass Communication</option>
-                                                    <option value="computer_science">Computer Science</option>
-                                                    <option value="electrical_eng">Electrical Engineering</option>
-                                                    <option value="mechanical_eng">Mechanical Engineering</option>
-                                                    <option value="civil_eng">Civil Engineering</option>
-                                                    <option value="architecture">Architecture</option>
-                                                    <option value="estate_management">Estate Management</option>
-                                                    <option value="urban_regional">Urban and Regional Planning</option>
-                                                    <option value="biochemistry">Biochemistry</option>
-                                                    <option value="microbiology">Microbiology</option>
-                                                </optgroup>
-                                                <optgroup label="Third Tier (Cutoff: 160-199)">
-                                                    <option value="public_admin">Public Administration</option>
-                                                    <option value="local_govt">Local Government Studies</option>
-                                                    <option value="sociology">Sociology</option>
-                                                    <option value="political_science">Political Science</option>
-                                                    <option value="history">History and International Studies</option>
-                                                    <option value="theatre_arts">Theatre Arts</option>
-                                                    <option value="linguistics">Linguistics</option>
-                                                    <option value="english">English Language</option>
-                                                    <option value="french">French</option>
-                                                    <option value="education">Education</option>
-                                                    <option value="agric_econ">Agricultural Economics</option>
-                                                    <option value="animal_science">Animal Science</option>
-                                                    <option value="crop_science">Crop Science</option>
-                                                    <option value="soil_science">Soil Science</option>
-                                                </optgroup>
-                                            </select>
-                                        </div>
-                                        <div className="basis-[47%] !mb-3">
-                                            <label>JAMB Score</label>
-                                            <input type="number" id="calc_score" name="calc_score" min="0" max="400" placeholder="Enter your JAMB score" required />
-                                        </div>
-                                        <div className="basis-[47%] !mb-3" >
-                                            <label>State of Origin</label>
-                                            <select id="calc_state" name="calc_state">
-                                                <option value="">Select State</option>
-                                                <option value="Abia">Abia</option>
-                                                <option value="Adamawa">Adamawa</option>
-                                                <option value="Akwa Ibom">Akwa Ibom</option>
-                                                <option value="Anambra">Anambra</option>
-                                                <option value="Bauchi">Bauchi</option>
-                                                <option value="Bayelsa">Bayelsa</option>
-                                                <option value="Benue">Benue</option>
-                                                <option value="Borno">Borno</option>
-                                                <option value="Cross River">Cross River</option>
-                                                <option value="Delta">Delta</option>
-                                                <option value="Ebonyi">Ebonyi</option>
-                                                <option value="Edo">Edo</option>
-                                                <option value="Ekiti">Ekiti</option>
-                                                <option value="Enugu">Enugu</option>
-                                                <option value="FCT">Federal Capital Territory</option>
-                                                <option value="Gombe">Gombe</option>
-                                                <option value="Imo">Imo</option>
-                                                <option value="Jigawa">Jigawa</option>
-                                                <option value="Kaduna">Kaduna</option>
-                                                <option value="Kano">Kano</option>
-                                                <option value="Katsina">Katsina</option>
-                                                <option value="Kebbi">Kebbi</option>
-                                                <option value="Kogi">Kogi</option>
-                                                <option value="Kwara">Kwara</option>
-                                                <option value="Lagos">Lagos</option>
-                                                <option value="Nasarawa">Nasarawa</option>
-                                                <option value="Niger">Niger</option>
-                                                <option value="Ogun">Ogun</option>
-                                                <option value="Ondo">Ondo</option>
-                                                <option value="Osun">Osun</option>
-                                                <option value="Oyo">Oyo</option>
-                                                <option value="Plateau">Plateau</option>
-                                                <option value="Rivers">Rivers</option>
-                                                <option value="Sokoto">Sokoto</option>
-                                                <option value="Taraba">Taraba</option>
-                                                <option value="Yobe">Yobe</option>
-                                                <option value="Zamfara">Zamfara</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="submit-row">
-                                        <button type="submit" className="btn btn-primary"><i className="fas fa-calculator"></i> Calculate Admission Chance</button>
-                                    </div>
-                                </form>
-                                <div id="calculator-result" className="calculator-result hidden">
-                                    <div className="result-header">
-                                        <h3>Your Admission Chance</h3>
-                                        <div className="chance-percent" id="chance-percent">0%</div>
-                                    </div>
-                                    <div className="chance-meter">
-                                        <div className="chance-fill w-0" id="chance-fill"></div>
-                                    </div>
-                                    <div className="chance-explanation" id="chance-explanation"></div>
-                                    <div className="factors-wrap">
-                                        <h4>Key Factors</h4>
-                                        <ul className="factors-list" id="factors-list"></ul>
-                                    </div>
-                                </div>
+                                <AdmissionCalculator />
                             </div>
 
                             <div id="full-form-panel" role="tabpanel" aria-labelledby="tab-full-form" className="hidden">

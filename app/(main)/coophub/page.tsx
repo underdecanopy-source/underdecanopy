@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Shield, HandHelping, Mail, Phone, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Twitter, Facebook, Instagram, Youtube, MessageCircle, Store, Music } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Shield, HandHelping, Mail, Phone, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Send, Heart, Share2, Play, MessageCircle, Store, Music, Menu, X } from 'lucide-react';
 
 const config = {
     whatsAppNumber: "+2348064852108",
@@ -54,6 +54,10 @@ export default function Page() {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
     const [activeProduct, setActiveProduct] = useState('school-fees');
     const [activeProcess, setActiveProcess] = useState('school-fees');
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Toggle FAQ accordion
     const toggleFaq = (index: number) => {
         if (openFaq === index) {
             setOpenFaq(null);
@@ -62,28 +66,108 @@ export default function Page() {
         }
     };
 
+    // Toggle mobile menu
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        if (isMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMenuOpen]);
+
+    // Smooth scroll behavior
+    useEffect(() => {
+        document.documentElement.style.scrollBehavior = 'smooth';
+        return () => {
+            document.documentElement.style.scrollBehavior = 'auto';
+        };
+    }, []);
+
     return (
         <>
             <main>
+                {/* Mobile Menu Button - Floating */}
+                <div className="fixed bottom-6 right-6 z-40 md:hidden">
+                    <button
+                        onClick={toggleMenu}
+                        className="p-3 bg-[var(--primary)] text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+                        aria-label="Toggle navigation menu"
+                        aria-expanded={isMenuOpen}
+                    >
+                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
+
+                {/* Mobile Menu Dropdown */}
+                {isMenuOpen && (
+                    <div
+                        ref={menuRef}
+                        className="fixed top-0 right-0 w-64 h-screen bg-white shadow-lg z-30 md:hidden overflow-y-auto animate-slideIn"
+                    >
+                        <div className="p-6 space-y-4">
+                            <button
+                                onClick={() => setIsMenuOpen(false)}
+                                className="absolute top-4 right-4 p-2"
+                                aria-label="Close menu"
+                            >
+                                <X size={24} />
+                            </button>
+                            <nav className="space-y-3 mt-8">
+                                <a href="#home" className="block px-4 py-2 hover:bg-gray-100 rounded transition-colors" onClick={() => setIsMenuOpen(false)}>Home</a>
+                                <a href="#products" className="block px-4 py-2 hover:bg-gray-100 rounded transition-colors" onClick={() => setIsMenuOpen(false)}>Products</a>
+                                <a href="#features" className="block px-4 py-2 hover:bg-gray-100 rounded transition-colors" onClick={() => setIsMenuOpen(false)}>Features</a>
+                                <a href="#how-it-works" className="block px-4 py-2 hover:bg-gray-100 rounded transition-colors" onClick={() => setIsMenuOpen(false)}>How It Works</a>
+                                <a href="#faq" className="block px-4 py-2 hover:bg-gray-100 rounded transition-colors" onClick={() => setIsMenuOpen(false)}>FAQ</a>
+                                <a href="#contact" className="block px-4 py-2 hover:bg-gray-100 rounded transition-colors" onClick={() => setIsMenuOpen(false)}>Contact</a>
+                            </nav>
+                        </div>
+                    </div>
+                )}
+
                 <section className="hero" id="home">
                     <div className="container">
                         <h1>Your Secure Digital Platform for Education & Cooperative Finance</h1>
                         <p>Underdecanopy CoopHub is the secure, transparent platform for managing school fees and cooperative services, powered by Wema Bank.</p>
 
                         <div className="product-selector">
-                            <button className={`product-tab ${activeProduct === 'school-fees' ? 'active' : ''}`} onClick={() => setActiveProduct('school-fees')}>School Fee Management</button>
-                            <button className={`product-tab ${activeProduct === 'cooperative' ? 'active' : ''}`} onClick={() => setActiveProduct('cooperative')}>Cooperative Services</button>
+                            <button
+                                className={`product-tab ${activeProduct === 'school-fees' ? 'active' : ''}`}
+                                onClick={() => setActiveProduct('school-fees')}
+                                aria-pressed={activeProduct === 'school-fees'}
+                            >
+                                School Fee Management
+                            </button>
+                            <button
+                                className={`product-tab ${activeProduct === 'cooperative' ? 'active' : ''}`}
+                                onClick={() => setActiveProduct('cooperative')}
+                                aria-pressed={activeProduct === 'cooperative'}
+                            >
+                                Cooperative Services
+                            </button>
                         </div>
 
                         <a href="#get-started" className="cta-button">Get Started Today</a>
                     </div>
                 </section>
 
-                <section className="products" id="products">
+                <section className="products" id="products" data-animate>
                     <div className="container">
                         <h2 className="section-title">Our Products</h2>
                         <div className="products-grid">
-                            <div className="product-card">
+                            <div className="product-card" data-animate>
                                 <div className="product-icon" aria-hidden="true">
                                     <GraduationCap />
                                 </div>
@@ -97,7 +181,7 @@ export default function Page() {
                                 </ul>
                             </div>
 
-                            <div className="product-card cooperative">
+                            <div className="product-card cooperative" data-animate>
                                 <div className="product-icon" aria-hidden="true">
                                     <Users />
                                 </div>
@@ -114,11 +198,11 @@ export default function Page() {
                     </div>
                 </section>
 
-                <section className="features" id="features">
+                <section className="features" id="features" data-animate>
                     <div className="container">
                         <h2 className="section-title">Why Choose CoopHub?</h2>
                         <div className="features-grid">
-                            <div className="feature-card">
+                            <div className="feature-card" data-animate>
                                 <div className="feature-icon" aria-hidden="true">
                                     <Shield />
                                 </div>
@@ -126,7 +210,7 @@ export default function Page() {
                                 <p>Your data is protected with full digital footprints. Sensitive information is handled directly by Wema Bank.</p>
                             </div>
 
-                            <div className="feature-card">
+                            <div className="feature-card" data-animate>
                                 <div className="feature-icon" aria-hidden="true">
                                     <ChartLine />
                                 </div>
@@ -134,7 +218,7 @@ export default function Page() {
                                 <p>Ditch the last-minute panic. Save gradually and build healthy financial habits.</p>
                             </div>
 
-                            <div className="feature-card">
+                            <div className="feature-card" data-animate>
                                 <div className="feature-icon" aria-hidden="true">
                                     <HandHelping />
                                 </div>
@@ -142,7 +226,7 @@ export default function Page() {
                                 <p>Quick access to loans based on your contributions without lengthy paperwork.</p>
                             </div>
 
-                            <div className="feature-card">
+                            <div className="feature-card" data-animate>
                                 <div className="feature-icon" aria-hidden="true">
                                     <Smartphone />
                                 </div>
@@ -150,7 +234,7 @@ export default function Page() {
                                 <p>Complete digital experience accessible from anywhere on your mobile device.</p>
                             </div>
 
-                            <div className="feature-card">
+                            <div className="feature-card" data-animate>
                                 <div className="feature-icon" aria-hidden="true">
                                     <UserCheck/>
                                 </div>
@@ -158,7 +242,7 @@ export default function Page() {
                                 <p>Fully regulated and compliant with all financial regulations for your peace of mind.</p>
                             </div>
 
-                            <div className="feature-card">
+                            <div className="feature-card" data-animate>
                                 <div className="feature-icon" aria-hidden="true">
                                     <Clock />
                                 </div>
@@ -169,13 +253,25 @@ export default function Page() {
                     </div>
                 </section>
 
-                <section className="how-it-works" id="how-it-works">
+                <section className="how-it-works" id="how-it-works" data-animate>
                     <div className="container">
                         <h2 className="section-title">How It Works</h2>
 
                         <div className="process-tabs">
-                            <button className={`process-tab ${activeProcess === 'school-fees' ? 'active' : ''}`} onClick={() => setActiveProcess('school-fees')}>School Fee Management</button>
-                            <button className={`process-tab ${activeProcess === 'cooperative' ? 'active' : ''}`} onClick={() => setActiveProcess('cooperative')}>Cooperative Services</button>
+                            <button
+                                className={`process-tab ${activeProcess === 'school-fees' ? 'active' : ''}`}
+                                onClick={() => setActiveProcess('school-fees')}
+                                aria-pressed={activeProcess === 'school-fees'}
+                            >
+                                School Fee Management
+                            </button>
+                            <button
+                                className={`process-tab ${activeProcess === 'cooperative' ? 'active' : ''}`}
+                                onClick={() => setActiveProcess('cooperative')}
+                                aria-pressed={activeProcess === 'cooperative'}
+                            >
+                                Cooperative Services
+                            </button>
                         </div>
 
                         <div className={`process-content ${activeProcess === 'school-fees' ? 'active' : ''}`} id="school-fees-process">
@@ -248,11 +344,11 @@ export default function Page() {
                     </div>
                 </section>
 
-                <section className="security">
+                <section className="security" data-animate>
                     <div className="container">
                         <h2 className="section-title section-title-light">Your Security Is Our Priority</h2>
                         <div className="security-grid">
-                            <div className="security-card">
+                            <div className="security-card" data-animate>
                                 <div className="security-icon" aria-hidden="true">
                                     <Lock />
                                 </div>
@@ -260,7 +356,7 @@ export default function Page() {
                                 <p>All data is encrypted using industry-standard protocols.</p>
                             </div>
 
-                            <div className="security-card">
+                            <div className="security-card" data-animate>
                                 <div className="security-icon" aria-hidden="true">
                                     <Shield />
                                 </div>
@@ -268,7 +364,7 @@ export default function Page() {
                                 <p>Powered by CoopHub, a platform operated by Wema Bank.</p>
                             </div>
 
-                            <div className="security-card">
+                            <div className="security-card" data-animate>
                                 <div className="security-icon" aria-hidden="true">
                                     <Fingerprint />
                                 </div>
@@ -276,7 +372,7 @@ export default function Page() {
                                 <p>Sensitive data handled directly by Wema Bank under their security controls.</p>
                             </div>
 
-                            <div className="security-card">
+                            <div className="security-card" data-animate>
                                 <div className="security-icon" aria-hidden="true">
                                     <ShieldCheck />
                                 </div>
@@ -287,15 +383,20 @@ export default function Page() {
                     </div>
                 </section>
 
-                <section className="faq" id="faq">
+                <section className="faq" id="faq" data-animate>
                     <div className="container">
                         <h2 className="section-title">Frequently Asked Questions</h2>
                         {faqData.map((faq, index) => (
-                            <div className={`faq-item ${openFaq === index ? 'active' : ''}`} key={index}>
-                                <button className="faq-question" onClick={() => toggleFaq(index)} aria-expanded={openFaq === index}>
+                            <div className={`faq-item ${openFaq === index ? 'active' : ''}`} key={index} data-animate>
+                                <button
+                                    className="faq-question"
+                                    onClick={() => toggleFaq(index)}
+                                    aria-expanded={openFaq === index}
+                                    aria-controls={`faq-answer-${index}`}
+                                >
                                     {faq.question}
                                 </button>
-                                <div className="faq-answer">
+                                <div className="faq-answer" id={`faq-answer-${index}`} role="region">
                                     {Array.isArray(faq.answer) ? (
                                         faq.answer.map((line, i) => <p key={i} dangerouslySetInnerHTML={{ __html: line }} />)
                                     ) : (
@@ -307,23 +408,23 @@ export default function Page() {
                     </div>
                 </section>
 
-                <section className="contact" id="contact">
+                <section className="contact" id="contact" data-animate>
                     <div className="container">
                         <h2 className="section-title section-title-light">We&apos;re Here to Help</h2>
                         <p className="text-center mb-12 text-[var(--gray)]">Can&apos;t find what you&apos;re looking for? Reach out to our support team.</p>
 
                         <div className="contact-methods">
-                            <div className="contact-method">
+                            <div className="contact-method" data-animate>
                                 <div className="contact-icon" aria-hidden="true"><Mail /></div>
                                 <h3>Email Us</h3>
                                 <p><a href={`mailto:${config.email}`}>{config.email}</a></p>
                             </div>
-                            <div className="contact-method">
+                            <div className="contact-method" data-animate>
                                 <div className="contact-icon" aria-hidden="true"><MessageCircle /></div>
                                 <h3>Message on WhatsApp</h3>
                                 <p><a href={`https://wa.me/${config.whatsAppNumber.replace('+', '')}`}>{config.whatsAppNumber}</a></p>
                             </div>
-                            <div className="contact-method">
+                            <div className="contact-method" data-animate>
                                 <div className="contact-icon" aria-hidden="true"><Globe /></div>
                                 <h3>Follow & DM</h3>
                                 <p>Follow <strong>@coophub</strong> on all social media platforms</p>
@@ -336,7 +437,7 @@ export default function Page() {
                     </div>
                 </section>
 
-                <section className="get-started" id="get-started">
+                <section className="get-started" id="get-started" data-animate>
                     <div className="container">
                         <div className="section-header">
                             <h2><Phone /> Get Started Today</h2>
@@ -344,11 +445,11 @@ export default function Page() {
                         </div>
 
                         <div className="cta-buttons">
-                            <a href={`tel:${config.phone}`} className="cta-button-large phone-button">
+                            <a href={`tel:${config.phone}`} className="cta-button-large phone-button" aria-label={`Call us at ${config.phone}`}>
                                 <Phone /> Call: {config.phone}
                             </a>
                             <span className="separator" role="separator">OR</span>
-                            <a href={`https://wa.me/${config.whatsAppNumber.replace('+', '')}`} className="cta-button-large whatsapp-button">
+                            <a href={`https://wa.me/${config.whatsAppNumber.replace('+', '')}`} className="cta-button-large whatsapp-button" aria-label="Message us on WhatsApp">
                                 <MessageCircle /> WhatsApp Us
                             </a>
                         </div>
@@ -356,13 +457,13 @@ export default function Page() {
                         <div className="download-section">
                             <p>Download the app now and begin managing your finances.</p>
                             <div className="download-buttons">
-                                <a href={config.appLinks.apple} className="download-button app-store">
+                                <a href={config.appLinks.apple} className="download-button app-store" aria-label="Download from Apple App Store">
                                     <Apple /> App Store
                                 </a>
-                                <a href={config.appLinks.google} className="download-button play-store">
+                                <a href={config.appLinks.google} className="download-button play-store" aria-label="Download from Google Play Store">
                                     <Store /> Play Store
                                 </a>
-                                <a href={config.appLinks.web} className="download-button web-app">
+                                <a href={config.appLinks.web} className="download-button web-app" aria-label="Access web app">
                                     <Globe /> Web App
                                 </a>
                             </div>
@@ -394,10 +495,10 @@ export default function Page() {
                         </div>
                         <div className="footer-social">
                             <p>Follow us: @coophub</p>
-                            <a href={config.socials.facebook} aria-label="Follow us on Facebook"><Facebook /></a>
-                            <a href={config.socials.twitter} aria-label="Follow us on Twitter"><Twitter /></a>
-                            <a href={config.socials.instagram} aria-label="Follow us on Instagram"><Instagram /></a>
-                            <a href={config.socials.youtube} aria-label="Follow us on YouTube"><Youtube /></a>
+                            <a href={config.socials.facebook} aria-label="Follow us on Facebook"><Heart /></a>
+                            <a href={config.socials.twitter} aria-label="Follow us on Twitter"><Send /></a>
+                            <a href={config.socials.instagram} aria-label="Follow us on Instagram"><Share2 /></a>
+                            <a href={config.socials.youtube} aria-label="Follow us on YouTube"><Play /></a>
                             <a href={config.socials.tiktok} aria-label="Follow us on Tiktok"><Music /></a>
                         </div>
                     </div>
