@@ -68,8 +68,8 @@ export function Navigation() {
                         <Link
                             key={item.href}
                             href={item.href}
-                            // Added vertical padding here to make links bigger on hover
-                            className="px-3 py-1 text-sm font-medium text-white transition-all tracking-wider hover:text-[#ff9800] hover:border-b-2 hover:border-b-[white]"
+                            // Fixed: Use opacity and color change instead of border to prevent layout shift
+                            className="relative px-3 py-1 text-sm font-medium text-white transition-all tracking-wider hover:text-[#ff9800] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#ff9800] after:transition-all after:duration-300 hover:after:w-full"
                         >
                             {item.label}
                         </Link>

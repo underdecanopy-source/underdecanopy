@@ -184,7 +184,7 @@ export default function TrustFixPage() {
         subtitle="Fast, reliable tech support"
       />
 
-      <MobileOptimizedFooter serviceName="TrustFix" />
+      <MobileOptimizedFooter serviceName="TrustFix" showQuickContact={false} />
 
       {/* Font Awesome for icons */}
       <Script

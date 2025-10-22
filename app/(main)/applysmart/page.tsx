@@ -495,7 +495,7 @@ export default function page() {
                 subtitle="Contact us for more information about ApplySmart"
             />
 
-            <MobileOptimizedFooter serviceName="ApplySmart" />
+            <MobileOptimizedFooter serviceName="ApplySmart" showQuickContact={false} />
         </>
     )
 }

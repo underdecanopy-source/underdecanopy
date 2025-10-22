@@ -717,7 +717,7 @@ export default function SmartTaxPage() {
                     subtitle="Get started with SmartTax today"
                 />
 
-                <MobileOptimizedFooter serviceName="SmartTax" />
+                <MobileOptimizedFooter serviceName="SmartTax" showQuickContact={false} />
             </main>
         </>
     );

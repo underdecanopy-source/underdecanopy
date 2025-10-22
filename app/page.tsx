@@ -5,19 +5,15 @@ import Image from 'next/image';
 import {
     Clock,
     Cpu,
-    Facebook,
     FileUser,
     HandCoins,
-    Instagram,
     LifeBuoy,
-    Linkedin,
     // LocationEditIcon, (kept if used elsewhere)
     MapPinHouse,
     Phone,
     School,
     Send,
     ShieldHalf,
-    Twitter,
     Printer,
     Video,
     Headset,
@@ -48,7 +44,6 @@ import GlassWaterIcon from '@/components/icons/GlassWater';
 
 
 import MicIcon from '@/components/icons/Mic';
-import MessageSquareIcon from '@/components/icons/MessageSquare';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -546,13 +541,19 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 mb-8">
                 <Clock size={24} className="text-orange-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Working Hours</h4>
                   <p className="text-gray-600">Monday - Friday: 9AM - 6PM</p>
                   <p className="text-gray-600">Saturday: 10AM - 4PM</p>
                 </div>
+              </div>
+
+              <div className="border-t pt-8">
+                <h4 className="text-lg font-bold text-gray-800 mb-4">Newsletter</h4>
+                <p className="text-gray-600 mb-4">Subscribe for updates and offers.</p>
+                <NewsletterForm />
               </div>
             </div>
 
@@ -561,124 +562,14 @@ export default function Page() {
         </div>
       </section>
 
-      <footer className="bg-gray-800 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-            <div className="footer-col">
-              <h4 className="text-lg font-bold mb-4">Underdecanopy Digital Hub</h4>
-              <p className="text-gray-400">
-                Your trusted center for digital solutions, business services, 
-                and a relaxing cafe experience in Ibadan.
-              </p>
-              <div className="flex gap-4 mt-4">
-                <a
-                  href="https://facebook.com/underdecanopy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                  className="text-gray-400 hover:text-white"
-                >
-                  <Facebook />
-                </a>
-                <a
-                  href="https://twitter.com/underdecanopy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Twitter"
-                  className="text-gray-400 hover:text-white"
-                >
-                  <Twitter />
-                </a>
-                <a
-                  href="https://instagram.com/underdecanopy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  className="text-gray-400 hover:text-white"
-                >
-                  <Instagram />
-                </a>
-                <a
-                  href="https://linkedin.com/company/underdecanopy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                  className="text-gray-400 hover:text-white"
-                >
-                  <Linkedin />
-                </a>
-              </div>
-            </div>
 
-            <div>
-              <h4 className="text-lg font-bold mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="#additional" className="text-gray-400 hover:text-white">Professional Services</a>
-                </li>
-                <li>
-                  <a href="#services" className="text-gray-400 hover:text-white">Core Services</a>
-                </li>
-                <li>
-                  <a href="#cafe" className="text-gray-400 hover:text-white">Cafe Experience</a>
-                </li>
-                <li>
-                  <a href="#podcast" className="text-gray-400 hover:text-white">Podcast</a>
-                </li>
-                <li>
-                  <a href="#contact" className="text-gray-400 hover:text-white">Contact</a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-lg font-bold mb-4">Our Services</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">TrustFix</a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">Swift Wheel</a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">TechLift</a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">ApplySmart</a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">SchoolPay</a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">SmartTax Receipts</a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-lg font-bold mb-4">Newsletter</h4>
-              <p className="text-gray-400 mb-4">Subscribe for updates and offers.</p>
-              <NewsletterForm />
-            </div>
-          </div>
-
-          <div className="border-t border-gray-700 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Underdecanopy Digital Hub. All Rights Reserved.</p>
-          </div>
-        </div>
-      </footer>
 
       <ContactSection
         title="Get in Touch"
         subtitle="We're here to help. Reach out to us today!"
       />
 
-      <MobileOptimizedFooter serviceName="Underdecanopy" />
+      <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={false} />
     </>
   );
 }

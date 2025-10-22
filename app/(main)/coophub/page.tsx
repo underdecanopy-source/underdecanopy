@@ -515,7 +515,7 @@ export default function Page() {
                 subtitle="Start your journey to financial freedom"
             />
 
-            <MobileOptimizedFooter serviceName="CoopHub" />
+            <MobileOptimizedFooter serviceName="CoopHub" showQuickContact={false} />
         </>
     );
 }

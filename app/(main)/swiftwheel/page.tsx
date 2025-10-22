@@ -466,7 +466,7 @@ export default function SwiftWheelPage() {
                     subtitle="Professional CAC services"
                 />
 
-                <MobileOptimizedFooter serviceName="SwiftWheel" />
+                <MobileOptimizedFooter serviceName="SwiftWheel" showQuickContact={false} />
 
             </div>
         </>
