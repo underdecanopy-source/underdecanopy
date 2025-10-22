@@ -188,7 +188,109 @@ function NewsletterForm() {
   );
 }
 
+
+import { ServiceCard } from '@/app/(main)/_components/ServiceCard';
+import { ProfessionalServiceCard } from '@/app/(main)/_components/ProfessionalServiceCard';
+
+
+const coreServices = [
+  {
+    icon: <ShieldHalf size={32} />,
+    title: 'TrustFix',
+    description:
+      'Discover top-notch computer and accessories sales, expert repairs, upgrades, and reliable IT support all in one place.',
+    link: '/trustfix',
+  },
+  {
+    icon: <LifeBuoy size={32} />,
+    title: 'Swift Wheel',
+    description:
+      'Register your business and file annual returns with ease. We handle CAC processes quickly and professionally.',
+    link: '/swiftwheel',
+  },
+  {
+    icon: <Cpu size={32} />,
+    title: 'TechLift',
+    description:
+      'Advance your career with hands-on training in computers, programming, graphics, and digital technologies from certified experts.',
+    link: '/techlift',
+  },
+  {
+    icon: <FileUser size={32} />,
+    title: 'ApplySmart',
+    description:
+      'Fast, easy, and reliable Post UTME, admission applications, and online registration for schools and universities.',
+    link: '/applysmart',
+  },
+  {
+    icon: <School size={32} />,
+    title: 'CoopHub',
+    description:
+      'Simplify your school and cooperative financial life in one place. Make secure fee payments, manage savings and contributions, and access instant loans, all through our trusted digital cooperative platform for students and parents.',
+    link: '/coophub',
+  },
+  {
+    icon: <HandCoins size={32} />,
+    title: 'SmartTax Receipts',
+    description:
+      'Our digital receipt system not only makes receiving receipts more convenient for your customers, it takes the stress out of customers having to hold onto their receipts when tax time rolls around.',
+    link: '/smarttax',
+  },
+];
+
+const professionalServices = [
+  {
+    icon: <Printer />,
+    title: 'Printing & Photocopy',
+    description:
+      'High-quality document printing, photocopying, and scanning services.',
+  },
+  {
+    icon: <Video />,
+    title: 'Church Media',
+    description:
+      'Audio-visual support, live streaming, and media production for churches.',
+  },
+  {
+    icon: <Headset />,
+    title: 'IT User Support',
+    description:
+      'Technical assistance, troubleshooting, and user training for IT systems.',
+  },
+  {
+    icon: <Laptop />,
+    title: 'School Management',
+    description:
+      'Sales and setup of school management and e-learning software.',
+  },
+  {
+    icon: <Paintbrush />,
+    title: 'Graphics Design',
+    description:
+      'Professional presentations, flyers, banners, and graphic design services.',
+  },
+  {
+    icon: <Code />,
+    title: 'Web Development',
+    description:
+      'Custom websites, web apps, and online solutions for your business.',
+  },
+  {
+    icon: <BookOpen />,
+    title: 'Student Research Companion',
+    description:
+      'Comprehensive research assistance including project topics, materials, and 24/7 support from experienced academic writers.',
+  },
+  {
+    icon: <Map />,
+    title: 'Space Rentals & Delivery Services',
+    description:
+      'We connect students with verified rentals and provide local delivery services across Ibadan.',
+  },
+];
+
 export default function Page() {
+
   return (
     <>
       <Navigation />
@@ -228,94 +330,15 @@ export default function Page() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
-                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
-                  <ShieldHalf size={32} />
-                </span>
-                TrustFix
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Discover top-notch computer and accessories sales, expert
-                repairs, upgrades, and reliable IT support all in one place.
-              </p>
-              <Link href="/trustfix" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
-                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
-                  <LifeBuoy size={32} />
-                </span>
-                Swift Wheel
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Register your business and file annual returns with ease. We
-                handle CAC processes quickly and professionally.
-              </p>
-              <Link href="/swiftwheel" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
-                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
-                  <Cpu size={32} />
-                </span>
-                TechLift
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Advance your career with hands-on training in computers,
-                programming, graphics, and digital technologies from certified
-                experts.
-              </p>
-              <Link href="/techlift" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
-                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
-                  <FileUser size={32} />
-                </span>
-                ApplySmart
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Fast, easy, and reliable Post UTME, admission applications, and
-                online registration for schools and universities.
-              </p>
-              <Link href="/applysmart" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
-                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
-                  <School size={32} />
-                </span>
-                CoopHub
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Simplify your school and cooperative financial life in one
-                place. Make secure fee payments, manage savings and
-                contributions, and access instant loans, all through our
-                trusted digital cooperative platform for students and parents.
-              </p>
-              <Link href="/coophub" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
-                <span className="p-3 rounded-full bg-orange-100 text-orange-500">
-                  <HandCoins size={32} />
-                </span>
-                SmartTax Receipts
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Our digital receipt system not only makes receiving receipts 
-                more convenient for your customers, it takes the stress out of 
-                customers having to hold onto their receipts when tax time
-                rolls around.
-              </p>
-              <Link href="/smarttax" className="text-orange-500 font-semibold hover:underline">Let&apos;s Go</Link>
-            </div>
+            {coreServices.map((service) => (
+              <ServiceCard
+                key={service.title}
+                icon={service.icon}
+                title={service.title}
+                description={service.description}
+                link={service.link}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -331,92 +354,14 @@ export default function Page() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div key="printing" className="text-center">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
-                <Printer />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Printing & Photocopy</h3>
-              <p className="text-gray-600">
-                High-quality document printing, photocopying, and scanning
-                services.
-              </p>
-            </div>
-
-            <div key="media" className="text-center">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
-                <Video />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Church Media</h3>
-              <p className="text-gray-600">
-                Audio-visual support, live streaming, and media production for
-                churches.
-              </p>
-            </div>
-
-            <div key="support" className="text-center">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
-                <Headset />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">IT User Support</h3>
-              <p className="text-gray-600">
-                Technical assistance, troubleshooting, and user training for IT
-                systems.
-              </p>
-            </div>
-
-            <div key="school-management" className="text-center">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
-                <Laptop />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">School Management</h3>
-              <p className="text-gray-600">
-                Sales and setup of school management and e-learning software.
-              </p>
-            </div>
-
-            <div key="design" className="text-center">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
-                <Paintbrush />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Graphics Design</h3>
-              <p className="text-gray-600">
-                Professional presentations, flyers, banners, and graphic design
-                services.
-              </p>
-            </div>
-
-            <div key="web-dev" className="text-center">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
-                <Code />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Web Development</h3>
-              <p className="text-gray-600">
-                Custom websites, web apps, and online solutions for your
-                business.
-              </p>
-            </div>
-
-            <div key="research" className="text-center">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
-                <BookOpen />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Student Research Companion</h3>
-              <p className="text-gray-600">
-                Comprehensive research assistance including project topics,
-                materials, and 24/7 support from experienced academic writers.
-              </p>
-            </div>
-
-            <div key="rentals" className="text-center">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-orange-500 text-white mx-auto mb-4">
-                <Map />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Space Rentals & Delivery Services</h3>
-              <p className="text-gray-600">
-                We connect students with verified rentals and provide local
-                delivery services across Ibadan.
-              </p>
-            </div>
+            {professionalServices.map((service) => (
+              <ProfessionalServiceCard
+                key={service.title}
+                icon={service.icon}
+                title={service.title}
+                description={service.description}
+              />
+            ))}
           </div>
         </div>
       </section>

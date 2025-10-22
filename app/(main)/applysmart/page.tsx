@@ -6,6 +6,7 @@ import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { MobileOptimizedFooter } from "@/components/contact/MobileOptimizedFooter";
+import { federalUniversities, stateUniversities, polytechnics, firstTierCourses, secondTierCourses, thirdTierCourses, states } from "@/lib/data/applysmart";
 
 export const metadata: Metadata = {
     title: "ApplySmart - Nigerian Admission & Scholarship Support | Underdecanopy",
@@ -38,88 +39,28 @@ export default function page() {
                                             <option value="">Preferred Institution *</option>
 
                                             <optgroup label="Federal Universities">
-                                                <option value="UNILAG">University of Lagos (UNILAG)</option>
-                                                <option value="UI">University of Ibadan (UI)</option>
-                                                <option value="OAU">Obafemi Awolowo University (OAU)</option>
-                                                <option value="UNIBEN">University of Benin (UNIBEN)</option>
-                                                <option value="UNN">University of Nigeria, Nsukka (UNN)</option>
-                                                <option value="ABU">Ahmadu Bello University (ABU)</option>
-                                                <option value="BUK">Bayero University Kano (BUK)</option>
-                                                <option value="FUTA">Federal University of Technology, Akure (FUTA)</option>
-                                                <option value="FUTO">Federal University of Technology, Owerri (FUTO)</option>
-                                                <option value="UNIPORT">University of Port Harcourt (UNIPORT)</option>
-                                                <option value="UNILORIN">University of Ilorin (UNILORIN)</option>
-                                                <option value="UNICAL">University of Calabar (UNICAL)</option>
-                                                <option value="FUNAAB">Federal University of Agriculture, Abeokuta (FUNAAB)</option>
-                                                <option value="UNIJOS">University of Jos (UNIJOS)</option>
-                                                <option value="UNIMAID">University of Maiduguri (UNIMAID)</option>
+                                                {federalUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
                                             </optgroup>
 
                                             <optgroup label="State Universities">
-                                                <option value="LASU">Lagos State University (LASU)</option>
-                                                <option value="EKSU">Ekiti State University (EKSU)</option>
-                                                <option value="AAU">Ambrose Alli University (AAU)</option>
-                                                <option value="OOU">Olabisi Onabanjo University (OOU)</option>
-                                                <option value="RSU">Rivers State University (RSU)</option>
-                                                <option value="PLASU">Plateau State University (PLASU)</option>
-                                                <option value="KSU">Prince Abubakar Audu University (KSU)</option>
+                                                {stateUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
                                             </optgroup>
 
 
                                             <optgroup label="Polytechnics">
-                                                <option value="YABATECH">Yaba College of Technology (YABATECH)</option>
-                                                <option value="FEDPOLYNEKEDE">Federal Polytechnic, Nekede</option>
-                                                <option value="FEDPOLYILARO">Federal Polytechnic, Ilaro</option>
-                                                <option value="MAPOLY">Moshood Abiola Polytechnic (MAPOLY)</option>
+                                                {polytechnics.map(poly => <option key={poly.value} value={poly.value}>{poly.label}</option>)}
                                             </optgroup>
                                         </select>
                                         <select id="mini_calc_course" name="mini_calc_course" required>
                                             <option value="">Preferred Course *</option>
                                             <optgroup label="First Tier (Cutoff: 240+)">
-                                                <option value="Medicine and Surgery (MBBS)">Medicine and Surgery</option>
-                                                <option value="Dentistry (BDS)">Dentistry (BDS)</option>
-                                                <option value="Pharmacy (Pharm.D)">Pharmacy (Pharm.D)</option>
-                                                <option value="Law (LL.B)">Law (LL.B)</option>
-                                                <option value="Nursing Science (B.N.Sc.)">Nursing Science (B.N.Sc.)</option>
-                                                <option value="Medical Laboratory Science (B.MLS)">Medical Laboratory Science (B.MLS)</option>
-                                                <option value="Physiotherapy">Physiotherapy</option>
-                                                <option value="Radiography and Radiation Science">Radiography</option>
-                                                <option value="Veterinary Medicine (DVM)">Veterinary Medicine (DVM)</option>
-                                                <option value="Optometry">Optometry</option>
-                                                <option value="Anatomy">Anatomy</option>
-                                                <option value="Physiology">Physiology</option>
+                                                {firstTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
                                             </optgroup>
                                             <optgroup label="Second Tier (Cutoff: 200-239)">
-                                                <option value="Accounting">Accounting</option>
-                                                <option value="Banking and Finance">Banking and Finance</option>
-                                                <option value="Business Administration">Business Administration</option>
-                                                <option value="Economics">Economics</option>
-                                                <option value="Mass Communication">Mass Communication</option>
-                                                <option value="Computer Science">Computer Science</option>
-                                                <option value="Electrical/Electronics Engineering">Electrical Engineering</option>
-                                                <option value="Mechanical Engineering">Mechanical Engineering</option>
-                                                <option value="Civil Engineering">Civil Engineering</option>
-                                                <option value="Architecture">Architecture</option>
-                                                <option value="Estate Management">Estate Management</option>
-                                                <option value="Urban and Regional Planning">Urban and Regional Planning</option>
-                                                <option value="Biochemistry">Biochemistry</option>
-                                                <option value="Microbiology">Microbiology</option>
+                                                {secondTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
                                             </optgroup>
                                             <optgroup label="Third Tier (Cutoff: 160-199)">
-                                                <option value="Public Administration">Public Administration</option>
-                                                <option value="Local Government Studies">Local Government Studies</option>
-                                                <option value="Sociology">Sociology</option>
-                                                <option value="Political Science">Political Science</option>
-                                                <option value="History and International Studies">History and International Studies</option>
-                                                <option value="Theatre Arts">Theatre Arts</option>
-                                                <option value="Linguistics">Linguistics</option>
-                                                <option value="English Language and Literature">English Language</option>
-                                                <option value="Modern Languages">French</option>
-                                                <option value="Education programs with subject majors">Education</option>
-                                                <option value="Agricultural Economics">Agricultural Economics</option>
-                                                <option value="Animal Science">Animal Science</option>
-                                                <option value="Crop Science">Crop Science</option>
-                                                <option value="Soil Science">Soil Science</option>
+                                                {thirdTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
                                             </optgroup>
                                         </select>
                                         <input type="number" id="mini_calc_score" name="mini_calc_score" placeholder="JAMB Score" min="0" max="400" required />
@@ -197,43 +138,7 @@ export default function page() {
                                             <label >State of Origin</label>
                                             <select id="state" name="state" required>
                                                 <option value="">Select State</option>
-                                                <option value="Abia">Abia</option>
-                                                <option value="Adamawa">Adamawa</option>
-                                                <option value="Akwa Ibom">Akwa Ibom</option>
-                                                <option value="Anambra">Anambra</option>
-                                                <option value="Bauchi">Bauchi</option>
-                                                <option value="Bayelsa">Bayelsa</option>
-                                                <option value="Benue">Benue</option>
-                                                <option value="Borno">Borno</option>
-                                                <option value="Cross River">Cross River</option>
-                                                <option value="Delta">Delta</option>
-                                                <option value="Ebonyi">Ebonyi</option>
-                                                <option value="Edo">Edo</option>
-                                                <option value="Ekiti">Ekiti</option>
-                                                <option value="Enugu">Enugu</option>
-                                                <option value="FCT">Federal Capital Territory</option>
-                                                <option value="Gombe">Gombe</option>
-                                                <option value="Imo">Imo</option>
-                                                <option value="Jigawa">Jigawa</option>
-                                                <option value="Kaduna">Kaduna</option>
-                                                <option value="Kano">Kano</option>
-                                                <option value="Katsina">Katsina</option>
-                                                <option value="Kebbi">Kebbi</option>
-                                                <option value="Kogi">Kogi</option>
-                                                <option value="Kwara">Kwara</option>
-                                                <option value="Lagos">Lagos</option>
-                                                <option value="Nasarawa">Nasarawa</option>
-                                                <option value="Niger">Niger</option>
-                                                <option value="Ogun">Ogun</option>
-                                                <option value="Ondo">Ondo</option>
-                                                <option value="Osun">Osun</option>
-                                                <option value="Oyo">Oyo</option>
-                                                <option value="Plateau">Plateau</option>
-                                                <option value="Rivers">Rivers</option>
-                                                <option value="Sokoto">Sokoto</option>
-                                                <option value="Taraba">Taraba</option>
-                                                <option value="Yobe">Yobe</option>
-                                                <option value="Zamfara">Zamfara</option>
+                                                {states.map(state => <option key={state.value} value={state.value}>{state.label}</option>)}
                                             </select>
                                         </div>
                                         <div>
@@ -251,111 +156,54 @@ export default function page() {
                                             <label>1st Choice Institution</label>
                                             <select id="pref1_institution" name="pref1_institution" required>
                                                 <option value="">Select Institution</option>
-                                                <option value="UNILAG">University of Lagos (UNILAG)</option>
-                                                <option value="UI">University of Ibadan (UI)</option>
-                                                <option value="OAU">Obafemi Awolowo University (OAU)</option>
-                                                <option value="UNIBEN">University of Benin (UNIBEN)</option>
-                                                <option value="UNN">University of Nigeria, Nsukka (UNN)</option>
-                                                <option value="ABU">Ahmadu Bello University (ABU)</option>
-                                                <option value="BUK">Bayero University Kano (BUK)</option>
-                                                <option value="FUTA">Federal University of Technology, Akure (FUTA)</option>
-                                                <option value="FUTO">Federal University of Technology, Owerri (FUTO)</option>
-                                                <option value="UNIPORT">University of Port Harcourt (UNIPORT)</option>
-                                                <option value="UNILORIN">University of Ilorin (UNILORIN)</option>
-                                                <option value="UNICAL">University of Calabar (UNICAL)</option>
-                                                <option value="FUNAAB">Federal University of Agriculture, Abeokuta (FUNAAB)</option>
-                                                <option value="UNIJOS">University of Jos (UNIJOS)</option>
-                                                <option value="UNIMAID">University of Maiduguri (UNIMAID)</option>
+                                                {federalUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
+                                                {stateUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
+                                                {polytechnics.map(poly => <option key={poly.value} value={poly.value}>{poly.label}</option>)}
                                             </select>
                                         </div>
                                         <div>
                                             <label>1st Choice Course</label>
                                             <select id="pref1_course" name="pref1_course" required>
                                                 <option value="">Select Course</option>
-                                                <option value="medicine">Medicine and Surgery</option>
-                                                <option value="law">Law</option>
-                                                <option value="accounting">Accounting</option>
-                                                <option value="computer_science">Computer Science</option>
-                                                <option value="engineering">Engineering</option>
-                                                <option value="mass_comm">Mass Communication</option>
-                                                <option value="business_admin">Business Administration</option>
-                                                <option value="economics">Economics</option>
-                                                <option value="pharmacy">Pharmacy</option>
-                                                <option value="nursing">Nursing</option>
+                                                {firstTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
+                                                {secondTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
+                                                {thirdTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
                                             </select>
                                         </div>
                                         <div>
                                             <label>2nd Choice Institution</label>
                                             <select id="pref2_institution" name="pref2_institution" required>
                                                 <option value="">Select Institution</option>
-                                                <option value="UNILAG">University of Lagos (UNILAG)</option>
-                                                <option value="UI">University of Ibadan (UI)</option>
-                                                <option value="OAU">Obafemi Awolowo University (OAU)</option>
-                                                <option value="UNIBEN">University of Benin (UNIBEN)</option>
-                                                <option value="UNN">University of Nigeria, Nsukka (UNN)</option>
-                                                <option value="ABU">Ahmadu Bello University (ABU)</option>
-                                                <option value="BUK">Bayero University Kano (BUK)</option>
-                                                <option value="FUTA">Federal University of Technology, Akure (FUTA)</option>
-                                                <option value="FUTO">Federal University of Technology, Owerri (FUTO)</option>
-                                                <option value="UNIPORT">University of Port Harcourt (UNIPORT)</option>
-                                                <option value="UNILORIN">University of Ilorin (UNILORIN)</option>
-                                                <option value="UNICAL">University of Calabar (UNICAL)</option>
-                                                <option value="FUNAAB">Federal University of Agriculture, Abeokuta (FUNAAB)</option>
-                                                <option value="UNIJOS">University of Jos (UNIJOS)</option>
-                                                <option value="UNIMAID">University of Maiduguri (UNIMAID)</option>
+                                                {federalUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
+                                                {stateUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
+                                                {polytechnics.map(poly => <option key={poly.value} value={poly.value}>{poly.label}</option>)}
                                             </select>
                                         </div>
                                         <div>
                                             <label>2nd Choice Course</label>
                                             <select id="pref2_course" name="pref2_course" required>
                                                 <option value="">Select Course</option>
-                                                <option value="medicine">Medicine and Surgery</option>
-                                                <option value="law">Law</option>
-                                                <option value="accounting">Accounting</option>
-                                                <option value="computer_science">Computer Science</option>
-                                                <option value="engineering">Engineering</option>
-                                                <option value="mass_comm">Mass Communication</option>
-                                                <option value="business_admin">Business Administration</option>
-                                                <option value="economics">Economics</option>
-                                                <option value="pharmacy">Pharmacy</option>
-                                                <option value="nursing">Nursing</option>
+                                                {firstTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
+                                                {secondTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
+                                                {thirdTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
                                             </select>
                                         </div>
                                         <div>
                                             <label>3rd Choice Institution</label>
                                             <select id="pref3_institution" name="pref3_institution" required>
                                                 <option value="">Select Institution</option>
-                                                <option value="UNILAG">University of Lagos (UNILAG)</option>
-                                                <option value="UI">University of Ibadan (UI)</option>
-                                                <option value="OAU">Obafemi Awolowo University (OAU)</option>
-                                                <option value="UNIBEN">University of Benin (UNIBEN)</option>
-                                                <option value="UNN">University of Nigeria, Nsukka (UNN)</option>
-                                                <option value="ABU">Ahmadu Bello University (ABU)</option>
-                                                <option value="BUK">Bayero University Kano (BUK)</option>
-                                                <option value="FUTA">Federal University of Technology, Akure (FUTA)</option>
-                                                <option value="FUTO">Federal University of Technology, Owerri (FUTO)</option>
-                                                <option value="UNIPORT">University of Port Harcourt (UNIPORT)</option>
-                                                <option value="UNILORIN">University of Ilorin (UNILORIN)</option>
-                                                <option value="UNICAL">University of Calabar (UNICAL)</option>
-                                                <option value="FUNAAB">Federal University of Agriculture, Abeokuta (FUNAAB)</option>
-                                                <option value="UNIJOS">University of Jos (UNIJOS)</option>
-                                                <option value="UNIMAID">University of Maiduguri (UNIMAID)</option>
+                                                {federalUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
+                                                {stateUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
+                                                {polytechnics.map(poly => <option key={poly.value} value={poly.value}>{poly.label}</option>)}
                                             </select>
                                         </div>
                                         <div>
                                             <label>3rd Choice Course</label>
                                             <select id="pref3_course" name="pref3_course" required>
                                                 <option value="">Select Course</option>
-                                                <option value="medicine">Medicine and Surgery</option>
-                                                <option value="law">Law</option>
-                                                <option value="accounting">Accounting</option>
-                                                <option value="computer_science">Computer Science</option>
-                                                <option value="engineering">Engineering</option>
-                                                <option value="mass_comm">Mass Communication</option>
-                                                <option value="business_admin">Business Administration</option>
-                                                <option value="economics">Economics</option>
-                                                <option value="pharmacy">Pharmacy</option>
-                                                <option value="nursing">Nursing</option>
+                                                {firstTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
+                                                {secondTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
+                                                {thirdTierCourses.map(course => <option key={course.value} value={course.value}>{course.label}</option>)}
                                             </select>
                                         </div>
                                         <div className="full">
