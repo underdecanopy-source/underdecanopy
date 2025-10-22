@@ -51,6 +51,11 @@ export async function signUp(prevState: unknown, formData: FormData) {
         const dataObj = {
             email: formData.get('email') as string,
             password: formData.get('password') as string,
+            confirmPassword: formData.get('confirmPassword') as string
+        }
+
+        if (dataObj.password !== dataObj.confirmPassword) {
+            return { errorMessage: "Passwords do not match" }
         }
 
         const { auth } = await createClient()

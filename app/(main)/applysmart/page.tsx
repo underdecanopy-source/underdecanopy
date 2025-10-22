@@ -7,6 +7,7 @@ import Image from "next/image";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { MobileOptimizedFooter } from "@/components/contact/MobileOptimizedFooter";
 import { federalUniversities, stateUniversities, polytechnics, firstTierCourses, secondTierCourses, thirdTierCourses, states } from "@/lib/data/applysmart";
+import { Navigation } from "./_components/Navigation";
 
 export const metadata: Metadata = {
     title: "ApplySmart - Nigerian Admission & Scholarship Support | Underdecanopy",
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 export default function page() {
     return (
         <>
+            <Navigation />
             <main data-page="applysmart">
                 <section className="hero" aria-labelledby="hero-title">
                     <div className="container">

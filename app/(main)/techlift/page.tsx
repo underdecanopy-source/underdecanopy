@@ -4,10 +4,12 @@ import Image from 'next/image';
 import styles from './techlift.module.css';
 import { ContactSection } from '@/components/contact/ContactSection';
 import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
+import { Navigation } from './_components/Navigation';
 
 export default function TechLiftPage() {
     return (
         <div className={styles.pageWrapper}>
+            <Navigation />
             <main>
                 {/* Hero Section */}
                 <section className={styles.hero}>

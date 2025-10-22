@@ -14,7 +14,10 @@ import { toast } from 'sonner'
 function SubmitButton() {
     const { pending } = useFormStatus()
     return (
-        <Button className='w-full'>{pending && <Loader2 className='animate-spin' />}SignUp</Button>
+        <Button className='w-full'>
+            {pending ? <Loader2 className='animate-spin mr-2' /> : null}
+            {pending ? 'Signing Up...' : 'SignUp'}
+        </Button>
     )
 }
 
@@ -42,9 +45,14 @@ export default function SignupForm() {
                     <Input type='email' name='email' placeholder='Enter your email' required />
                 </div>
 
-                <div className='flex flex-col space-y-1.5'>
+                <div class='flex flex-col space-y-1.5'>
                     <Label htmlFor='password'>Password</Label>
                     <Input type='password' name='password' placeholder='Enter your password' required />
+                </div>
+
+                <div class='flex flex-col space-y-1.5'>
+                    <Label htmlFor='confirmPassword'>Confirm Password</Label>
+                    <Input type='password' name='confirmPassword' placeholder='Confirm your password' required />
                 </div>
 
             </CardContent>
