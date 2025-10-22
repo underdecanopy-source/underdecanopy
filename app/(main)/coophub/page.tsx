@@ -100,7 +100,7 @@ export default function Page() {
 
     return (
         <>
-            <main>
+            <main data-page="coophub">
                 {/* Mobile Menu Button - Floating */}
                 <div className="fixed bottom-6 right-6 z-40 md:hidden">
                     <button

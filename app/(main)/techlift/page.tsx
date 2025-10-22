@@ -2,8 +2,6 @@
 
 import Image from 'next/image';
 import styles from './techlift.module.css';
-import { ContactSection } from '@/components/contact/ContactSection';
-import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 
 export default function TechLiftPage() {
     return (
@@ -231,13 +229,6 @@ export default function TechLiftPage() {
                         </div>
                     </div>
                 </footer>
-
-                <ContactSection
-                    title="Start Your Tech Journey"
-                    subtitle="Enroll in our courses today"
-                />
-
-                <MobileOptimizedFooter serviceName="TechLift" />
             </main>
         </div>
     );

@@ -20,7 +20,7 @@ export default function SmartTaxPage() {
     return (
         <>
             <style>{`
-                :root {
+                main[data-page="smarttax"] {
                     --primary: #1a4f72;
                     --secondary: #e9b949;
                     --accent: #2e8540;
@@ -480,7 +480,7 @@ export default function SmartTaxPage() {
                 </div>
             </header>
 
-            <main>
+            <main data-page="smarttax">
                 <section className="hero">
                     <div className="container">
                         <h2>AI-Powered SmartTax for Nigerian Businesses</h2>

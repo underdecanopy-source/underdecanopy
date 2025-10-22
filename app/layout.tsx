@@ -18,9 +18,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <main>
+    <html lang="en" className="scroll-smooth">
+      <body className="w-full overflow-x-hidden">
+        <main className="w-full">
           {children}
           <Toaster />
         </main>

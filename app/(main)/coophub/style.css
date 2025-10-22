@@ -1,5 +1,6 @@
-/* === GLOBAL STYLES === */
-:root {
+/* === COOPHUB-SPECIFIC STYLES === */
+/* Scope CSS variables to CoopHub content only */
+main[data-page="coophub"] {
     --primary: #1a237e;
     --primary-dark: #1a237e;
     --secondary: #1a237e;

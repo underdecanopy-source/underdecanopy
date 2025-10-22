@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function page() {
     return (
         <>
-            <main>
+            <main data-page="applysmart">
                 <section className="hero" aria-labelledby="hero-title">
                     <div className="container">
                         <div className="hero-inner">

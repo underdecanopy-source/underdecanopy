@@ -1,4 +1,6 @@
-:root {
+/* === APPLYSMART-SPECIFIC STYLES === */
+/* Scope CSS variables to ApplySmart content only */
+main[data-page="applysmart"] {
     --primary: #0056b3;
     --primary-light: #e6f0ff;
     --accent: #00a651;
