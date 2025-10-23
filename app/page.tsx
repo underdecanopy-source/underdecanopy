@@ -4,25 +4,9 @@
 import Image from 'next/image';
 import {
     Clock,
-    Cpu,
-    FileUser,
-    HandCoins,
-    LifeBuoy,
-    // LocationEditIcon, (kept if used elsewhere)
     MapPinHouse,
     Phone,
-    School,
     Send,
-    ShieldHalf,
-    Printer,
-    Video,
-    Headset,
-    Laptop,
-    Paintbrush,
-    Code,
-    BookOpen,
-    Map,
-    Star,
 } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { Navigation } from '@/components/Navigation';
@@ -32,16 +16,7 @@ import {
   subscribeToNewsletter,
   type NewsletterState,
 } from '@/lib/actions/newsletter';
-import { ContactSection } from '@/components/contact/ContactSection';
-import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
-
-// LOCAL ICON COMPONENTS (fallbacks to avoid missing-library-exports)
-import CoffeeIcon from '@/components/icons/Coffee';
-import CookieIcon from '@/components/icons/Cookie';
-import UtensilsIcon from '@/components/icons/Utensils';
-import GlassWaterIcon from '@/components/icons/GlassWater';
-
-
+import { coreServices, professionalServices, cafeItems } from '@/lib/data/home';
 
 import MicIcon from '@/components/icons/Mic';
 
@@ -192,107 +167,10 @@ function NewsletterForm() {
 import { ServiceCard } from '@/app/(main)/_components/ServiceCard';
 import { ProfessionalServiceCard } from '@/app/(main)/_components/ProfessionalServiceCard';
 
-
-const coreServices = [
-  {
-    icon: <ShieldHalf size={32} />,
-    title: 'TrustFix',
-    description:
-      'Discover top-notch computer and accessories sales, expert repairs, upgrades, and reliable IT support all in one place.',
-    link: '/trustfix',
-  },
-  {
-    icon: <LifeBuoy size={32} />,
-    title: 'Swift Wheel',
-    description:
-      'Register your business and file annual returns with ease. We handle CAC processes quickly and professionally.',
-    link: '/swiftwheel',
-  },
-  {
-    icon: <Cpu size={32} />,
-    title: 'TechLift',
-    description:
-      'Advance your career with hands-on training in computers, programming, graphics, and digital technologies from certified experts.',
-    link: '/techlift',
-  },
-  {
-    icon: <FileUser size={32} />,
-    title: 'ApplySmart',
-    description:
-      'Fast, easy, and reliable Post UTME, admission applications, and online registration for schools and universities.',
-    link: '/applysmart',
-  },
-  {
-    icon: <School size={32} />,
-    title: 'CoopHub',
-    description:
-      'Simplify your school and cooperative financial life in one place. Make secure fee payments, manage savings and contributions, and access instant loans, all through our trusted digital cooperative platform for students and parents.',
-    link: '/coophub',
-  },
-  {
-    icon: <HandCoins size={32} />,
-    title: 'SmartTax Receipts',
-    description:
-      'Our digital receipt system not only makes receiving receipts more convenient for your customers, it takes the stress out of customers having to hold onto their receipts when tax time rolls around.',
-    link: '/smarttax',
-  },
-];
-
-const professionalServices = [
-  {
-    icon: <Printer />,
-    title: 'Printing & Photocopy',
-    description:
-      'High-quality document printing, photocopying, and scanning services.',
-  },
-  {
-    icon: <Video />,
-    title: 'Church Media',
-    description:
-      'Audio-visual support, live streaming, and media production for churches.',
-  },
-  {
-    icon: <Headset />,
-    title: 'IT User Support',
-    description:
-      'Technical assistance, troubleshooting, and user training for IT systems.',
-  },
-  {
-    icon: <Laptop />,
-    title: 'School Management',
-    description:
-      'Sales and setup of school management and e-learning software.',
-  },
-  {
-    icon: <Paintbrush />,
-    title: 'Graphics Design',
-    description:
-      'Professional presentations, flyers, banners, and graphic design services.',
-  },
-  {
-    icon: <Code />,
-    title: 'Web Development',
-    description:
-      'Custom websites, web apps, and online solutions for your business.',
-  },
-  {
-    icon: <BookOpen />,
-    title: 'Student Research Companion',
-    description:
-      'Comprehensive research assistance including project topics, materials, and 24/7 support from experienced academic writers.',
-  },
-  {
-    icon: <Map />,
-    title: 'Space Rentals & Delivery Services',
-    description:
-      'We connect students with verified rentals and provide local delivery services across Ibadan.',
-  },
-];
-
 export default function Page() {
 
   return (
-    <>
+    <main>
       <Navigation />
 
       <section className="bg-gray-100 py-10">
@@ -304,9 +182,9 @@ export default function Page() {
                 Your trusted center for digital solutions, business services, 
                 and a relaxing cafe experience in Ibadan.
               </p>
-              <a href="#contact" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-300">
+              <Link href="#contact" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-300">
                 Get Started Today
-              </a>
+              </Link>
             </div>
             <Image
               src="/hub.png"
@@ -358,7 +236,7 @@ export default function Page() {
               <ProfessionalServiceCard
                 key={service.title}
                 icon={service.icon}
-                title={service.title}
+.                title={service.title}
                 description={service.description}
               />
             ))}
@@ -377,56 +255,15 @@ export default function Page() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <CoffeeIcon />
+            {cafeItems.map((item) => (
+              <div key={item.title} className="bg-white p-6 rounded-lg shadow-md text-center">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
+                  {item.icon}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">{item.title}</h3>
+                <p className="text-gray-600">{item.description}</p>
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Coffee & Tea</h3>
-              <p className="text-gray-600">Freshly brewed coffee, herbal teas, and hot chocolate.</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <CookieIcon />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Pastries & Snacks</h3>
-              <p className="text-gray-600">Croissants, meat pies, doughnuts, chin-chin, and more.</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <UtensilsIcon />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Meals</h3>
-              <p className="text-gray-600">Rice dishes, noodles, and light meals for busy days.</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <GlassWaterIcon />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Cold Drinks</h3>
-              <p className="text-gray-600">Soft drinks, bottled water, and fresh juices.</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <Star />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Specials</h3>
-              <p className="text-gray-600">Ask for our chef&apos;s special and combo offers.</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                <Star />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Café Experience</h3>
-              <p className="text-gray-600">
-                Relax, work, or connect with others in our cozy cafe while 
-                enjoying our menu.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -440,9 +277,9 @@ export default function Page() {
             Tune in to our episodes for digital tips and business insights 
             from Ibadan and beyond.
           </p>
-          <a href="https://underdecanopy.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-colors duration-300">
+          <Link href="https://underdecanopy.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-colors duration-300">
             Listen to Our Podcast
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -506,15 +343,6 @@ export default function Page() {
           </div>
         </div>
       </section>
-
-
-
-      <ContactSection
-        title="Get in Touch"
-        subtitle="We're here to help. Reach out to us today!"
-      />
-
-      <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={false} />
-    </>
+    </main>
   );
 }
