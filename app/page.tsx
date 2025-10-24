@@ -23,7 +23,8 @@ import { NewsletterForm } from '@/app/components/home/NewsletterForm';
 export default function Page() {
 
   return (
-    <>
+    <main>
+      <Navigation />
 
 
       <section className="bg-gray-100 py-10">
@@ -192,6 +193,6 @@ export default function Page() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }
