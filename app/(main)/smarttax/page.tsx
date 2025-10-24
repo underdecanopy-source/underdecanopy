@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ContactSection } from '@/components/contact/ContactSection';
 import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
-import './style.css';
+
 
 export default function SmartTaxPage() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
