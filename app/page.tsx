@@ -16,6 +16,7 @@ import { contactInfo } from '@/lib/data/contact';
 import MicIcon from '@/components/icons/Mic';
 import { ServiceCard } from '@/app/(main)/_components/ServiceCard';
 import { ProfessionalServiceCard } from '@/app/(main)/_components/ProfessionalServiceCard';
+import CafeItem from '@/app/(main)/_components/CafeItem';
 import { ContactForm } from '@/app/components/home/ContactForm';
 import { NewsletterForm } from '@/app/components/home/NewsletterForm';
 
@@ -108,13 +109,12 @@ export default function Page() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {cafeItems.map((item) => (
-              <div key={item.title} className="bg-white p-6 rounded-lg shadow-md text-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 mx-auto mb-4">
-                  {item.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </div>
+              <CafeItem
+                key={item.title}
+                icon={item.icon}
+                title={item.title}
+                description={item.description}
+              />
             ))}
           </div>
         </div>
