@@ -352,7 +352,7 @@ The Underdecanopy Digital Hub is a well-built, production-ready application. The
 
 ---
 
-**Reviewed by:** Augment Agent  
+
 **Review Date:** October 21, 2025  
 **Next Review:** After first deployment
 

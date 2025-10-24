@@ -2,17 +2,12 @@ import Script from 'next/script';
 import Link from 'next/link';
 import { ContactSection } from '@/components/contact/ContactSection';
 import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
+import { Navigation } from './_components/Navigation';
 
 export default function TrustFixPage() {
   return (
     <>
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-blue-600">TrustFix</h1>
-          <span className="text-sm italic text-gray-500">Smart. Trustworthy. Fast.</span>
-        </div>
-      </header>
+      <Navigation />
 
       <main className="bg-gray-50 text-gray-800">
         {/* Hero Section */}

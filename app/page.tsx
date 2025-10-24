@@ -8,164 +8,16 @@ import {
     Phone,
     Send,
 } from 'lucide-react';
-import { useFormState, useFormStatus } from 'react-dom';
 import { Navigation } from '@/components/Navigation';
 import Link from 'next/link';
-import { submitContactForm, type State } from '@/lib/actions/contact';
-import {
-  subscribeToNewsletter,
-  type NewsletterState,
-} from '@/lib/actions/newsletter';
 import { coreServices, professionalServices, cafeItems } from '@/lib/data/home';
+import { contactInfo } from '@/lib/data/contact';
 
 import MicIcon from '@/components/icons/Mic';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="w-full bg-orange-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition-colors duration-300 disabled:bg-gray-400"
-    >
-      {pending ? 'Sending...' : 'Send Message'}
-    </button>
-  );
-}
-
-function ContactForm() {
-  const initialState: State = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(submitContactForm, initialState);
-
-  return (
-    <div className="bg-white p-8 rounded-lg shadow-md">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">Send a Message</h3>
-      <form action={dispatch}>
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700 font-semibold mb-2">
-            Full Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Enter your name"
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-          {state.errors?.name && (
-            <p className="text-red-500 text-sm mt-1">{state.errors.name[0]}</p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 font-semibold mb-2">
-            Email Address
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Enter your email"
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-          {state.errors?.email && (
-            <p className="text-red-500 text-sm mt-1">{state.errors.email[0]}</p>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="subject" className="block text-gray-700 font-semibold mb-2">
-            Subject
-          </label>
-          <input
-            type="text"
-            id="subject"
-            name="subject"
-            placeholder="Enter subject"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label htmlFor="message" className="block text-gray-700 font-semibold mb-2">
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            placeholder="Enter your message"
-            required
-            rows={4}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-          ></textarea>
-          {state.errors?.message && (
-            <p className="text-red-500 text-sm mt-1">
-              {state.errors.message[0]}
-            </p>
-          )}
-        </div>
-
-        <SubmitButton />
-
-        {state.message && (
-          <p
-            className={`mt-4 text-sm ${
-              state.errors ? 'text-red-500' : 'text-green-500'
-            }`}
-          >
-            {state.message}
-          </p>
-        )}
-      </form>
-    </div>
-  );
-}
-
-function NewsletterSubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="bg-orange-500 text-white px-4 rounded-r-lg hover:bg-orange-600 transition-colors duration-300 disabled:bg-gray-400"
-    >
-      {pending ? 'Subscribing...' : 'Subscribe'}
-    </button>
-  );
-}
-
-function NewsletterForm() {
-  const initialState: NewsletterState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(subscribeToNewsletter, initialState);
-
-  return (
-    <form action={dispatch}>
-      <div className="flex">
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          required
-          className="w-full px-4 py-2 text-gray-800 border border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
-        <NewsletterSubmitButton />
-      </div>
-      {state.errors?.email && (
-        <p className="text-red-500 text-sm mt-1">{state.errors.email[0]}</p>
-      )}
-      {state.message && !state.errors && (
-        <p className="text-green-500 text-sm mt-1">{state.message}</p>
-      )}
-    </form>
-  );
-}
-
-
 import { ServiceCard } from '@/app/(main)/_components/ServiceCard';
 import { ProfessionalServiceCard } from '@/app/(main)/_components/ProfessionalServiceCard';
+import { ContactForm } from '@/app/components/home/ContactForm';
+import { NewsletterForm } from '@/app/components/home/NewsletterForm';
 
 export default function Page() {
 
@@ -236,7 +88,7 @@ export default function Page() {
               <ProfessionalServiceCard
                 key={service.title}
                 icon={service.icon}
-.                title={service.title}
+                title={service.title}
                 description={service.description}
               />
             ))}
@@ -300,10 +152,7 @@ export default function Page() {
                 <MapPinHouse size={24} className="text-orange-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Location</h4>
-                  <p className="text-gray-600">
-                    Love Garden, Opposite Zenith Bank, North Campus, The
-                    Polytechnic, Ibadan, Oyo State.
-                  </p>
+                  <p className="text-gray-600">{contactInfo.address}</p>
                 </div>
               </div>
 
@@ -311,7 +160,7 @@ export default function Page() {
                 <Phone size={24} className="text-orange-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Phone</h4>
-                  <p className="text-gray-600">+234 806 485 2108</p>
+                  <p className="text-gray-600">{contactInfo.phone}</p>
                 </div>
               </div>
 
@@ -319,7 +168,7 @@ export default function Page() {
                 <Send size={24} className="text-orange-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Email</h4>
-                  <p className="text-gray-600">underdecanopy@gmail.com</p>
+                  <p className="text-gray-600">{contactInfo.email}</p>
                 </div>
               </div>
 
@@ -327,8 +176,8 @@ export default function Page() {
                 <Clock size={24} className="text-orange-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Working Hours</h4>
-                  <p className="text-gray-600">Monday - Friday: 9AM - 6PM</p>
-                  <p className="text-gray-600">Saturday: 10AM - 4PM</p>
+                  <p className="text-gray-600">{contactInfo.workingHours.weekdays}</p>
+                  <p className="text-gray-600">{contactInfo.workingHours.saturday}</p>
                 </div>
               </div>
 

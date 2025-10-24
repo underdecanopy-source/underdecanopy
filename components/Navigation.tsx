@@ -55,7 +55,7 @@ export function Navigation() {
     }, [isMenuOpen]);
 
     return (
-        <header className="sticky top-0 z-50 w-full drop-shadow-lg drop-shadow-black/30 bg-[#1a237e] backdrop-blur-sm overflow-x-hidden">
+        <header className="sticky top-0 z-50 w-full drop-shadow-lg drop-shadow-black/30 bg-[#1a237e] backdrop-blur-sm">
             <div className="w-full mx-auto flex h-16 items-center justify-between px-6 md:px-8 max-w-full">
                 {/* === Logo/Branding Section - Left Side === */}
                 <Link href="/" className="text-xl font-bold text-white transition-colors hover:text-blue-600">

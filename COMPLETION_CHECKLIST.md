@@ -348,7 +348,7 @@ The ApplySmart admission calculator has been successfully implemented with:
 
 ---
 
-**Signed Off By:** Augment Agent
+
 **Date:** October 21, 2025
 **Version:** 1.0
 **Status:** Production Ready ✅
