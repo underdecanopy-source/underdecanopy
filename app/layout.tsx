@@ -3,6 +3,7 @@ import "./globals.css";
 import "./style.css";
 import { Toaster } from "sonner";
 import { ContactBar } from "@/components/contact/ContactBar";
+import { Navigation } from "@/components/Navigation";
 
 export const metadata: Metadata = {
   title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className="w-full overflow-x-hidden">
         <main className="w-full">
+          <Navigation />
           {children}
           <Toaster />
         </main>
