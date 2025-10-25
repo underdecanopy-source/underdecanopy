@@ -19,11 +19,20 @@ html, body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    min-height: 100vh;
 }
 
 main {
     width: 100%;
     display: block;
+    /* Add padding-bottom to prevent ContactBar from covering content on mobile */
+    padding-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    main {
+        padding-bottom: 70px; /* Space for mobile ContactBar */
+    }
 }
 
 /* Ensure consistent text rendering */
@@ -33,11 +42,63 @@ main {
 }
 
 /* ensure images are block-level so they don't leave baseline gaps */
-img { display: block; }
+img { 
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Prevent layout shift during image loading */
+img[width][height] {
+    aspect-ratio: attr(width) / attr(height);
+}
+
+/* Add CSS containment for better performance and prevent layout shifts */
+.container {
+    contain: layout style;
+}
+
+section {
+    contain: layout;
+}
 
 /* reserve font fallback quickly to reduce layout shift on font load */
 @font-face {
   font-family: 'YourFont';
   src: url('/fonts/YourFont.woff2') format('woff2');
   font-display: swap;
+}
+
+/* Smooth scrolling for better UX */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Improved focus visibility for accessibility */
+*:focus-visible {
+  outline: 2px solid #ff9800;
+  outline-offset: 2px;
+}
+
+/* Button resets for consistency */
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Prevent text selection on buttons to improve mobile UX */
+button,
+.btn,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Ensure proper box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }

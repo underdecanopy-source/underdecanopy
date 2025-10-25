@@ -33,7 +33,7 @@ export function MobileOptimizedFooter({
               {/* Call Button */}
               <a
                 href={CONTACT_CONFIG.getPhoneLink()}
-                className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors"
+                className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-95"
               >
                 <Phone className="w-5 h-5 flex-shrink-0" />
                 <span>Call Now</span>
@@ -44,7 +44,7 @@ export function MobileOptimizedFooter({
                 href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors"
+                className="flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 active:scale-95"
               >
                 <MessageCircle className="w-5 h-5 flex-shrink-0" />
                 <span>WhatsApp</span>
@@ -53,7 +53,7 @@ export function MobileOptimizedFooter({
               {/* Email Button */}
               <a
                 href={CONTACT_CONFIG.getEmailLink()}
-                className="flex items-center gap-3 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors"
+                className="flex items-center gap-3 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95"
               >
                 <Mail className="w-5 h-5 flex-shrink-0" />
                 <span>Email</span>
@@ -64,7 +64,7 @@ export function MobileOptimizedFooter({
                 href={CONTACT_CONFIG.getGoogleMapsLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors"
+                className="flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 active:scale-95"
               >
                 <MapPin className="w-5 h-5 flex-shrink-0" />
                 <span>Location</span>

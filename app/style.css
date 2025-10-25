@@ -27,6 +27,7 @@
       color: var(--dark);
       line-height: 1.6;
       overflow-x: hidden;
+      min-height: 100vh;
   }
 
   h1,
@@ -45,12 +46,13 @@
       width: 100%;
       margin: 0 auto;
       padding: 0 20px;
+      contain: layout style;
   }
 
-
-
-
-
+  section {
+      padding: 100px 0;
+      contain: layout;
+  }
 
   .hero {
       background: linear-gradient(135deg, var(--secondary) 0%, #283593 100%);
@@ -115,6 +117,10 @@
       border: none;
       cursor: pointer;
       animation: pulseBtn 1.8s infinite;
+      min-height: 3.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
   }
 
   @keyframes pulseBtn {
@@ -192,6 +198,8 @@
       transition: var(--transition);
       cursor: pointer;
       border: 2px solid transparent;
+      contain: layout style;
+      min-height: 250px;
   }
 
   .service-card:hover {

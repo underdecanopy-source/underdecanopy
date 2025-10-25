@@ -46,7 +46,7 @@ export default function SmartTaxPage() {
                     <div className="container">
                         <h2>AI-Powered SmartTax for Nigerian Businesses</h2>
                         <p>Generate CAC and Tax Law 2025 compliant digital receipts for your transactions. Simplify your tax filing and annual returns with our intelligent solution.</p>
-                        <a href="#" className="btn btn-primary" onClick={handleDemoClick}>Get Started Today</a>
+                        <a href="#" className="btn btn-primary" onClick={handleDemoClick} style={{ display: 'inline-block' }}>Get Started Today</a>
                     </div>
                 </section>
 
@@ -233,40 +233,40 @@ export default function SmartTaxPage() {
                             <p>Find answers to common questions about SmartTax</p>
                         </div>
                         <div className="faq-list">
-                            <div className={`faq-item ${activeFaq === 0 ? 'active' : ''}`}>
-                                <div className="faq-question" onClick={() => toggleFaq(0)}>
+                            <div className={`faq-item ${activeFaq === 0 ? 'active' : ''}`} style={{ contain: 'layout' }}>
+                                <div className="faq-question" onClick={() => toggleFaq(0)} role="button" tabIndex={0} onKeyPress={(e) => e.key === 'Enter' && toggleFaq(0)} style={{ cursor: 'pointer' }}>
                                     <span>Is SmartTax accepted by CAC and FIRS?</span>
-                                    <span>{activeFaq === 0 ? '-' : '+'}</span>
+                                    <span aria-hidden="true">{activeFaq === 0 ? '-' : '+'}</span>
                                 </div>
-                                <div className="faq-answer">
+                                <div className="faq-answer" style={{ transition: 'all 0.3s ease-in-out', overflow: 'hidden', maxHeight: activeFaq === 0 ? '500px' : '0' }}>
                                     <p>Yes, SmartTax is fully compliant with CAC record-keeping requirements and FIRS e-invoicing regulations as per the 2025 Tax Law. All receipts include necessary fields and digital signatures for verification.</p>
                                 </div>
                             </div>
-                            <div className={`faq-item ${activeFaq === 1 ? 'active' : ''}`}>
-                                <div className="faq-question" onClick={() => toggleFaq(1)}>
+                            <div className={`faq-item ${activeFaq === 1 ? 'active' : ''}`} style={{ contain: 'layout' }}>
+                                <div className="faq-question" onClick={() => toggleFaq(1)} role="button" tabIndex={0} onKeyPress={(e) => e.key === 'Enter' && toggleFaq(1)} style={{ cursor: 'pointer' }}>
                                     <span>How does the AI categorization work?</span>
-                                    <span>{activeFaq === 1 ? '-' : '+'}</span>
+                                    <span aria-hidden="true">{activeFaq === 1 ? '-' : '+'}</span>
                                 </div>
-                                <div className="faq-answer">
+                                <div className="faq-answer" style={{ transition: 'all 0.3s ease-in-out', overflow: 'hidden', maxHeight: activeFaq === 1 ? '500px' : '0' }}>
                                     <p>Our AI analyzes transaction descriptions and amounts to automatically assign appropriate tax codes and categories based on Nigerian tax legislation. This reduces manual errors and ensures proper classification for tax purposes.</p>
                                 </div>
                             </div>
-                            <div className={`faq-item ${activeFaq === 2 ? 'active' : ''}`}>
-                                <div className="faq-question" onClick={() => toggleFaq(2)}>
+                            <div className={`faq-item ${activeFaq === 2 ? 'active' : ''}`} style={{ contain: 'layout' }}>
+                                <div className="faq-question" onClick={() => toggleFaq(2)} role="button" tabIndex={0} onKeyPress={(e) => e.key === 'Enter' && toggleFaq(2)} style={{ cursor: 'pointer' }}>
                                     <span>Can I use SmartTax offline?</span>
-                                    <span>{activeFaq === 2 ? '-' : '+'}</span>
+                                    <span aria-hidden="true">{activeFaq === 2 ? '-' : '+'}</span>
                                 </div>
-                                <div className="faq-answer">
+                                <div className="faq-answer" style={{ transition: 'all 0.3s ease-in-out', overflow: 'hidden', maxHeight: activeFaq === 2 ? '500px' : '0' }}>
                                     <p>Yes, our mobile app allows you to create receipts offline. They will sync automatically when you&apos;re back online, ensuring you never miss recording a transaction.</p>
                                 </div>
                             </div>
-                            <div className={`faq-item ${activeFaq === 3 ? 'active' : ''}`}>
-                                <div className="faq-question" onClick={() => toggleFaq(3)}>
+                            <div className={`faq-item ${activeFaq === 3 ? 'active' : ''}`} style={{ contain: 'layout' }}>
+                                <div className="faq-question" onClick={() => toggleFaq(3)} role="button" tabIndex={0} onKeyPress={(e) => e.key === 'Enter' && toggleFaq(3)} style={{ cursor: 'pointer' }}>
                                     <span>What happens to my data if I cancel my subscription?</span>
-                                    <span>{activeFaq === 3 ? '-' : '+'}</span>
+                                    <span aria-hidden="true">{activeFaq === 3 ? '-' : '+'}</span>
                                 </div>
-                                <div className="faq-answer">
-                                    <p>You can export all your data in standard formats (PDF, Excel) before cancellation. According to Nigerian law, we&apos;re required to maintain business records for 6 years, so your data remains securely stored for compliance purposes.</p>
+                                <div className="faq-answer" style={{ transition: 'all 0.3s ease-in-out', overflow: 'hidden', maxHeight: activeFaq === 3 ? '500px' : '0' }}>
+                                    <p>According to Nigerian law, we&apos;re required to maintain business records for 6 years, so your data remains securely stored for compliance purposes.</p>
                                 </div>
                             </div>
                         </div>

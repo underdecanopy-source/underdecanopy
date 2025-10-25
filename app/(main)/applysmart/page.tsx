@@ -43,9 +43,9 @@ export default function Page() {
                             <div className="text-left">
                                 <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-4">Your Path to University Admission and Scholarships Starts Here</h1>
                                 <p className="text-gray-600 text-lg mb-8">Get personalized admission guidance and scholarship matches based on JAMB CAPS protocols. We analyze your top three choices and provide a detailed report.</p>
-                                <div className="flex gap-4">
-                                    <a href="#admission-form" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors">Check Admission Opportunities</a>
-                                    <a href="#how-it-works" className="bg-gray-200 text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-300 transition-colors">How it works</a>
+                                <div className="flex gap-4 flex-wrap">
+                                    <a href="#admission-form" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95 inline-block">Check Admission Opportunities</a>
+                                    <a href="#how-it-works" className="bg-gray-200 text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 active:scale-95 inline-block">How it works</a>
                                 </div>
                             </div>
                             <div className="hidden lg:block">
@@ -115,7 +115,7 @@ export default function Page() {
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Secure Your Admission?</h2>
                         <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Submit your preferences today and receive a personalized admission analysis within 24 hours.</p>
-                        <a href="#admission-form" className="bg-orange-500 text-white py-3 px-8 rounded-full text-lg hover:bg-orange-600 transition-colors">Get Your Admission Analysis</a>
+                        <a href="#admission-form" className="bg-orange-500 text-white py-3 px-8 rounded-full text-lg hover:bg-orange-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95 inline-block">Get Your Admission Analysis</a>
                     </div>
                 </section>
             </main>

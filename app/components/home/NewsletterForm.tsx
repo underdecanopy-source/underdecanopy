@@ -19,16 +19,18 @@ export function NewsletterForm() {
           name="email"
           placeholder="Enter your email"
           required
-          className="w-full px-4 py-2 text-gray-800 border border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full px-4 py-2 text-gray-800 border border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors"
         />
         <NewsletterSubmitButton />
       </div>
-      {state.errors?.email && (
-        <p className="text-red-500 text-sm mt-1">{state.errors.email[0]}</p>
-      )}
-      {state.message && !state.errors && (
-        <p className="text-green-500 text-sm mt-1">{state.message}</p>
-      )}
+      <div className="min-h-[1.25rem] mt-1">
+        {state.errors?.email && (
+          <p className="text-red-500 text-sm">{state.errors.email[0]}</p>
+        )}
+        {state.message && !state.errors && (
+          <p className="text-green-500 text-sm">{state.message}</p>
+        )}
+      </div>
     </form>
   );
 }

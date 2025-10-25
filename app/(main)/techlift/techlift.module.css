@@ -4,6 +4,7 @@
     line-height: 1.6;
     background-color: var(--light);
     overflow-x: hidden;
+    min-height: 100vh;
 }
 
 .pageWrapper h1,
@@ -21,6 +22,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    contain: layout style;
 }
 
 .btn {
@@ -37,12 +39,25 @@
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
     text-align: center;
+    min-height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn:hover {
     background: var(--primary-dark);
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.btn:active {
+    transform: translateY(-1px) scale(0.98);
 }
 
 .btnSecondary {
@@ -156,6 +171,8 @@
     transition: all 0.3s ease;
     border: 1px solid var(--light-gray);
     text-align: center;
+    contain: layout;
+    min-height: 280px;
 }
 
 .featureCard:hover {
@@ -205,6 +222,8 @@
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
+    contain: layout;
+    min-height: 400px;
 }
 
 .courseCard:hover {
@@ -263,6 +282,8 @@
     padding: 30px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--light-gray);
+    contain: layout;
+    min-height: 220px;
 }
 
 .testimonialHeader {

@@ -55,8 +55,8 @@ export function Navigation() {
     }, [isMenuOpen]);
 
     return (
-        <header className="sticky top-0 z-50 w-full drop-shadow-lg drop-shadow-black/30 bg-[#1a237e] backdrop-blur-sm">
-            <div className="w-full mx-auto flex h-16 items-center justify-between px-6 md:px-8 max-w-full">
+        <header className="sticky top-0 z-50 w-full drop-shadow-lg drop-shadow-black/30 bg-[#1a237e] backdrop-blur-sm" style={{ contain: 'layout style' }}>
+            <div className="w-full mx-auto flex h-16 items-center justify-between px-6 md:px-8 max-w-full" style={{ minHeight: '4rem' }}>
                 {/* === Logo/Branding Section - Left Side === */}
                 <Link href="/" className="text-xl font-bold text-white transition-colors hover:text-blue-600">
                     Underdecanopy
@@ -93,23 +93,24 @@ export function Navigation() {
         
         How the transition works:
         1. `overflow-hidden`: Hides the content initially.
-        2. `transition-max-height duration-500 ease-in-out`: Tells Tailwind to transition the `max-height` property over 0.5s.
+        2. `transition-all duration-500 ease-in-out`: Tells Tailwind to transition all properties over 0.5s.
         3. `max-h-0`: When the menu is closed, its max height is 0, so it collapses.
         4. `max-h-96`: When the menu is open, we give it a large enough max height (96 = 24rem) so the content can show, giving the *drop-down* effect.
       */}
             <div
                 ref={menuContainerRef}
-                className={`md:hidden overflow-hidden transition-max-height duration-500 ease-in-out ${isMenuOpen ? 'max-h-96 border-t' : 'max-h-0'
+                className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-96 border-t opacity-100' : 'max-h-0 opacity-0'
                     }`}
+                style={{ contain: 'layout' }}
             >
-                <nav className="flex flex-col p-4">
+                <nav className="flex flex-col p-4" style={{ contain: 'layout' }}>
                     {navItems.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
                             onClick={toggleMenu} // Close menu when a link is clicked
                             // Increased padding (py-3 px-4) for a bigger, touch-friendly mobile button
-                            className="block w-auto py-3 text-sm font-medium text-white transition-all tracking-wider hover:text-[#ff9800]"
+                            className="block w-auto py-3 text-sm font-medium text-white transition-all tracking-wider hover:text-[#ff9800] focus:outline-none focus:ring-2 focus:ring-[#ff9800] focus:ring-inset rounded"
                         >
                             {item.label}
                         </Link>
