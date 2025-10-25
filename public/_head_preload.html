@@ -1,0 +1,26 @@
+<!-- 
+  TEMPLATE FILE: Preload Critical Resources
+  This is a reference/example file - copy relevant parts to your Next.js layout
+  Do NOT include this file directly in production
+-->
+
+<!-- Preload critical CSS -->
+<link rel="preload" href="/styles/critical.css" as="style" />
+
+<!-- Preload critical fonts (adjust paths based on your actual font files) -->
+<!-- <link rel="preload" href="/fonts/your-font.woff2" as="font" type="font/woff2" crossorigin /> -->
+
+<!-- Preconnect to external domains for faster resource loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- DNS prefetch for additional domains -->
+<!-- <link rel="dns-prefetch" href="https://analytics.example.com" /> -->
+
+<!-- Example: Inline critical CSS directly in the head to prevent FOUC and CLS -->
+<!-- In production, use a build tool to inject the actual contents of styles/critical.css -->
+<style>
+  /* Critical CSS example - replace with actual contents from styles/critical.css */
+  img { max-width: 100%; height: auto; }
+  body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+</style>
