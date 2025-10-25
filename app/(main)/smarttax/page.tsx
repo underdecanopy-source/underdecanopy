@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 
 
 export default function SmartTaxPage() {
@@ -272,7 +273,12 @@ export default function SmartTaxPage() {
                     </div>
                 </section>
 
+                <ContactSection
+                    title="Simplify Your Tax Management"
+                    subtitle="Get started with SmartTax today"
+                />
 
+                <MobileOptimizedFooter serviceName="SmartTax" showQuickContact={false} />
             </main>
         </>
     );

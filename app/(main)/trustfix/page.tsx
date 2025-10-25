@@ -1,6 +1,7 @@
 import Script from 'next/script';
 import Link from 'next/link';
-
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 import { Navigation } from './_components/Navigation';
 
 export default function TrustFixPage() {
@@ -173,7 +174,12 @@ export default function TrustFixPage() {
         </section>
       </main>
 
+      <ContactSection
+        title="Book a Technician Now"
+        subtitle="Fast, reliable tech support"
+      />
 
+      <MobileOptimizedFooter serviceName="TrustFix" showQuickContact={false} />
 
       {/* Font Awesome for icons */}
       <Script
