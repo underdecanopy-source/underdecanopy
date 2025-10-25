@@ -19,6 +19,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        {/* Critical CSS for CLS prevention */}
+        <link rel="stylesheet" href="/critical.css" />
+        {/* Font preload optimization */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className="w-full overflow-x-hidden">
         <main className="w-full">
           {children}
