@@ -2,13 +2,6 @@
   "name": "underdecanopy-digital-hub",
   "version": "0.1.0",
   "private": true,
-  "//": "IMPORTANT: Use exact versions or conservative version ranges to ensure stability",
-  "//notes": {
-    "dependencies": "Keep Next.js and React versions stable. Test thoroughly before upgrading major versions.",
-    "prisma": "Prisma client version should match the CLI version in devDependencies",
-    "radix-ui": "UI components - upgrade carefully as they may have breaking changes",
-    "performance": "Monitor bundle size when adding new dependencies. Use next/bundle-analyzer if needed."
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
