@@ -1,0 +1,63 @@
+/* Critical CSS for CLS Prevention */
+/* This CSS should be inlined in the <head> to prevent layout shifts */
+
+/* Reserve space for images to prevent CLS */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent layout shift from fonts loading */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Reserve space for common components */
+.navigation-placeholder {
+  min-height: 64px;
+}
+
+.footer-placeholder {
+  min-height: 200px;
+}
+
+/* Prevent CLS from contact bar */
+.contact-bar-placeholder {
+  min-height: 60px;
+}
+
+/* Image placeholder to prevent CLS */
+.image-placeholder {
+  position: relative;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.image-placeholder::before {
+  content: '';
+  display: block;
+  padding-top: 56.25%; /* 16:9 aspect ratio by default */
+}
+
+.image-placeholder img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Prevent layout shift from loading states */
+.loading-skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
