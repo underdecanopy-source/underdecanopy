@@ -21,7 +21,7 @@ export function ContactBar() {
           {/* Phone Call */}
           <a
             href={CONTACT_CONFIG.getPhoneLink()}
-            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-blue-50 transition-colors flex-1"
+            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-95"
             aria-label="Call us"
           >
             <Phone className="w-5 h-5 text-blue-600" />
@@ -33,7 +33,7 @@ export function ContactBar() {
             href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-green-50 transition-colors flex-1"
+            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-green-50 transition-all duration-200 flex-1 focus:outline-none focus:ring-2 focus:ring-green-500 active:scale-95"
             aria-label="Message on WhatsApp"
           >
             <MessageCircle className="w-5 h-5 text-green-600" />
@@ -43,7 +43,7 @@ export function ContactBar() {
           {/* Email */}
           <a
             href={CONTACT_CONFIG.getEmailLink()}
-            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-orange-50 transition-colors flex-1"
+            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-orange-50 transition-all duration-200 flex-1 focus:outline-none focus:ring-2 focus:ring-orange-500 active:scale-95"
             aria-label="Send us an email"
           >
             <Mail className="w-5 h-5 text-orange-600" />
@@ -57,7 +57,7 @@ export function ContactBar() {
         href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-20 right-4 z-40 md:hidden bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-green-600 transition-all hover:scale-110 animate-bounce"
+        className="fixed bottom-20 right-4 z-40 md:hidden bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-green-600 transition-all duration-300 hover:scale-110 animate-bounce focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 active:scale-95"
         aria-label="Chat with us on WhatsApp"
         title="Chat with us on WhatsApp"
       >
@@ -71,7 +71,7 @@ export function ContactBar() {
           href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-green-600 transition-all hover:scale-110"
+          className="bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-green-600 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 active:scale-95"
           aria-label="Chat with us on WhatsApp"
           title="Chat with us on WhatsApp"
         >
@@ -81,7 +81,7 @@ export function ContactBar() {
         {/* Phone */}
         <a
           href={CONTACT_CONFIG.getPhoneLink()}
-          className="bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition-all hover:scale-110"
+          className="bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-95"
           aria-label="Call us"
           title="Call us"
         >

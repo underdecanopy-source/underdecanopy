@@ -81,20 +81,22 @@ export default function Page() {
                         
                         <div className="flex justify-center gap-4 mb-8">
                             <button
-                                className={`px-6 py-3 font-semibold rounded-full transition-colors ${activeProduct === 'school-fees' ? 'bg-orange-500 text-white' : 'bg-white text-blue-900'}`}
+                                className={`px-6 py-3 font-semibold rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95 ${activeProduct === 'school-fees' ? 'bg-orange-500 text-white shadow-lg' : 'bg-white text-blue-900 hover:bg-gray-50'}`}
                                 onClick={() => setActiveProduct('school-fees')}
+                                style={{ minWidth: '12rem' }}
                             >
                                 School Fee Management
                             </button>
                             <button
-                                className={`px-6 py-3 font-semibold rounded-full transition-colors ${activeProduct === 'cooperative' ? 'bg-orange-500 text-white' : 'bg-white text-blue-900'}`}
+                                className={`px-6 py-3 font-semibold rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95 ${activeProduct === 'cooperative' ? 'bg-orange-500 text-white shadow-lg' : 'bg-white text-blue-900 hover:bg-gray-50'}`}
                                 onClick={() => setActiveProduct('cooperative')}
+                                style={{ minWidth: '12rem' }}
                             >
                                 Cooperative Services
                             </button>
                         </div>
 
-                        <Link href="#get-started" className="bg-orange-500 text-white py-3 px-8 rounded-full text-lg hover:bg-orange-600 transition-colors">
+                        <Link href="#get-started" className="bg-orange-500 text-white py-3 px-8 rounded-full text-lg hover:bg-orange-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95 inline-block">
                             Get Started Today
                         </Link>
                     </div>
@@ -164,14 +166,16 @@ export default function Page() {
                         <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">How It Works</h2>
                         <div className="flex justify-center gap-4 mb-8">
                             <button
-                                className={`px-6 py-3 font-semibold rounded-full transition-colors ${activeProcess === 'school-fees' ? 'bg-blue-900 text-white' : 'bg-gray-200 text-gray-800'}`}
+                                className={`px-6 py-3 font-semibold rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-95 ${activeProcess === 'school-fees' ? 'bg-blue-900 text-white shadow-lg' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
                                 onClick={() => setActiveProcess('school-fees')}
+                                style={{ minWidth: '12rem' }}
                             >
                                 School Fee Management
                             </button>
                             <button
-                                className={`px-6 py-3 font-semibold rounded-full transition-colors ${activeProcess === 'cooperative' ? 'bg-blue-900 text-white' : 'bg-gray-200 text-gray-800'}`}
+                                className={`px-6 py-3 font-semibold rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-95 ${activeProcess === 'cooperative' ? 'bg-blue-900 text-white shadow-lg' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
                                 onClick={() => setActiveProcess('cooperative')}
+                                style={{ minWidth: '12rem' }}
                             >
                                 Cooperative Services
                             </button>
@@ -245,23 +249,34 @@ export default function Page() {
                         <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Frequently Asked Questions</h2>
                         <div className="space-y-4">
                             {faqData.map((faq, index) => (
-                                <div key={index} className="border rounded-lg overflow-hidden">
+                                <div key={index} className="border rounded-lg overflow-hidden" style={{ contain: 'layout' }}>
                                     <button
-                                        className="w-full flex justify-between items-center p-4 font-semibold text-left bg-gray-50 hover:bg-gray-100"
+                                        className="w-full flex justify-between items-center p-4 font-semibold text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                                         onClick={() => toggleFaq(index)}
+                                        aria-expanded={openFaq === index}
+                                        aria-controls={`faq-content-${index}`}
                                     >
                                         {faq.question}
-                                        <span className={`transform transition-transform ${openFaq === index ? 'rotate-180' : ''}`}>▼</span>
+                                        <span 
+                                            className={`transform transition-transform duration-300 flex-shrink-0 ml-2 ${openFaq === index ? 'rotate-180' : ''}`}
+                                            aria-hidden="true"
+                                        >
+                                            ▼
+                                        </span>
                                     </button>
-                                    {openFaq === index && (
+                                    <div
+                                        id={`faq-content-${index}`}
+                                        className={`transition-all duration-300 ease-in-out overflow-hidden ${openFaq === index ? 'max-h-96' : 'max-h-0'}`}
+                                        style={{ contain: 'layout' }}
+                                    >
                                         <div className="p-4 bg-white">
                                             {Array.isArray(faq.answer) ? (
-                                                faq.answer.map((line, i) => <p key={i} className="text-gray-600" dangerouslySetInnerHTML={{ __html: line }} />)
+                                                faq.answer.map((line, i) => <p key={i} className="text-gray-600 mb-2" dangerouslySetInnerHTML={{ __html: line }} />)
                                             ) : (
                                                 <p className="text-gray-600" dangerouslySetInnerHTML={{ __html: faq.answer }} />
                                             )}
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             ))}
                         </div>

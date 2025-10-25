@@ -44,7 +44,7 @@ export default function Page() {
               </p>
               <Link
                 href="#contact"
-                className="inline-block bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-300"
+                className="inline-block bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95"
               >
                 Get Started Today
               </Link>
@@ -148,7 +148,7 @@ export default function Page() {
             Tune in to our episodes for digital tips and business insights 
             from Ibadan and beyond.
           </p>
-          <Link href="https://underdecanopy.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-colors duration-300">
+          <Link href="https://underdecanopy.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-orange-500 active:scale-95 inline-block">
             Listen to Our Podcast
           </Link>
         </div>
