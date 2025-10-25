@@ -9,9 +9,9 @@ export default function page() {
         <CardHeader className='mb-4'>
           <CardTitle className='text-center text-3xl'>
             Login
-            <LoginForm />
           </CardTitle>
         </CardHeader>
+        <LoginForm />
       </Card>
     </div>
   )

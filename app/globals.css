@@ -12,3 +12,22 @@
     --accent: #06b6d4;
     --success: #10b981;
 }
+
+/* Ensure consistent layout across all pages */
+html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+main {
+    width: 100%;
+    display: block;
+}
+
+/* Ensure consistent text rendering */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -7,20 +7,33 @@ import { signUp } from '@/lib/actions/auth'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { useActionState, useEffect } from 'react'
+import { useEffect } from 'react'
+import { useFormState, useFormStatus } from 'react-dom'
 import { toast } from 'sonner'
+
+function SubmitButton() {
+    const { pending } = useFormStatus()
+    return (
+        <Button className='w-full'>
+            {pending ? <Loader2 className='animate-spin mr-2' /> : null}
+            {pending ? 'Signing Up...' : 'SignUp'}
+        </Button>
+    )
+}
 
 export default function SignupForm() {
     const router = useRouter()
-    const [state, signUpAction, isPending] = useActionState(signUp, null)
+    const [state, signUpAction] = useFormState(signUp, null)
 
     useEffect(() => {
-        if (state?.errorMessage) {
-            toast.error(state.errorMessage)
-        }
-        else if (state?.errorMessage === null) {
-            toast.success("Signed Up, Please check your email")
-            router.replace("/")
+        if (typeof window !== 'undefined') {
+            if (state?.errorMessage) {
+                toast.error(state.errorMessage)
+            }
+            else if (state?.errorMessage === null) {
+                toast.success("Signed Up, Please check your email")
+                router.replace("/")
+            }
         }
     }, [state, router])
 
@@ -37,9 +50,14 @@ export default function SignupForm() {
                     <Input type='password' name='password' placeholder='Enter your password' required />
                 </div>
 
+                <div className='flex flex-col space-y-1.5'>
+                    <Label htmlFor='confirmPassword'>Confirm Password</Label>
+                    <Input type='password' name='confirmPassword' placeholder='Confirm your password' required />
+                </div>
+
             </CardContent>
             <CardFooter className='flex flex-col gap-6 mt-4'>
-                <Button className='w-full'>{isPending && <Loader2 className='animate-spin' />}SignUp</Button>
+                <SubmitButton />
                 <p className='text-xs'>
                     Already have an account? <Link href="/login" className='text-blue-500 cursor-pointer'>Login</Link>
                 </p>

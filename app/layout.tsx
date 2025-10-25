@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-// import { Toaster } from "sonner";
+import "./style.css";
+import { Toaster } from "sonner";
+import { ContactBar } from "@/components/contact/ContactBar";
 
 export const metadata: Metadata = {
   title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -17,11 +19,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html>
-      <body>
-        <main>
+    <html lang="en" className="scroll-smooth">
+      <body className="w-full overflow-x-hidden">
+        <main className="w-full">
           {children}
+          <Toaster />
         </main>
+        <ContactBar />
       </body>
     </html>
   );

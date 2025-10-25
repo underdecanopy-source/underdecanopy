@@ -2,10 +2,14 @@
 
 import Image from 'next/image';
 import styles from './techlift.module.css';
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
+import { Navigation } from './_components/Navigation';
 
 export default function TechLiftPage() {
     return (
         <div className={styles.pageWrapper}>
+            <Navigation />
             <main>
                 {/* Hero Section */}
                 <section className={styles.hero}>
@@ -230,6 +234,13 @@ export default function TechLiftPage() {
                     </div>
                 </footer>
             </main>
+
+            <ContactSection
+                title="Ready to Transform Your Career?"
+                subtitle="Get started with TechLift today"
+            />
+
+            <MobileOptimizedFooter serviceName="TechLift" showQuickContact={false} />
         </div>
     );
 }

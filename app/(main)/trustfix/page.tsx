@@ -1,16 +1,13 @@
 import Script from 'next/script';
 import Link from 'next/link';
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
+import { Navigation } from './_components/Navigation';
 
 export default function TrustFixPage() {
   return (
     <>
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-blue-600">TrustFix</h1>
-          <span className="text-sm italic text-gray-500">Smart. Trustworthy. Fast.</span>
-        </div>
-      </header>
+      <Navigation />
 
       <main className="bg-gray-50 text-gray-800">
         {/* Hero Section */}
@@ -177,37 +174,12 @@ export default function TrustFixPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0">
-              <Link href="/" className="flex items-center space-x-2" aria-label="TrustFix Home">
-                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" role="img" aria-labelledby="footer-logo-title">
-                  <title id="footer-logo-title">TrustFix Logo</title>
-                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"></path>
-                </svg>
-                <span className="text-xl font-bold">TrustFix</span>
-              </Link>
-              <p className="mt-2 text-gray-400">Smart. Trustworthy. Fast.</p>
-            </div>
-            <div className="flex space-x-6">
-              <a href="https://facebook.com/your-page" className="text-gray-400 hover:text-white transition" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
-              <a href="https://twitter.com/your-handle" className="text-gray-400 hover:text-white transition" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
-              <a href="https://instagram.com/your-handle" className="text-gray-400 hover:text-white transition" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
-              <a href="https://linkedin.com/your-page" className="text-gray-400 hover:text-white transition" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between">
-            <p className="text-gray-400 mb-4 md:mb-0">© 2024 TrustFix. All rights reserved.</p>
-            <div className="flex space-x-6">
-              <a href="#" className="text-gray-400 hover:text-white transition">Privacy Policy</a>
-              <a href="#" className="text-gray-400 hover:text-white transition">Terms of Service</a>
-              <a href="#contact-form" className="text-gray-400 hover:text-white transition">Contact Us</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <ContactSection
+        title="Book a Technician Now"
+        subtitle="Fast, reliable tech support"
+      />
+
+      <MobileOptimizedFooter serviceName="TrustFix" showQuickContact={false} />
 
       {/* Font Awesome for icons */}
       <Script
