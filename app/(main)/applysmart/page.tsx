@@ -3,8 +3,7 @@
 import type { Metadata } from "next";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
-import { ContactSection } from "@/components/contact/ContactSection";
-import { MobileOptimizedFooter } from "@/components/contact/MobileOptimizedFooter";
+
 import { federalUniversities, stateUniversities, polytechnics, firstTierCourses, secondTierCourses, thirdTierCourses, states } from "@/lib/data/applysmart";
 import { Navigation } from "@/components/Navigation";
 import { AdmissionCalculator } from "@/app/(main)/applysmart/_components/AdmissionCalculator";
@@ -110,12 +109,7 @@ export default function Page() {
                 </section>
             </main>
 
-            <ContactSection
-                title="Ready to Get Started?"
-                subtitle="Contact us for more information about ApplySmart"
-            />
 
-            <MobileOptimizedFooter serviceName="ApplySmart" showQuickContact={false} />
         </>
     );
 }

@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Shield, HandHelping, Mail, Phone, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Send, Heart, Share2, Play, MessageCircle, Store, Music } from 'lucide-react';
-import { ContactSection } from '@/components/contact/ContactSection';
-import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
+
 import { Navigation } from '@/components/Navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -320,12 +319,7 @@ export default function Page() {
                 </section>
             </main>
 
-            <ContactSection
-                title="Join CoopHub Today"
-                subtitle="Start your journey to financial freedom"
-            />
 
-            <MobileOptimizedFooter serviceName="CoopHub" showQuickContact={false} />
         </>
     );
 }
