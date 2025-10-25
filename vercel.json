@@ -1,13 +1,13 @@
 {
-  "//": "IMPORTANT: This configuration is for STATIC SITES or sites that need custom routing.",
-  "//note": "If your project uses Next.js App Router or Pages Router with ISR/SSR, DO NOT use the 'rewrites' configuration below.",
-  "//nextjs-warning": "Next.js projects with dynamic features should NOT include rewrites that bypass Next.js routing.",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "_comment_1": "IMPORTANT: This configuration is designed for sites with custom routing needs",
+  "_comment_2": "Next.js projects with ISR/SSR should NOT override routing with rewrites",
+  "_comment_3": "See README or documentation for guidance on static site rewrites",
   
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm ci",
   
-  "//headers-note": "Headers for security and performance",
   "headers": [
     {
       "source": "/(.*)",
@@ -46,15 +46,5 @@
     }
   ],
   
-  "//rewrites-warning": "ONLY use this section for pure static sites or SPA. Remove if using Next.js SSR/ISR!",
-  "//rewrites": [
-    {
-      "//": "Example rewrite for SPA - DO NOT USE with Next.js unless you know what you're doing",
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  
-  "//redirects-note": "Use redirects for URL changes, not for routing static sites",
   "redirects": []
 }
