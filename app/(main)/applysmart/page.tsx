@@ -1,19 +1,29 @@
 'use client';
 
-import type { Metadata } from "next";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { MobileOptimizedFooter } from "@/components/contact/MobileOptimizedFooter";
-import { federalUniversities, stateUniversities, polytechnics, firstTierCourses, secondTierCourses, thirdTierCourses, states } from "@/lib/data/applysmart";
-import { Navigation } from "@/components/Navigation";
 import { AdmissionCalculator } from "@/app/(main)/applysmart/_components/AdmissionCalculator";
 
-// TODO: Since this is a client component, metadata should be handled differently or moved.
-// export const metadata: Metadata = {
-//     title: "ApplySmart - Nigerian Admission & Scholarship Support | Underdecanopy",
-//     description: "ApplySmart helps Nigerian applicants find admission options and scholarships. Submit your top 3 choices for a tailored admission report and scholarship matches. Get instant admission chance calculations based on JAMB scores.",
-// };
+const Metadata = {
+  title: "ApplySmart - University Admission Calculator",
+  description: "Get personalized admission guidance and scholarship matches based on JAMB CAPS protocols.",
+};
+
+const Facebook = "Facebook";
+const Instagram = "Instagram";
+const Linkedin = "Linkedin";
+const Twitter = "Twitter";
+
+const federalUniversities = [];
+const stateUniversities = [];
+const polytechnics = [];
+const firstTierCourses = [];
+const secondTierCourses = [];
+const thirdTierCourses = [];
+const states = [];
+
+const Navigation = () => null;
 
 const StepCard = ({ number, name, description }: { number: string, name: string, description: string }) => (
     <div className="bg-white p-6 rounded-lg shadow-md">

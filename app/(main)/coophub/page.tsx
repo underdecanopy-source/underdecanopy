@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, HandHelping, Mail, Phone, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, Send, Heart, Share2, Play, MessageCircle, Store, Music } from 'lucide-react';
+import { Shield, HandHelping, Mail, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, MessageCircle, Store } from 'lucide-react';
 import { ContactSection } from '@/components/contact/ContactSection';
 import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 import { Navigation } from '@/components/Navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 
 const config = {
     whatsAppNumber: "+2348064852108",
@@ -271,8 +270,8 @@ export default function Page() {
 
                 <section className="bg-gray-800 text-white py-16" id="contact">
                     <div className="container mx-auto px-4 text-center">
-                        <h2 className="text-3xl font-bold mb-4">We're Here to Help</h2>
-                        <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Can't find what you're looking for? Reach out to our support team.</p>
+                        <h2 className="text-3xl font-bold mb-4">We&apos;re Here to Help</h2>
+                        <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Can&apos;t find what you&apos;re looking for? Reach out to our support team.</p>
                         <div className="grid md:grid-cols-3 gap-8 mb-12">
                             <div className="bg-gray-700 p-6 rounded-lg">
                                 <Mail className="h-10 w-10 mx-auto mb-4 text-orange-500" />

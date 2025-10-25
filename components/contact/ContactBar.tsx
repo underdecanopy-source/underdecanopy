@@ -11,7 +11,7 @@ import { CONTACT_CONFIG } from '@/lib/config/contact';
 import { useState } from 'react';
 
 export function ContactBar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [_isOpen, _setIsOpen] = useState(false);
 
   return (
     <>

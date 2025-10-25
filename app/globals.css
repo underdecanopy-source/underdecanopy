@@ -31,3 +31,13 @@ main {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+/* ensure images are block-level so they don't leave baseline gaps */
+img { display: block; }
+
+/* reserve font fallback quickly to reduce layout shift on font load */
+@font-face {
+  font-family: 'YourFont';
+  src: url('/fonts/YourFont.woff2') format('woff2');
+  font-display: swap;
+}

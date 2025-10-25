@@ -7,7 +7,7 @@ process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-key';
 // Suppress console errors in tests (optional)
 const originalError = console.error;
 beforeAll(() => {
-  console.error = (...args: any[]) => {
+  console.error = (...args: unknown[]) => {
     if (
       typeof args[0] === 'string' &&
       args[0].includes('Warning: ReactDOM.render')

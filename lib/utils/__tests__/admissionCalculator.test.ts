@@ -3,7 +3,6 @@ import {
   getChanceColor,
   courseData,
   institutionData,
-  CalculationResult,
 } from '../admissionCalculator';
 
 describe('Admission Calculator', () => {

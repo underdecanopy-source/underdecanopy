@@ -18,7 +18,7 @@ interface ContactSectionProps {
 
 export function ContactSection({
   title = "Get in Touch",
-  subtitle = "We're here to help. Reach out to us today!",
+  subtitle = "We&apos;re here to help. Reach out to us today!",
   showMap = true,
   showHours = true,
 }: ContactSectionProps) {
@@ -151,7 +151,7 @@ export function ContactSection({
         {/* CTA Button */}
         <div className="mt-12 text-center">
           <p className="text-gray-600 mb-6">
-            Don't see what you're looking for? We're just a message away!
+            Don&apos;t see what you&apos;re looking for? We&apos;re just a message away!
           </p>
           <a
             href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}

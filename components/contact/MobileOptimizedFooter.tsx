@@ -9,6 +9,7 @@
 import { Phone, MessageCircle, Mail, MapPin } from 'lucide-react';
 import { CONTACT_CONFIG } from '@/lib/config/contact';
 import { SocialLinks } from './SocialLinks';
+import Link from 'next/link';
 
 interface MobileOptimizedFooterProps {
   serviceName?: string;
@@ -142,9 +143,9 @@ export function MobileOptimizedFooter({
             <h3 className="text-white font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="/" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/" className="text-gray-400 hover:text-white transition-colors">
                   Home
-                </a>
+                </Link>
               </li>
               <li>
                 <a href="#services" className="text-gray-400 hover:text-white transition-colors">

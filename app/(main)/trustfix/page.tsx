@@ -1,5 +1,6 @@
 import Script from 'next/script';
 import Link from 'next/link';
+
 import { ContactSection } from '@/components/contact/ContactSection';
 import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 import { Navigation } from './_components/Navigation';

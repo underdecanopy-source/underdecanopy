@@ -10,7 +10,7 @@ export default function Loading() {
       <div className="sticky top-0 z-50 w-full bg-gray-200 h-16 drop-shadow-lg"></div>
 
       {/* Hero Section Skeleton */}
-      <section className="bg-gray-100 py-10">
+      <section className="bg-gray-100 py-16">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8">
             {/* Text Content */}
@@ -22,8 +22,8 @@ export default function Loading() {
             </div>
 
             {/* Image Placeholder */}
-            <div className="hidden md:block w-1/2">
-              <div className="w-full aspect-square bg-gray-300 rounded-full"></div>
+            <div className="w-full md:w-1/2 flex justify-center">
+              <div className="w-full max-w-md md:max-w-none aspect-square bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </div>

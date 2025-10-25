@@ -29,26 +29,41 @@ export default function Page() {
       <Navigation />
 
 
-      <section className="bg-gray-100 py-10">
+      {/* Hero — replace the existing hero section with this */}
+      <section className="bg-gray-100 py-16">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8">
-            <div className="text-left max-w-lg">
-              <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Underdecanopy Digital Hub</h1>
+          <div className="flex flex-col md:flex-row md:items-center gap-8">
+            {/* Text column */}
+            <div className="text-left max-w-lg flex-shrink-0">
+              <h1 className="text-4xl font-bold text-gray-800 mb-4">
+                Welcome to Underdecanopy Digital Hub
+              </h1>
               <p className="text-gray-600 mb-8">
                 Your trusted center for digital solutions, business services,
                 and a relaxing cafe experience in Ibadan.
               </p>
-              <Link href="#contact" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-300">
+              <Link
+                href="#contact"
+                className="inline-block bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-300"
+              >
                 Get Started Today
               </Link>
             </div>
-            <Image
-              src="/hub.png"
-              alt="Underdecanopy Digital Hub"
-              className="w-full md:w-1/2 rounded-full shadow-lg"
-              width={1000}
-              height={1000}
-            />
+
+            {/* Image column: ensure it can grow but does not force text to shrink */}
+            <div className="flex-1 min-w-0">
+              <div className="max-w-full md:max-w-md mx-auto">
+                <Image
+                  src="/hub.png"
+                  alt="Underdecanopy Digital Hub"
+                  width={1000}
+                  height={1000}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                  className="w-full h-auto object-cover rounded-lg shadow-lg block"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
