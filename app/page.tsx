@@ -19,6 +19,8 @@ import { ProfessionalServiceCard } from '@/app/(main)/_components/ProfessionalSe
 import CafeItem from '@/app/(main)/_components/CafeItem';
 import { ContactForm } from '@/app/components/home/ContactForm';
 import { NewsletterForm } from '@/app/components/home/NewsletterForm';
+import { ContactSection } from '@/components/contact/ContactSection';
+import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
 
 export default function Page() {
 
@@ -193,6 +195,15 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <ContactSection
+        title="Get Started Today"
+        subtitle="Contact us for your digital solutions"
+      />
+
+      <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={true} />
+
     </main>
   );
 }
++
