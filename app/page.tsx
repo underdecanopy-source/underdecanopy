@@ -52,7 +52,7 @@ export default function Page() {
 
             {/* Image column: ensure it can grow but does not force text to shrink */}
             <div className="flex-1 min-w-0">
-              <div className="max-w-full md:max-w-md mx-auto">
+              <div className="max-w-full md:max-w-md mx-auto" style={{ contain: 'layout' }}>
                 <Image
                   src="/hub.png"
                   alt="Underdecanopy Digital Hub"
@@ -61,6 +61,7 @@ export default function Page() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                   priority
                   className="w-full h-auto object-cover rounded-lg shadow-lg block"
+                  style={{ aspectRatio: '1 / 1' }}
                 />
               </div>
             </div>
@@ -78,7 +79,7 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style={{ contain: 'layout' }}>
             {coreServices.map((service) => (
               <ServiceCard
                 key={service.title}
@@ -102,7 +103,7 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" style={{ contain: 'layout' }}>
             {professionalServices.map((service) => (
               <ProfessionalServiceCard
                 key={service.title}
@@ -125,7 +126,7 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style={{ contain: 'layout' }}>
             {cafeItems.map((item) => (
               <CafeItem
                 key={item.title}

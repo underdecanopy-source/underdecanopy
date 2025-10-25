@@ -16,8 +16,8 @@ export function ContactBar() {
   return (
     <>
       {/* Mobile Contact Bar - Sticky at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-gray-200 shadow-lg w-screen" style={{ width: '100vw', maxWidth: '100%' }}>
-        <div className="flex justify-around items-center py-3 px-2 w-full">
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-gray-200 shadow-lg" style={{ width: '100%', maxWidth: '100vw', contain: 'layout style' }}>
+        <div className="flex justify-around items-center py-3 px-2 w-full" style={{ maxWidth: '100%' }}>
           {/* Phone Call */}
           <a
             href={CONTACT_CONFIG.getPhoneLink()}
