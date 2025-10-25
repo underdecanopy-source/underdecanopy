@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./style.css";
 import { Toaster } from "sonner";
 import { ContactBar } from "@/components/contact/ContactBar";
 
