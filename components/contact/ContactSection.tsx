@@ -157,7 +157,7 @@ export function ContactSection({
             href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105"
+            className="inline-block bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition-all"
           >
             Start a Conversation on WhatsApp
           </a>

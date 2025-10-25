@@ -12,7 +12,7 @@ export default function Loading() {
       {/* Hero Section Skeleton */}
       <section className="bg-gray-100 py-10">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between flex-wrap items-center gap-8">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8">
             {/* Text Content */}
             <div className="max-w-lg flex-1">
               <div className="h-10 bg-gray-300 rounded mb-4 w-3/4"></div>

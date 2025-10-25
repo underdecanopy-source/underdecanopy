@@ -234,7 +234,7 @@ export default function SwiftWheelPage() {
                                 </div>
                             </div>
                             
-                            <div className="border border-blue-400 border-2 rounded-lg p-6 shadow-lg bg-white relative transform scale-105">
+                            <div className="border border-blue-400 border-2 rounded-lg p-6 shadow-lg bg-white relative">
                                 <div className="text-center mb-4">
                                     <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">MOST POPULAR</span>
                                     <h3 className="text-xl font-semibold mt-2">Limited Liability Company</h3>

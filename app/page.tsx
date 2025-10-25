@@ -31,11 +31,11 @@ export default function Page() {
 
       <section className="bg-gray-100 py-10">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between flex-wrap items-center">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8">
             <div className="text-left max-w-lg">
               <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Underdecanopy Digital Hub</h1>
               <p className="text-gray-600 mb-8">
-                Your trusted center for digital solutions, business services, 
+                Your trusted center for digital solutions, business services,
                 and a relaxing cafe experience in Ibadan.
               </p>
               <Link href="#contact" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-colors duration-300">
@@ -45,7 +45,7 @@ export default function Page() {
             <Image
               src="/hub.png"
               alt="Underdecanopy Digital Hub"
-              className="hidden md:block w-1/2 rounded-full shadow-lg"
+              className="w-full md:w-1/2 rounded-full shadow-lg"
               width={1000}
               height={1000}
             />
@@ -147,7 +147,7 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
             <div className="bg-white p-8 rounded-lg shadow-md">
               <h3 className="text-2xl font-bold text-gray-800 mb-6">Get In Touch</h3>
 
