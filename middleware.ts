@@ -1,36 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const HOST_MAP: Record<string, string> = {
-  'underdecanopy.com': '/sites/underdecanopy',
-  'www.underdecanopy.com': '/sites/underdecanopy',
-  'coophub.underdecanopy.com': '/sites/coophub',
-  'applysmart.underdecanopy.com': '/sites/applysmart',
-  'smarttax.underdecanopy.com': '/sites/smarttax',
-  'swiftwheel.underdecanopy.com': '/sites/swiftwheel',
-  'techlift.underdecanopy.com': '/sites/techlift',
-  'trustfix.underdecanopy.com': '/sites/trustfix',
-  'localhost': '/sites/underdecanopy',
-  '127.0.0.1': '/sites/underdecanopy',
-};
+const SUBDOMAINS = ['coophub', 'applysmart', 'smarttax', 'swiftwheel', 'techlift', 'trustfix'];
+const ROOT_DOMAIN = 'underdecanopy.com';
 
 export function middleware(req: NextRequest) {
-  const host = req.headers.get('host') || '';
-  const hostname = host.split(':')[0];
-
-  const targetPrefix = HOST_MAP[hostname];
-  if (!targetPrefix) {
-    return NextResponse.next();
-  }
-
+  const hostHeader = req.headers.get('host') || '';
+  const host = hostHeader.split(':')[0]; // strip port if any
   const url = req.nextUrl.clone();
-  if (url.pathname.startsWith(targetPrefix)) {
+
+  // Ensure we only rewrite requests for our domain
+  if (!host.endsWith(ROOT_DOMAIN)) {
     return NextResponse.next();
   }
 
-  url.pathname = `${targetPrefix}${url.pathname === '/' ? '/' : url.pathname}`;
-  return NextResponse.rewrite(url);
+  // split host into parts: [sub, sub2?, domain, tld]
+  const parts = host.split('.');
+  // typical host forms:
+  // underdecanopy.com -> ['underdecanopy','com']
+  // coophub.underdecanopy.com -> ['coophub','underdecanopy','com']
+  if (parts.length >= 3) {
+    const sub = parts[0].toLowerCase();
+    if (SUBDOMAINS.includes(sub)) {
+      // rewrite to the corresponding site route
+      url.pathname = `/sites/${sub}${url.pathname}`;
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  // For main domain (underdecanopy.com or www) leave as-is (serves main landing)
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: '/:path*',
+  matcher: ['/((?!_next/static|_next/image|api|favicon.ico).*)'],
 };
