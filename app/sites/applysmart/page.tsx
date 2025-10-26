@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 const ApplySmartPage = () => {
@@ -64,5 +66,20 @@ const ApplySmartPage = () => {
         </div>
     );
 };
+
+<style jsx>{`
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  .feature-card {
+    background: #f0f0f0;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+  }
+`}</style>
 
 export default ApplySmartPage;

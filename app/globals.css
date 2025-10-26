@@ -60,6 +60,7 @@ img[width][height] {
 
 section {
     contain: layout;
+    min-height: 200px; /* Prevent shrinking */
 }
 
 /* reserve font fallback quickly to reduce layout shift on font load */
