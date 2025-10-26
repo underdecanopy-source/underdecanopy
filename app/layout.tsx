@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   // ✅ ADDED: Open Graph tags for social media sharing
   openGraph: {
     title: "Underdecanopy Digital Hub | Business Centre & Cafe",
-    description: "Your trusted center for digital solutions, business services, and cafe experience in Ibadan",
+    description: "Your trusted center for digital solutions, business services, and cafe experience in Nigeria",
     url: "https://underdecanopy.com",
     siteName: "Underdecanopy Digital Hub",
     images: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Underdecanopy Digital Hub",
-    description: "Digital solutions and business services in Ibadan",
+    description: "Digital solutions and business services in Nigeria",
     images: ["/og-image.jpg"],
   },
 };
@@ -53,7 +53,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     name: "Underdecanopy Digital Hub",
-    description: "Digital solutions, business services, and cafe in Ibadan",
+    description: "Digital solutions, business services, and cafe in Nigeria",
     url: "https://underdecanopy.com",
     address: {
       "@type": "PostalAddress",
@@ -72,6 +72,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        {/* Font preloading for critical fonts to reduce CLS */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
