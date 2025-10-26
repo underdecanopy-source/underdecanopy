@@ -39,7 +39,7 @@ export default function Page() {
                 Welcome to Underdecanopy Digital Hub
               </h1>
               <p className="text-gray-600 mb-8">
-                Your trusted center for digital solutions, business services,
+                Your trusted centre for digital solutions, business services,
                 and a relaxing cafe experience in Ibadan.
               </p>
               <Link
@@ -61,7 +61,8 @@ export default function Page() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                   priority
                   className="w-full h-auto object-cover rounded-lg shadow-lg block"
-                  style={{ aspectRatio: '1 / 1' }}
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z"
                 />
               </div>
             </div>
