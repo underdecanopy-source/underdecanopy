@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 
 interface ContactFormProps {
@@ -25,19 +27,21 @@ const ContactForm: React.FC<ContactFormProps> = ({ purpose, className }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, message, purpose }),
+        body: JSON.stringify({ name, email, message, purpose, path: typeof window !== 'undefined' ? window.location.href : '' }),
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.error || 'Network response was not ok');
       }
 
       setSuccess('Your message has been sent successfully!');
       setName('');
       setEmail('');
       setMessage('');
-    } catch (error) {
+    } catch (err) {
       setError('There was a problem sending your message.');
+      console.error('Contact form error:', err);
     } finally {
       setLoading(false);
     }
@@ -80,19 +84,31 @@ const ContactForm: React.FC<ContactFormProps> = ({ purpose, className }) => {
         form {
           display: flex;
           flex-direction: column;
+          gap: 1rem;
         }
         label {
-          margin-bottom: 0.5rem;
+          display: flex;
+          flex-direction: column;
+          font-weight: 600;
         }
         input, textarea {
-          margin-bottom: 1rem;
+          margin-top: 0.5rem;
+          padding: 0.5rem 0.75rem;
+          border: 1px solid #e3e3e3;
+          border-radius: 6px;
+          font-size: 1rem;
         }
-        .success {
-          color: green;
+        textarea { min-height: 120px; resize: vertical; }
+        button {
+          padding: 0.75rem 1rem;
+          background: #2c5530;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
         }
-        .error {
-          color: red;
-        }
+        .success { color: #2c5530; background: #e8f5e9; padding: 0.75rem; border-radius: 6px; }
+        .error { color: #c62828; background: #ffebee; padding: 0.75rem; border-radius: 6px; }
       `}</style>
     </form>
   );
