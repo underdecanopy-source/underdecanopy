@@ -1,4 +1,6 @@
-import ContactForm from './ContactForm';
+'use client';
+
+import ContactForm from '@/components/ContactForm';
 
 export default function CoopHubLandingPage() {
   return (
