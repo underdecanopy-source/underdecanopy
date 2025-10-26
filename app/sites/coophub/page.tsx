@@ -25,7 +25,7 @@ export default function CoopHubLandingPage() {
       </section>
       <section className="contact">
         <h3>Contact Us</h3>
-        <ContactForm />
+        <ContactForm purpose="coophub" />
       </section>
       <style jsx>{`
         .header {
