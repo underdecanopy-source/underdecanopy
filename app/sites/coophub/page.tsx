@@ -1,6 +1,4 @@
-'use client';
-
-import ContactForm from '@/components/ContactForm';
+import ContactForm from './ContactForm';
 
 export default function CoopHubLandingPage() {
   return (
@@ -25,7 +23,7 @@ export default function CoopHubLandingPage() {
       </section>
       <section className="contact">
         <h3>Contact Us</h3>
-        <ContactForm purpose="coophub" />
+        <ContactForm />
       </section>
       <style jsx>{`
         .header {
