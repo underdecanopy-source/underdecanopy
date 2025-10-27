@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./fonts.css";
 import { Toaster } from "sonner";
-import { ContactBar } from "@/components/contact/ContactBar";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://underdecanopy.com"),
@@ -46,7 +45,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{  
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   // ✅ ADDED: JSON-LD structured data for SEO
