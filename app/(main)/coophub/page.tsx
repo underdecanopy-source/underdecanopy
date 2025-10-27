@@ -194,7 +194,7 @@ export default function Page() {
                                             <div className="flex-shrink-0 h-10 w-10 bg-blue-900 text-white rounded-full flex items-center justify-center font-bold">{index + 1}</div>
                                             <div>
                                                 <h3 className="text-xl font-bold text-gray-800">{step.title}</h3>
-                                                <p className="text-gray-600" dangerouslySetInnerHTML={{ __html: step.description }} />
+                                                <p className="text-gray-600 min-h-20" dangerouslySetInnerHTML={{ __html: step.description }} />
                                             </div>
                                         </div>
                                     ))}
@@ -266,15 +266,16 @@ export default function Page() {
                                     </button>
                                     <div
                                         id={`faq-content-${index}`}
-                                        className={`transition-all duration-300 ease-in-out overflow-hidden ${openFaq === index ? 'max-h-96' : 'max-h-0'}`}
-                                        style={{ contain: 'layout' }}
+                                        className={`grid transition-all duration-300 ease-in-out ${openFaq === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
                                     >
-                                        <div className="p-4 bg-white">
-                                            {Array.isArray(faq.answer) ? (
-                                                faq.answer.map((line, i) => <p key={i} className="text-gray-600 mb-2" dangerouslySetInnerHTML={{ __html: line }} />)
-                                            ) : (
-                                                <p className="text-gray-600" dangerouslySetInnerHTML={{ __html: faq.answer }} />
-                                            )}
+                                        <div className="overflow-hidden">
+                                            <div className="p-4 bg-white min-h-20">
+                                                {Array.isArray(faq.answer) ? (
+                                                    faq.answer.map((line, i) => <p key={i} className="text-gray-600 mb-2" dangerouslySetInnerHTML={{ __html: line }} />)
+                                                ) : (
+                                                    <p className="text-gray-600" dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
