@@ -213,7 +213,12 @@ export default function Page() {
         </div>
       </section>
 
-      <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={true} />
+      <ContactSection
+        title="Get Started Today"
+        subtitle="Contact us for your digital solutions"
+      />
+
+      <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={false} />
 
     </main>
   );
