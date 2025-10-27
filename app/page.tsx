@@ -72,7 +72,7 @@ export default function Page() {
 
       <section className="py-12" id="services">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-800">Our Core Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
               Comprehensive digital solutions tailored to meet your business and 
@@ -96,7 +96,7 @@ export default function Page() {
 
       <section className="bg-gray-100 py-12" id="additional">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-800">Professional Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
               Comprehensive solutions to meet your business and personal 
@@ -119,7 +119,7 @@ export default function Page() {
 
       <section className="py-12" id="cafe">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-orange-500">Cafe Experience</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
               Enjoy snacks, meals, and beverages while you work or learn. Relax 
