@@ -70,8 +70,8 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="py-8" id="services">
-        <div className="container mx-auto px-4 flex flex-col gap-y-6">
+      <section className="py-12" id="services">
+        <div className="container mx-auto px-4 flex flex-col gap-y-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-800">Our Core Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
@@ -94,8 +94,8 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="bg-gray-100 py-8" id="additional">
-        <div className="container mx-auto px-4 flex flex-col gap-y-6">
+      <section className="bg-gray-100 py-12" id="additional">
+        <div className="container mx-auto px-4 flex flex-col gap-y-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-800">Professional Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
@@ -117,8 +117,8 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="py-8" id="cafe">
-        <div className="container mx-auto px-4 flex flex-col gap-y-.6">
+      <section className="py-12" id="cafe">
+        <div className="container mx-auto px-4 flex flex-col gap-y-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-orange-500">Cafe Experience</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
