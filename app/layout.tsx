@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+<<<<<<< Updated upstream
 import "./fonts.css";
+=======
+>>>>>>> Stashed changes
 import { Toaster } from "sonner";
 import { ContactBar } from "@/components/contact/ContactBar";
 
@@ -72,6 +75,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+<<<<<<< Updated upstream
         {/* Font preloading for critical fonts to reduce CLS */}
 
         <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiEyp8kv8JHgFVrFJA.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
@@ -89,6 +93,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+=======
+        {/* Critical CSS for CLS prevention */}
+        <link rel="stylesheet" href="/critical.css" />
+        {/* Font preload optimization */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+>>>>>>> Stashed changes
       </head>
       <body className="w-full overflow-x-hidden">
         <main className="w-full">
