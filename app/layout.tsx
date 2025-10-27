@@ -5,19 +5,13 @@ import { Toaster } from "sonner";
 import { ContactBar } from "@/components/contact/ContactBar";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://underdecanopy.com"),
   title: "Underdecanopy Digital Hub | Business Centre & Cafe",
   description:
     "Underdecanopy Digital Hub is your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan. We offer services like business registration, IT support, digital training, and more.",
   icons: {
     icon: "/favicon.png",
   },
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
-};
   // ✅ ADDED: Open Graph tags for social media sharing
   openGraph: {
     title: "Underdecanopy Digital Hub | Business Centre & Cafe",
@@ -42,6 +36,12 @@ export const viewport: Viewport = {
     description: "Digital solutions and business services in Nigeria",
     images: ["/og-image.jpg"],
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
