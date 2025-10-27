@@ -29,11 +29,7 @@ main {
     padding-bottom: 0;
 }
 
-@media (max-width: 768px) {
-    main {
-        padding-bottom: 0; /* Space for mobile ContactBar */
-    }
-}
+
 
 /* Ensure consistent text rendering */
 * {
