@@ -9,14 +9,11 @@ interface ProfessionalServiceCardProps {
 
 export function ProfessionalServiceCard({ icon, title, description }: ProfessionalServiceCardProps) {
   return (
-    <div className="text-center min-h-[200px] flex flex-col" style={{ contain: 'layout' }}>
-      <div className="w-full aspect-[4/3] overflow-hidden rounded-lg mb-4" style={{ minHeight: '0' }}>
-        {/* Placeholder for image if needed */}
-      </div>
+    <div className="text-center flex flex-col">
       <div className="flex items-center justify-center rounded-full bg-orange-500 text-white mx-auto mb-4 flex-shrink-0" style={{ width: '4rem', height: '4rem' }}>
         {icon}
       </div>
-      <h3 className="text-lg font-semibold text-gray-800 mb-2 min-h-[3rem] flex items-center justify-center">{title}</h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
       <p className="text-gray-600 flex-grow">{description}</p>
     </div>
   );

@@ -11,10 +11,7 @@ interface ServiceCardProps {
 
 export function ServiceCard({ icon, title, description, link }: ServiceCardProps) {
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md min-h-[280px] flex flex-col" style={{ contain: 'layout' }}>
-      <div className="w-full aspect-[4/3] overflow-hidden rounded-lg mb-4" style={{ minHeight: '0' }}>
-        {/* Placeholder for image if needed */}
-      </div>
+    <div className="bg-white p-6 rounded-lg shadow-md flex flex-col">
       <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
         <span className="p-3 rounded-full bg-orange-100 text-orange-500 flex-shrink-0" style={{ width: '3rem', height: '3rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {icon}
