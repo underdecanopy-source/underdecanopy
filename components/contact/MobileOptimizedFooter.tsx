@@ -21,7 +21,7 @@ export function MobileOptimizedFooter({
   showQuickContact = true,
 }: MobileOptimizedFooterProps) {
   return (
-    <footer className="bg-gray-900 text-gray-100 pt-12 pb-24 md:pb-12">
+    <footer className="bg-gray-900 text-gray-100 pt-12 pb-12">
       <div className="container mx-auto px-4 md:px-6">
         {/* Quick Contact Section - Mobile Optimized */}
         {showQuickContact && (

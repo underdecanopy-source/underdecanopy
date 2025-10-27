@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./fonts.css";
 import { Toaster } from "sonner";
@@ -11,12 +11,13 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.png",
   },
-  // ✅ ADDED: Viewport configuration for mobile responsiveness
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
   // ✅ ADDED: Open Graph tags for social media sharing
   openGraph: {
     title: "Underdecanopy Digital Hub | Business Centre & Cafe",
