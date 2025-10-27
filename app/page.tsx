@@ -70,9 +70,9 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="py-16" id="services">
+      <section className="py-12" id="services">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-gray-800">Our Core Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
               Comprehensive digital solutions tailored to meet your business and 
@@ -80,7 +80,7 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style={{ contain: 'layout' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {coreServices.map((service) => (
               <ServiceCard
                 key={service.title}
@@ -94,9 +94,9 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="bg-gray-100 py-16" id="additional">
+      <section className="bg-gray-100 py-12" id="additional">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-gray-800">Professional Services</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
               Comprehensive solutions to meet your business and personal 
@@ -104,7 +104,7 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" style={{ contain: 'layout' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {professionalServices.map((service) => (
               <ProfessionalServiceCard
                 key={service.title}
@@ -117,9 +117,9 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="py-16" id="cafe">
+      <section className="py-12" id="cafe">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-orange-500">Cafe Experience</h2>
             <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
               Enjoy snacks, meals, and beverages while you work or learn. Relax 
@@ -127,7 +127,7 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style={{ contain: 'layout' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {cafeItems.map((item) => (
               <CafeItem
                 key={item.title}
