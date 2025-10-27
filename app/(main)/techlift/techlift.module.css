@@ -125,11 +125,12 @@
 .heroImage {
     flex: 1;
     text-align: center;
+    aspect-ratio: 600 / 500;
 }
 
 .heroImage img {
     max-width: 100%;
-    height: auto;
+    object-fit: cover;
     border-radius: 10px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
@@ -171,7 +172,7 @@
     transition: all 0.3s ease;
     border: 1px solid var(--light-gray);
     text-align: center;
-    contain: layout;
+    contain: layout paint;
     min-height: 280px;
 }
 
@@ -222,7 +223,7 @@
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    contain: layout;
+    contain: layout paint;
     min-height: 400px;
 }
 
@@ -282,7 +283,7 @@
     padding: 30px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--light-gray);
-    contain: layout;
+    contain: layout paint;
     min-height: 220px;
 }
 

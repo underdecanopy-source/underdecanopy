@@ -183,11 +183,7 @@ export default function TrustFixPage() {
       <MobileOptimizedFooter serviceName="TrustFix" showQuickContact={false} />
 
       {/* Font Awesome for icons */}
-      <Script
-        src="https://kit.fontawesome.com/a076d05399.js"
-        crossOrigin="anonymous"
-        strategy="lazyOnload"
-      />
+
     </>
   );
 }

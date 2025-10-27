@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "./style.css";
+import "./fonts.css";
 import { Toaster } from "sonner";
 import { ContactBar } from "@/components/contact/ContactBar";
 
@@ -73,12 +73,18 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <head>
         {/* Font preloading for critical fonts to reduce CLS */}
+
+        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiEyp8kv8JHgFVrFJA.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLEj6V1s.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLCz7V1s.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.gstatic.com/s/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbWmT.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.gstatic.com/s/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bWmT.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.gstatic.com/s/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjammT.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="preconnect" href="https://kit.fontawesome.com" crossOrigin="anonymous" />
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossOrigin="anonymous"></script>
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
