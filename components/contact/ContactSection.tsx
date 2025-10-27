@@ -23,7 +23,7 @@ export function ContactSection({
   showHours = true,
 }: ContactSectionProps) {
   return (
-    <section className="py-12 md:py-20 bg-gradient-to-br from-blue-50 to-indigo-50" style={{ contain: 'layout' }}>
+    <section className="pt-12 md:pt-20 bg-gradient-to-br from-blue-50 to-indigo-50" style={{ contain: 'layout' }}>
       <div className="container mx-auto px-4 md:px-6">
         {/* Header */}
         <div className="text-center mb-12">
