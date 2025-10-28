@@ -187,6 +187,7 @@ export default function TechLiftPage() {
                         <a href="#contact" className={styles.btn}>Start Your Journey Today</a>
                     </div>
                 </section>
+            </main>
                 
             <ContactSection
                 title="Ready to Transform Your Career?"
