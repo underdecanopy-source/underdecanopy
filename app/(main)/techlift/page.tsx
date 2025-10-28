@@ -187,56 +187,7 @@ export default function TechLiftPage() {
                         <a href="#contact" className={styles.btn}>Start Your Journey Today</a>
                     </div>
                 </section>
-
-                {/* Footer */}
-                <footer id="contact" className={styles.footer}>
-                    <div className={styles.container}>
-                        <div className={styles.footerGrid}>
-                            <div className={styles.footerColumn}>
-                                <h3>TechLift</h3>
-                                <p style={{ color: '#cbd5e1', marginBottom: '20px' }}>Advancing careers through hands-on tech education.</p>
-                                <div className={styles.socialLinks}>
-                                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><span className="fab fa-facebook-f" aria-hidden="true"></span></a>
-                                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><span className="fab fa-twitter" aria-hidden="true"></span></a>
-                                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><span className="fab fa-instagram" aria-hidden="true"></span></a>
-                                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><span className="fab fa-linkedin-in" aria-hidden="true"></span></a>
-                                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><span className="fab fa-youtube" aria-hidden="true"></span></a>
-                                </div>
-                            </div>
-                            <div className={styles.footerColumn}>
-                                <h3>Quick Links</h3>
-                                <ul className={styles.footerLinks}>
-                                    <li><a href="#home">Home</a></li>
-                                    <li><a href="#courses">Courses</a></li>
-                                    <li><a href="#about">About Us</a></li>
-                                    <li><a href="#testimonials">Testimonials</a></li>
-                                </ul>
-                            </div>
-                            <div className={styles.footerColumn}>
-                                <h3>Programs</h3>
-                                <ul className={styles.footerLinks}>
-                                    <li><a href="#courses">Web Development</a></li>
-                                    <li><a href="#courses">Graphic Design</a></li>
-                                    <li><a href="#courses">Mobile Development</a></li>
-                                </ul>
-                            </div>
-                            <div className={styles.footerColumn}>
-                                <h3>Contact Us</h3>
-                                <div className={styles.footerContact}>
-                                    <p><span className="fas fa-map-marker-alt" aria-hidden="true"></span> 123 Tech Street, San Francisco, CA</p>
-                                    <p><span className="fas fa-phone-alt" aria-hidden="true"></span> (555) 123-4567</p>
-                                    <p><span className="fas fa-envelope" aria-hidden="true"></span> info@techlift.com</p>
-                                    <p><span className="fas fa-clock" aria-hidden="true"></span> Mon-Fri: 9AM - 6PM</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={styles.copyright}>
-                            <p>&copy; 2024 TechLift. All rights reserved.</p>
-                        </div>
-                    </div>
-                </footer>
-            </main>
-
+                
             <ContactSection
                 title="Ready to Transform Your Career?"
                 subtitle="Get started with TechLift today"

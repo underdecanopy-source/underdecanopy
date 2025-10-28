@@ -284,31 +284,6 @@ export default function Page() {
                     </div>
                 </section>
 
-                <section className="bg-gray-800 text-white py-16" id="contact">
-                    <div className="container mx-auto px-4 text-center">
-                        <h2 className="text-3xl font-bold mb-4">We&apos;re Here to Help</h2>
-                        <p className="text-gray-400 mb-8 max-w-2xl mx-auto">Can&apos;t find what you&apos;re looking for? Reach out to our support team.</p>
-                        <div className="grid md:grid-cols-3 gap-8 mb-12">
-                            <div className="bg-gray-700 p-6 rounded-lg">
-                                <Mail className="h-10 w-10 mx-auto mb-4 text-orange-500" />
-                                <h3 className="text-xl font-bold mb-2">Email Us</h3>
-                                <a href={`mailto:${config.email}`} className="text-orange-400 hover:underline">{config.email}</a>
-                            </div>
-                            <div className="bg-gray-700 p-6 rounded-lg">
-                                <MessageCircle className="h-10 w-10 mx-auto mb-4 text-orange-500" />
-                                <h3 className="text-xl font-bold mb-2">Message on WhatsApp</h3>
-                                <a href={`https://wa.me/${config.whatsAppNumber.replace('+', '')}`} className="text-orange-400 hover:underline">{config.whatsAppNumber}</a>
-                            </div>
-                            <div className="bg-gray-700 p-6 rounded-lg">
-                                <Globe className="h-10 w-10 mx-auto mb-4 text-orange-500" />
-                                <h3 className="text-xl font-bold mb-2">Follow & DM</h3>
-                                <p className="text-gray-400">Follow <strong>@coophub</strong> on all social media platforms</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-
                 <section className="py-20 bg-blue-900 text-white" id="get-started">
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">Get Started Today</h2>

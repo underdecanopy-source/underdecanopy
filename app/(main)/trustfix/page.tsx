@@ -155,26 +155,6 @@ export default function TrustFixPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section id="contact" className="py-20 bg-blue-600 text-white">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4"><span aria-hidden="true">📞</span> Get Help or Book a Technician</h2>
-              <p className="text-xl opacity-90 max-w-2xl mx-auto">Reach out to us now and enjoy fast, secure, and professional service.</p>
-            </div>
-            <div className="flex flex-col md:flex-row justify-center items-center space-y-6 md:space-y-0 md:space-x-6">
-              <a href="tel:08064852108" className="px-8 py-4 bg-white text-blue-600 rounded-md hover:bg-opacity-90 transition text-center font-semibold text-lg flex items-center">
-                <i className="fas fa-phone-alt mr-2"></i> Call: 080-6485-2108
-              </a>
-              <span className="text-white opacity-70">OR</span>
-              <a href="https://wa.me/2348064852108" className="px-8 py-4 bg-green-500 text-white rounded-md hover:bg-green-600 transition text-center font-semibold text-lg flex items-center">
-                <i className="fab fa-whatsapp mr-2"></i> WhatsApp Us
-              </a>
-            </div>
-          </div>
-        </section>
-      </main>
-
       <ContactSection
         title="Book a Technician Now"
         subtitle="Fast, reliable tech support"
