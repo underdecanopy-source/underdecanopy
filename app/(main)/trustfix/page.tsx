@@ -1,3 +1,5 @@
+'use client';
+
 import Script from 'next/script';
 import Link from 'next/link';
 
@@ -154,6 +156,7 @@ export default function TrustFixPage() {
             </form>
           </div>
         </section>
+      </main>
 
       <ContactSection
         title="Book a Technician Now"
