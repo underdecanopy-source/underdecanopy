@@ -17,10 +17,13 @@ import MicIcon from '@/components/icons/Mic';
 import { ServiceCard } from '@/app/(main)/_components/ServiceCard';
 import { ProfessionalServiceCard } from '@/app/(main)/_components/ProfessionalServiceCard';
 import CafeItem from '@/app/(main)/_components/CafeItem';
-import { ContactForm } from '@/app/components/home/ContactForm';
-import { NewsletterForm } from '@/app/components/home/NewsletterForm';
-import { ContactSection } from '@/components/contact/ContactSection';
-import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
+import { lazy, Suspense } from 'react';
+const ContactForm = lazy(() => import('@/app/components/home/ContactForm').then(module => ({ default: module.ContactForm })));
+const NewsletterForm = lazy(() => import('@/app/components/home/NewsletterForm').then(module => ({ default: module.NewsletterForm })));
+const ContactSection = lazy(() => import('@/components/contact/ContactSection').then(module => ({ default: module.ContactSection })));
+const MobileOptimizedFooter = lazy(() => import('@/components/contact/MobileOptimizedFooter').then(module => ({ default: module.MobileOptimizedFooter })));
+const CafeItem = lazy(() => import('@/app/(main)/_components/CafeItem').then(module => ({ default: module.CafeItem })));
+const ProfessionalServiceCard = lazy(() => import('@/app/(main)/_components/ProfessionalServiceCard').then(module => ({ default: module.ProfessionalServiceCard })));
 
 export default function Page() {
 
@@ -59,7 +62,7 @@ export default function Page() {
                     alt="Underdecanopy Digital Hub"
                     width={1000}
                     height={1000}
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     priority
                     className="w-full h-auto object-cover rounded-lg shadow-lg block"
                     placeholder="blur"
@@ -107,12 +110,13 @@ export default function Page() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {professionalServices.map((service) => (
-                <ProfessionalServiceCard
-                  key={service.title}
-                  icon={service.icon}
-                  title={service.title}
-                  description={service.description}
-                />
+                <Suspense fallback={<div>Loading...</div>} key={service.title}>
+                  <ProfessionalServiceCard
+                    icon={service.icon}
+                    title={service.title}
+                    description={service.description}
+                  />
+                </Suspense>
               ))}
             </div>
           </div>
@@ -130,12 +134,13 @@ export default function Page() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {cafeItems.map((item) => (
-                <CafeItem
-                  key={item.title}
-                  icon={item.icon}
-                  title={item.title}
-                  description={item.description}
-                />
+                <Suspense fallback={<div>Loading...</div>} key={item.title}>
+                  <CafeItem
+                    icon={item.icon}
+                    title={item.title}
+                    description={item.description}
+                  />
+                </Suspense>
               ))}
             </div>
           </div>
@@ -150,7 +155,7 @@ export default function Page() {
               Tune in to our episodes for digital tips and business insights 
               from Ibadan and beyond.
             </p>
-            <Link href="https://underdecanopy.com/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-orange-500 active:scale-95 inline-block">
+            <Link href="https://underdecanopy.com/podcast" rel="noopener noreferrer" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-orange-500 active:scale-95 inline-block">
               Listen to Our Podcast
             </Link>
           </div>
@@ -205,22 +210,73 @@ export default function Page() {
                 <div className="border-t pt-8">
                   <h4 className="text-lg font-bold text-gray-800 mb-4">Newsletter</h4>
                   <p className="text-gray-600 mb-4">Subscribe for updates and offers.</p>
-                  <NewsletterForm />
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <NewsletterForm />
+                  </Suspense>
                 </div>
               </div>
 
-              <ContactForm />
+              <Suspense fallback={<div>Loading...</div>}>
+                <ContactForm />
+              </Suspense>
             </div>
           </div>
         </section>
       </main>
 
-      <ContactSection
-        title="Get Started Today"
-        subtitle="Contact us for your digital solutions"
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <ContactSection
+          title="Get Started Today"
+          subtitle="Contact us for your digital solutions"
+        />
+      </Suspense>
 
-      <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={false} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={false} />
+      </Suspense>
+
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "Underdecanopy Digital Hub",
+          "image": "https://underdecanopy.com/hub.png",
+          "@id": "",
+          "url": "https://underdecanopy.com",
+          "telephone": "+2348064852108",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "TIK Centre, Opposite Medical Centre, Along Poly Main Road",
+            "addressLocality": "Ibadan",
+            "addressRegion": "Oyo",
+            "postalCode": "200284",
+            "addressCountry": "NG"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 7.4439,
+            "longitude": 3.9083
+          },
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday"
+            ],
+            "opens": "08:00",
+            "closes": "18:00"
+          },
+          "sameAs": [
+            "https://www.facebook.com/underdecanopy",
+            "https://www.twitter.com/underdecanopy",
+            "https://www.instagram.com/underdecanopy",
+            "https://www.linkedin.com/company/underdecanopy"
+          ] 
+        }
+      </script>
     </>
   );
 }

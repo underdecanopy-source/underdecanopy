@@ -19,7 +19,7 @@ export function NewsletterForm() {
           name="email"
           placeholder="Enter your email"
           required
-          className="w-full px-4 py-2 text-gray-800 border border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors"
+          aria-label="Email for newsletter"
         />
         <NewsletterSubmitButton />
       </div>

@@ -14,6 +14,7 @@ export function Navigation() {
                         <Link href="/techlift" className="text-2xl font-bold text-purple-600">TechLift</Link>
                     </div>
                     <nav className="hidden md:flex md:space-x-8">
+                        <a href="/" className="text-gray-500 hover:text-gray-700">Home</a>
                         <a href="#about" className="text-gray-500 hover:text-gray-700">About</a>
                         <a href="#courses" className="text-gray-500 hover:text-gray-700">Courses</a>
                         <a href="#testimonials" className="text-gray-500 hover:text-gray-700">Testimonials</a>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -11,8 +12,8 @@ export function Navigation() {
         <header className="sticky top-0 z-50 w-full bg-white shadow-md">
             <div className="w-full mx-auto flex h-16 items-center justify-between px-6 md:px-8 max-w-full">
                 {/* Logo/Branding */}
-                <Link href="/trustfix" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
-                    TrustFix
+                <Link href="/applysmart" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                    ApplySmart
                 </Link>
 
                 {/* Desktop Navigation */}
@@ -23,8 +24,14 @@ export function Navigation() {
                     <a href="#how-it-works" className="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full">
                         How It Works
                     </a>
-                    <a href="#services" className="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full">
-                        Services
+                    <a href="#admission-calculator" className="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full">
+                        Admission Calculator
+                    </a>
+                    <a href="#scholarships" className="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full">
+                        Scholarships
+                    </a>
+                    <a href="#blog" className="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full">
+                        Blog
                     </a>
                     <a href="#contact" className="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full">
                         Contact
@@ -49,6 +56,13 @@ export function Navigation() {
             >
                 <nav className="flex flex-col p-4 bg-gray-50">
                     <a
+                        href="/"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block py-3 px-4 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    >
+                        Home
+                    </a>
+                    <a
                         href="#how-it-works"
                         onClick={() => setIsMenuOpen(false)}
                         className="block py-3 px-4 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
@@ -56,18 +70,25 @@ export function Navigation() {
                         How It Works
                     </a>
                     <a
-                        href="#services"
+                        href="#admission-calculator"
                         onClick={() => setIsMenuOpen(false)}
                         className="block py-3 px-4 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                     >
-                        Services
+                        Admission Calculator
                     </a>
                     <a
-                        href="#pricing"
+                        href="#scholarships"
                         onClick={() => setIsMenuOpen(false)}
                         className="block py-3 px-4 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                     >
-                        Pricing
+                        Scholarships
+                    </a>
+                    <a
+                        href="#blog"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block py-3 px-4 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    >
+                        Blog
                     </a>
                     <a
                         href="#contact"
@@ -81,4 +102,3 @@ export function Navigation() {
         </header>
     );
 }
-

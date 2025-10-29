@@ -145,6 +145,7 @@ export default function SwiftWheelPage() {
                         </div>
                         <nav className="hidden md:block">
                             <ul className="flex space-x-6">
+                                <li><a href="/" className="hover:text-blue-200">Home</a></li>
                                 <li><a href="#services" className="hover:text-blue-200">Services</a></li>
                                 <li><a href="#pricing" className="hover:text-blue-200">Pricing</a></li>
                                 <li><a href="#faq" className="hover:text-blue-200">FAQ</a></li>

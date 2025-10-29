@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 // NOTE: For the transition to work well, we need to use a Tailwind trick 
 // (max-h-0 and overflow-hidden) instead of conditional rendering (&&) for the flyout.
 
+import { usePathname } from 'next/navigation';
+
 // Define the menu links
 const navItems = [
     { href: '/', label: 'Home' },
@@ -22,6 +24,7 @@ export function Navigation() {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const menuContainerRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -68,6 +71,7 @@ export function Navigation() {
                         <Link
                             key={item.href}
                             href={item.href}
+                            aria-current={pathname === item.href ? 'page' : undefined}
                             // Fixed: Use opacity and color change instead of border to prevent layout shift
                             className="relative px-3 py-1 text-sm font-medium text-white transition-all tracking-wider hover:text-[#ff9800] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#ff9800] after:transition-all after:duration-300 hover:after:w-full"
                         >
@@ -84,6 +88,8 @@ export function Navigation() {
                     ref={menuButtonRef}
                     onClick={toggleMenu}
                     aria-label="Toggle Menu"
+                    aria-expanded={isMenuOpen}
+                    aria-controls="mobile-menu"
                 >
                     {isMenuOpen ? <X className='h-6 w-6' /> : <Menu className="h-6 w-6" />}
                 </Button>
@@ -98,6 +104,7 @@ export function Navigation() {
         4. `max-h-96`: When the menu is open, we give it a large enough max height (96 = 24rem) so the content can show, giving the *drop-down* effect.
       */}
             <div
+                id="mobile-menu"
                 ref={menuContainerRef}
                 className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-96 border-t opacity-100' : 'max-h-0 opacity-0'
                     }`}

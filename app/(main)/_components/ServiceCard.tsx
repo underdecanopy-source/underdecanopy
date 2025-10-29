@@ -10,8 +10,24 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ icon, title, description, link }: ServiceCardProps) {
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": title,
+    "description": description,
+    "url": `https://underdecanopy.com${link}`,
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "Underdecanopy Digital Hub"
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
       <h3 className="flex items-center gap-3 text-xl font-bold text-gray-800 mb-4">
         <span className="p-3 rounded-full bg-orange-100 text-orange-500 flex-shrink-0" style={{ width: '3rem', height: '3rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {icon}
