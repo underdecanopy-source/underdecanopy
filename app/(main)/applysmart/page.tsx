@@ -130,7 +130,6 @@ export default function Page() {
             </main>
 
             <ContactSection
-                id="contact"
                 title="Ready to Get Started?"
                 subtitle="Contact us for more information about ApplySmart"
             />

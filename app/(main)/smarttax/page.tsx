@@ -13,7 +13,7 @@ export default function SmartTaxPage() {
         <>
             <Header />
             <main data-page="smarttax">
-                <Hero id="hero" />
+                <Hero />
                 <Features />
                 <Demo />
                 <Compliance />
