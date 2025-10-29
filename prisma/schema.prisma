@@ -74,3 +74,12 @@ model CafeMenuItem {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
+
+model NewsletterSubscription {
+  id        String   @id @default("uuid")
+  email     String   @unique
+  subscribedAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

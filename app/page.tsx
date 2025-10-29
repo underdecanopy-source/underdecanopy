@@ -15,8 +15,6 @@ import { contactInfo } from '@/lib/data/contact';
 
 import MicIcon from '@/components/icons/Mic';
 import { ServiceCard } from '@/app/(main)/_components/ServiceCard';
-import { ProfessionalServiceCard } from '@/app/(main)/_components/ProfessionalServiceCard';
-import CafeItem from '@/app/(main)/_components/CafeItem';
 import { lazy, Suspense } from 'react';
 const ContactForm = lazy(() => import('@/app/components/home/ContactForm').then(module => ({ default: module.ContactForm })));
 const NewsletterForm = lazy(() => import('@/app/components/home/NewsletterForm').then(module => ({ default: module.NewsletterForm })));
@@ -235,48 +233,51 @@ export default function Page() {
         <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={false} />
       </Suspense>
 
-      <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          "name": "Underdecanopy Digital Hub",
-          "image": "https://underdecanopy.com/hub.png",
-          "@id": "",
-          "url": "https://underdecanopy.com",
-          "telephone": "+2348064852108",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "TIK Centre, Opposite Medical Centre, Along Poly Main Road",
-            "addressLocality": "Ibadan",
-            "addressRegion": "Oyo",
-            "postalCode": "200284",
-            "addressCountry": "NG"
-          },
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": 7.4439,
-            "longitude": 3.9083
-          },
-          "openingHoursSpecification": {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": [
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday"
-            ],
-            "opens": "08:00",
-            "closes": "18:00"
-          },
-          "sameAs": [
-            "https://www.facebook.com/underdecanopy",
-            "https://www.twitter.com/underdecanopy",
-            "https://www.instagram.com/underdecanopy",
-            "https://www.linkedin.com/company/underdecanopy"
-          ] 
-        }
-      </script>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "Underdecanopy Digital Hub",
+            "image": "https://underdecanopy.com/hub.png",
+            "@id": "",
+            "url": "https://underdecanopy.com",
+            "telephone": "+2348064852108",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "TIK Centre, Opposite Medical Centre, Along Poly Main Road",
+              "addressLocality": "Ibadan",
+              "addressRegion": "Oyo",
+              "postalCode": "200284",
+              "addressCountry": "NG"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 7.4439,
+              "longitude": 3.9083
+            },
+            "openingHoursSpecification": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            "sameAs": [
+              "https://www.facebook.com/underdecanopy",
+              "https://www.twitter.com/underdecanopy",
+              "https://www.instagram.com/underdecanopy",
+              "https://www.linkedin.com/company/underdecanopy"
+            ]
+          })
+        }}
+      />
     </>
   );
 }

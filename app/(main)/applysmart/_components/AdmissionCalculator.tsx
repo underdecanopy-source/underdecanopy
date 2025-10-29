@@ -1,13 +1,59 @@
 'use client';
 
 import { useState } from 'react';
-import { federalUniversities, stateUniversities, polytechnics, firstTierCourses, secondTierCourses, thirdTierCourses } from "@/lib/data/applysmart";
+import { federalUniversities, stateUniversities, polytechnics, firstTierCourses, secondTierCourses, thirdTierCourses, states } from "@/lib/data/applysmart";
+import { calculateAdmissionChance } from "@/lib/utils/admissionCalculator";
+
+// Mapping from form course values to utility course keys
+const courseMapping: Record<string, string> = {
+    'Medicine and Surgery (MBBS)': 'medicine',
+    'Dentistry (BDS)': 'dentistry',
+    'Pharmacy (Pharm.D)': 'pharmacy',
+    'Law (LL.B)': 'law',
+    'Nursing Science (B.N.Sc.)': 'nursing',
+    'Medical Laboratory Science (B.MLS)': 'medical_lab',
+    'Physiotherapy': 'physiotherapy',
+    'Radiography and Radiation Science': 'radiography',
+    'Veterinary Medicine (DVM)': 'vet_med',
+    'Optometry': 'optometry',
+    'Anatomy': 'anatomy',
+    'Physiology': 'physiology',
+    'Accounting': 'accounting',
+    'Banking and Finance': 'banking_finance',
+    'Business Administration': 'business_admin',
+    'Economics': 'economics',
+    'Mass Communication': 'mass_comm',
+    'Computer Science': 'computer_science',
+    'Electrical/Electronics Engineering': 'electrical_eng',
+    'Mechanical Engineering': 'mechanical_eng',
+    'Civil Engineering': 'civil_eng',
+    'Architecture': 'architecture',
+    'Estate Management': 'estate_management',
+    'Urban and Regional Planning': 'urban_regional',
+    'Biochemistry': 'biochemistry',
+    'Microbiology': 'microbiology',
+    'Public Administration': 'public_admin',
+    'Local Government Studies': 'local_govt',
+    'Sociology': 'sociology',
+    'Political Science': 'political_science',
+    'History and International Studies': 'history',
+    'Theatre Arts': 'theatre_arts',
+    'Linguistics': 'linguistics',
+    'English Language and Literature': 'english',
+    'Modern Languages': 'french',
+    'Education programs with subject majors': 'education',
+    'Agricultural Economics': 'agric_econ',
+    'Animal Science': 'animal_science',
+    'Crop Science': 'crop_science',
+    'Soil Science': 'soil_science',
+};
 
 export function AdmissionCalculator() {
     const [institution, setInstitution] = useState('');
     const [course, setCourse] = useState('');
     const [score, setScore] = useState('');
-    const [result, setResult] = useState<{ chance: number; explanation: string; factors: string[] } | null>(null);
+    const [state, setState] = useState('');
+    const [result, setResult] = useState<ReturnType<typeof calculateAdmissionChance> | null>(null);
 
     const calculateChance = (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,46 +63,19 @@ export function AdmissionCalculator() {
             return;
         }
 
-        // Simplified logic
-        let chance = 50;
-        let explanation = 'Based on your score, you have a moderate chance.';
-        const factors = [];
-
-        if (jambScore >= 250) {
-            chance += 30;
-            factors.push('High JAMB score is a significant advantage.');
-        } else if (jambScore >= 200) {
-            chance += 15;
-            factors.push('Good JAMB score.');
-        } else if (jambScore < 180) {
-            chance -= 20;
-            factors.push('Low JAMB score, admission might be challenging.');
+        const courseKey = courseMapping[course];
+        if (!courseKey) {
+            alert('Please select a valid course.');
+            return;
         }
 
-        if (firstTierCourses.some(c => c.value === course)) {
-            if (jambScore < 240) chance -= 15;
-            factors.push('Competitive course selected.');
-        } else if (secondTierCourses.some(c => c.value === course)) {
-            if (jambScore < 200) chance -= 10;
-            factors.push('Moderately competitive course.');
-        }
-
-        chance = Math.max(10, Math.min(95, chance));
-
-        if (chance > 75) {
-            explanation = 'You have a very strong chance of admission!';
-        } else if (chance > 50) {
-            explanation = 'You have a good chance, but consider other options as well.';
-        } else {
-            explanation = 'Admission is competitive. It is recommended to have backup options.';
-        }
-
-        setResult({ chance, explanation, factors });
+        const calculationResult = calculateAdmissionChance(institution, courseKey, jambScore, state);
+        setResult(calculationResult);
     };
 
     return (
         <form onSubmit={calculateChance} className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 gap-6">
                 <div>
                     <label htmlFor="institution" className="block text-sm font-medium text-gray-700">Preferred Institution</label>
                     <select id="institution" value={institution} onChange={e => setInstitution(e.target.value)} required className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
@@ -91,6 +110,13 @@ export function AdmissionCalculator() {
                     <label htmlFor="score" className="block text-sm font-medium text-gray-700">JAMB Score</label>
                     <input type="number" id="score" value={score} onChange={e => setScore(e.target.value)} min="0" max="400" required className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
                 </div>
+                <div>
+                    <label htmlFor="state" className="block text-sm font-medium text-gray-700">State of Origin</label>
+                    <select id="state" value={state} onChange={e => setState(e.target.value)} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Select State (Optional)</option>
+                        {states.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                    </select>
+                </div>
             </div>
             <div className="text-center">
                 <button type="submit" className="bg-blue-600 text-white py-3 px-8 rounded-full text-lg hover:bg-blue-700 transition-colors">Calculate Admission Chance</button>
@@ -102,7 +128,7 @@ export function AdmissionCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
                         <div className="bg-blue-600 h-4 rounded-full" style={{ width: `${result.chance}%` }}></div>
                     </div>
-                    <p className="text-center text-gray-600 mb-4">{result.explanation}</p>
+                    <p className="text-center text-gray-600 mb-4">{result.recommendation}</p>
                     <div className="space-y-2">
                         <h4 className="font-bold">Key Factors Considered:</h4>
                         <ul className="list-disc list-inside text-gray-600">

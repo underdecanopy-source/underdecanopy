@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import db from '@/lib/prisma';
 
 const newsletterFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -30,9 +31,28 @@ export async function subscribeToNewsletter(
 
   const email = validatedFields.data.email;
 
-  // For now, we'll just log the email to the console.
-  // In a real application, you would add this email to your mailing list.
-  console.log('New newsletter subscription:', email);
+  try {
+    // Check if already subscribed
+    const existingSubscription = await db.newsletterSubscription.findUnique({
+      where: { email },
+    });
 
-  return { message: 'Thank you for subscribing!' };
+    if (existingSubscription && existingSubscription.isActive) {
+      return { message: 'You are already subscribed to our newsletter!' };
+    }
+
+    // Create or reactivate subscription
+    await db.newsletterSubscription.upsert({
+      where: { email },
+      update: { isActive: true },
+      create: { email },
+    });
+
+    return { message: 'Thank you for subscribing!' };
+  } catch (error) {
+    console.error('Newsletter subscription error:', error);
+    return {
+      message: 'Failed to subscribe. Please try again.',
+    };
+  }
 }

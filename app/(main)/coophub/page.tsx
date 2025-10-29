@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Shield, HandHelping, Mail, GraduationCap, Users, ChartLine, Smartphone, UserCheck, Clock, Lock, Fingerprint, ShieldCheck, Globe, Apple, MessageCircle, Store } from 'lucide-react';
 import { ContactSection } from '@/components/contact/ContactSection';
 import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
-import { Navigation } from './_component/Navigation';
+import { Navigation } from './_components/Navigation';
 import Link from 'next/link';
 
 const config = {
