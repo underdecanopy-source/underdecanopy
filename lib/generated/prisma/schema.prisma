@@ -9,19 +9,78 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Note {
+model User {
+  id                    String                 @id @default("uuid")
+  email                 String                 @unique
+  role                  Role                   @default(USER)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  serviceRequests       ServiceRequest[]
+  businessRegistrations BusinessRegistration[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Service {
+  id              String           @id @default("uuid")
+  name            String           @unique
+  description     String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  serviceRequests ServiceRequest[]
+}
+
+model ServiceRequest {
   id        String   @id @default("uuid")
-  text      String
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id])
+  details   String
+  status    String   @default("PENDING")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model User {
-  id        String   @id @default("uuid")
-  email     String   @unique
-  notes     Note[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model TrainingCourse {
+  id          String   @id @default("uuid")
+  name        String
+  description String
+  duration    String
+  price       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BusinessRegistration {
+  id           String   @id @default("uuid")
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  businessName String
+  businessType String
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CafeMenuItem {
+  id          String   @id @default("uuid")
+  name        String
+  description String
+  price       Float
+  category    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model NewsletterSubscription {
+  id           String   @id @default("uuid")
+  email        String   @unique
+  subscribedAt DateTime @default(now())
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

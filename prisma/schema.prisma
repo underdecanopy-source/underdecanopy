@@ -30,6 +30,7 @@ model Service {
   description String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  serviceRequests ServiceRequest[]
 }
 
 model ServiceRequest {
