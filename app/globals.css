@@ -593,3 +593,65 @@ footer {
         font-size: 2rem;
     }
 }
+
+/* Critical CSS for preventing layout shifts (CLS) */
+
+/* Base reset to prevent layout shifts */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure images and videos don't cause layout shifts */
+img, video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Reserve space for images with width/height attributes */
+img[width][height] {
+  aspect-ratio: attr(width) / attr(height);
+}
+
+/* Prevent layout shift during font loading */
+body {
+  font-display: swap;
+}
+
+/* Main app container should take full viewport height */
+#app, main {
+  min-height: 100vh;
+}
+
+/* Skeleton loading utilities to reserve space during loading */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Prevent layout shift for lazy-loaded images */
+img[loading="lazy"] {
+  min-height: 200px;
+}
+
+/* Ensure proper containment to prevent layout shifts */
+.container {
+  contain: layout style paint;
+}
+
+/* Prevent cumulative layout shift from content injection */
+[data-loading] {
+  min-height: 100px;
+}
