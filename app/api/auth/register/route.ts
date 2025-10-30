@@ -32,8 +32,7 @@ export async function POST(req: NextRequest) {
     const user = await db.user.create({
       data: {
         email,
-        // Note: In a real app, you'd store the hashed password
-        // For now, we'll store it as is since the schema doesn't have a password field
+        password: hashedPassword,
       },
       select: {
         id: true,
