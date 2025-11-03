@@ -50,12 +50,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // Structured data for SEO
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://underdecanopy.com';
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Underdecanopy Digital Hub',
-    url: 'https://underdecanopy.com',
-    logo: 'https://underdecanopy.com/favicon.png',
+    url: baseUrl,
+    logo: `${baseUrl}/favicon.png`,
     description: 'Digital solutions, business services, and cafe experience in Nigeria',
     address: {
       '@type': 'PostalAddress',

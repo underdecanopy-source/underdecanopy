@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import db from '@/lib/prisma';
+import { logger } from '@/lib/utils/logger';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -13,9 +14,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { email, password } = loginSchema.parse(body);
 
-    // Find user
+    // Find user - only select required fields
     const user = await db.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        role: true,
+      },
     });
 
     if (!user) {
@@ -53,7 +60,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error('Login error:', error);
+    logger.error('Login error', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

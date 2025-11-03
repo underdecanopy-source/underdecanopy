@@ -2,15 +2,28 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Simple in-memory rate limiter
-// For production, use Redis or a dedicated rate limiting service
+// WARNING: This implementation has limitations:
+// - Will not work across multiple server instances (use Redis for multi-instance)
+// - Will lose data on server restart
+// - Memory cleanup runs in each instance
+// For production with multiple instances, use Redis with ioredis or upstash-redis
 const rateLimit = new Map<string, { count: number; resetTime: number }>();
 
 const WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 100; // max requests per window
+const CLEANUP_INTERVAL = 60 * 1000; // 1 minute
+
+// Track cleanup interval to prevent multiple intervals
+let cleanupIntervalId: NodeJS.Timeout | null = null;
 
 export function rateLimitMiddleware(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   const now = Date.now();
+  
+  // Start cleanup if not already running
+  if (!cleanupIntervalId) {
+    startCleanup();
+  }
   
   const clientData = rateLimit.get(ip);
   
@@ -40,11 +53,26 @@ export function rateLimitMiddleware(req: NextRequest) {
 }
 
 // Cleanup old entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, value] of rateLimit.entries()) {
-    if (now > value.resetTime) {
-      rateLimit.delete(key);
+function startCleanup() {
+  cleanupIntervalId = setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of rateLimit.entries()) {
+      if (now > value.resetTime) {
+        rateLimit.delete(key);
+      }
     }
+  }, CLEANUP_INTERVAL);
+  
+  // Prevent the interval from keeping the process alive
+  if (cleanupIntervalId.unref) {
+    cleanupIntervalId.unref();
   }
-}, WINDOW_MS);
+}
+
+// For testing: allow cleanup to be stopped
+export function stopCleanup() {
+  if (cleanupIntervalId) {
+    clearInterval(cleanupIntervalId);
+    cleanupIntervalId = null;
+  }
+}
