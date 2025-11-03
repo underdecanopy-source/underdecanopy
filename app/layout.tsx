@@ -49,9 +49,37 @@ export default function RootLayout({
 }: Readonly<{  
   children: React.ReactNode;
 }>) {
+  // Structured data for SEO
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Underdecanopy Digital Hub',
+    url: 'https://underdecanopy.com',
+    logo: 'https://underdecanopy.com/favicon.png',
+    description: 'Digital solutions, business services, and cafe experience in Nigeria',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Ibadan',
+      addressCountry: 'NG',
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'Customer Service',
+      email: 'contactus@underdecanopy.com',
+    },
+    sameAs: [
+      // Add social media profiles when available
+    ],
+  };
+
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        {/* Structured Data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         {/* Font preloading for critical fonts to reduce CLS */}
         <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiEyp8kv8JHgFVrFJA.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
         <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLEj6V1s.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />

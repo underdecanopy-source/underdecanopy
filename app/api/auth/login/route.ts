@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 import db from '@/lib/prisma';
 
 const loginSchema = z.object({
@@ -15,12 +16,6 @@ export async function POST(req: NextRequest) {
     // Find user
     const user = await db.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
     });
 
     if (!user) {
@@ -30,9 +25,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // For now, since we don't have password hashing in the schema,
-    // we'll just check if the user exists
-    // In a real app, you'd verify the hashed password
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      );
+    }
 
     return NextResponse.json(
       {
