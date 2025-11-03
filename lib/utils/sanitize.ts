@@ -1,29 +1,38 @@
 /**
  * Sanitize user input to prevent XSS attacks
+ * NOTE: For basic text input only. For HTML content, use sanitizeHtml.
  */
 export function sanitizeInput(input: string): string {
   if (typeof input !== 'string') return '';
   
+  // For maximum security, we encode all special characters
   return input
     .trim()
-    .replace(/[<>]/g, '') // Remove angle brackets
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+=/gi, '') // Remove event handlers
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
     .slice(0, 10000); // Limit length
 }
 
 /**
- * Sanitize HTML content - allows safe HTML tags
+ * Sanitize HTML content
+ * WARNING: This removes ALL HTML tags for safety.
+ * For production with user HTML, use a library like DOMPurify on the client side.
  */
 export function sanitizeHtml(html: string): string {
   if (typeof html !== 'string') return '';
   
-  // Basic HTML sanitization - for production, use a library like DOMPurify
+  // Strip all HTML tags and encode special characters for maximum security
   return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/on\w+\s*=\s*[^\s>]*/gi, '')
+    .replace(/<[^>]*>/g, '') // Remove all HTML tags
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
     .slice(0, 50000);
 }
 
