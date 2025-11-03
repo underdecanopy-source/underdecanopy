@@ -2,7 +2,7 @@
 
 import { useFormState } from 'react-dom';
 import { submitContactForm, type State } from '@/lib/actions/contact';
-import { SubmitButton } from '../home/SubmitButton';
+import { SubmitButton } from '@/app/components/home/SubmitButton';
 
 export function ContactForm() {
   const initialState: State = { message: null, errors: {} };
