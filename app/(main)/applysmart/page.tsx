@@ -23,7 +23,7 @@ const secondTierCourses = [];
 const thirdTierCourses = [];
 const states = [];
 
-import { Navigation } from "./_components/Navigation";
+import { Navigation } from "@/components/Navigation";
 
 const StepCard = ({ number, name, description }: { number: string, name: string, description: string }) => (
     <div className="bg-white p-6 rounded-lg shadow-md">

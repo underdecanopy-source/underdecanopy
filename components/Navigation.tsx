@@ -6,13 +6,14 @@ import { Menu, X } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
-import { navItems } from '@/lib/data/nav';
+import { getNavItems } from '@/lib/data/navService';
 
 export function Navigation() {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const menuContainerRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
+    const navItems = getNavItems(pathname);
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
