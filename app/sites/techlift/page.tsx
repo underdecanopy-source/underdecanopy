@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-// import { Navigation } from './_components/Navigation';
+import { Navigation } from './_components/Navigation';
 
 const TechLiftPage = () => {
   return (
     <div>
-      {/* <Navigation /> */}
+      <Navigation />
       <section className="hero bg-purple-600 text-white py-20">
         <div className="container mx-auto px-4 text-center">
             <h2 className="text-4xl font-bold mb-4">Accelerate Your Tech Skills</h2>

@@ -1,12 +1,12 @@
 'use client';
 
 import ContactForm from '@/components/ContactForm';
-// import { Navigation } from './_components/Navigation';
+import { Navigation } from './_components/Navigation';
 
 export default function CoopHubLandingPage() {
   return (
     <div>
-      {/* <Navigation /> */}
+      <Navigation />
       <section className="hero bg-green-600 text-white py-20">
         <div className="container mx-auto px-4 text-center">
             <h2 className="text-4xl font-bold mb-4">Your Cooperative Solutions</h2>

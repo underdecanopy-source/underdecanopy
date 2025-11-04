@@ -1,12 +1,12 @@
 'use client';
 
 import ContactForm from '@/components/ContactForm';
-// import { Navigation } from './_components/Navigation';
+import { Navigation } from './_components/Navigation';
 
 export default function UnderdecanopyPage() {
   return (
     <div className="container">
-      {/* <Navigation /> */}
+      <Navigation />
 
       <section className="hero bg-gray-800 text-white py-20">
         <div className="container mx-auto px-4 text-center">

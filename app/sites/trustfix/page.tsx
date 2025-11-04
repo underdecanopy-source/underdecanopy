@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-// import { Navigation } from './_components/Navigation';
+import { Navigation } from './_components/Navigation';
 
 const TrustFixPage = () => {
   return (
     <div>
-      {/* <Navigation /> */}
+      <Navigation />
 
       <section className="hero bg-purple-800 text-white py-20">
         <div className="container mx-auto px-4 text-center">
