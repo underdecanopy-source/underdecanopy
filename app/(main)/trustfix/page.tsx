@@ -5,12 +5,12 @@ import Link from 'next/link';
 
 import { ContactSection } from '@/components/contact/ContactSection';
 import { MobileOptimizedFooter } from '@/components/contact/MobileOptimizedFooter';
-import { Navigation } from './_components/Navigation';
+// import { Navigation } from './_components/Navigation';
 
 export default function TrustFixPage() {
   return (
     <>
-      <Navigation />
+      {/* <Navigation /> */}
 
       <main className="bg-gray-50 text-gray-800">
         {/* Hero Section */}

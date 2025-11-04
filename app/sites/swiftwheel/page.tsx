@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Navigation } from './_components/Navigation';
+// import { Navigation } from './_components/Navigation';
 
 const SwiftWheelLandingPage = () => {
   return (
     <div>
-      <Navigation />
+      {/* <Navigation /> */}
       {/* Hero Section */}
       <section className="hero bg-blue-800 text-white py-20">
         <div className="container mx-auto px-4 text-center">

@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Navigation } from './_components/Navigation';
+// import { Navigation } from './_components/Navigation';
 
 const ApplySmartPage = () => {
     return (
         <div>
-            <Navigation />
+            {/* <Navigation /> */}
             <section className="hero bg-blue-600 text-white py-20">
                 <div className="container mx-auto px-4 text-center">
                     <h2 className="text-4xl font-bold mb-4">Your Gateway to Scholarship Applications</h2>
