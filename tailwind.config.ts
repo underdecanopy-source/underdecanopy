@@ -1,0 +1,114 @@
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: '1rem',
+        sm: '1.5rem',
+        lg: '2rem',
+        xl: '2rem',
+        '2xl': '2rem',
+      },
+      screens: {
+        sm: '100%',
+        md: '100%',
+        lg: '1280px',
+        xl: '1280px',
+        '2xl': '1400px',
+      },
+    },
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#2563eb',
+          dark: '#1d4ed8',
+          legacy: '#1a4f72',
+          'legacy-dark': '#0d3a5c',
+        },
+        secondary: {
+          DEFAULT: '#8b5cf6',
+          legacy: '#e9b949',
+          'legacy-dark': '#d4a63a',
+        },
+        accent: {
+          DEFAULT: '#06b6d4',
+          legacy: '#2e8540',
+          'legacy-dark': '#267835',
+        },
+        success: {
+          DEFAULT: '#10b981',
+          legacy: '#28a745',
+        },
+        danger: {
+          DEFAULT: '#ef4444',
+          legacy: '#dc3545',
+        },
+        dark: {
+          DEFAULT: '#1e293b',
+          legacy: '#343a40',
+        },
+        light: {
+          DEFAULT: '#f8fafc',
+          legacy: '#f5f7fa',
+        },
+        gray: {
+          DEFAULT: '#64748b',
+          light: '#e2e8f0',
+          legacy: '#666',
+          'legacy-light': '#999',
+        },
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+      },
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-heading)', 'system-ui', 'sans-serif'],
+        body: ['Open Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Montserrat', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+      },
+      fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '1rem' }],
+        'hero': ['2.5rem', { lineHeight: '1.2' }],
+        'hero-mobile': ['2rem', { lineHeight: '1.2' }],
+      },
+      maxWidth: {
+        'prose': '65ch',
+        'prose-wide': '80ch',
+        'container-sm': '800px',
+        'container': '1200px',
+        'container-lg': '1280px',
+        'container-xl': '1400px',
+      },
+      minHeight: {
+        'card': '200px',
+        'section': '300px',
+        'hero': '400px',
+      },
+      boxShadow: {
+        'card': '0 5px 15px rgba(0, 0, 0, 0.05)',
+        'card-hover': '0 8px 20px rgba(0, 0, 0, 0.1)',
+        'feature': '0 3px 10px rgba(0, 0, 0, 0.05)',
+        'pricing': '0 5px 15px rgba(0, 0, 0, 0.05)',
+      },
+      borderRadius: {
+        'card': '8px',
+      },
+      transitionDuration: {
+        'card': '300ms',
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config

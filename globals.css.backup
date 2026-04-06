@@ -1,0 +1,407 @@
+@import "tailwindcss";
+
+/* =====================================================
+   CSS VARIABLES - Design Tokens
+   ===================================================== */
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary: #8b5cf6;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --gray: #64748b;
+    --light-gray: #e2e8f0;
+    --accent: #06b6d4;
+    --success: #10b981;
+}
+
+/* =====================================================
+   BASE RESET - Prevent Layout Issues
+   ===================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: #f5f7fa;
+    color: var(--dark);
+    line-height: 1.6;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+footer {
+    flex-shrink: 0;
+    width: 100%;
+    margin-top: auto;
+}
+
+/* =====================================================
+   TYPOGRAPHY SPACING - Professional Layout
+   ===================================================== */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    line-height: 1.2;
+}
+
+h1 {
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    margin-bottom: 1.25rem;
+}
+
+h3 {
+    margin-bottom: 1rem;
+}
+
+h4, h5, h6 {
+    margin-bottom: 0.75rem;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+/* Consecutive paragraphs */
+p + p {
+    margin-top: 1rem;
+}
+
+/* Lists */
+ul, ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* =====================================================
+   BUTTON BASE STYLES - Prevent Shrinking
+   ===================================================== */
+button,
+a.btn,
+a.cta-button,
+[role="button"],
+a[class*="bg-"][class*="text-white"],
+a[class*="rounded"],
+a[href^="tel:"],
+a[href^="mailto:"],
+a[href*="whatsapp"],
+a[href*="wa.me"] {
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0 !important;
+  white-space: nowrap;
+  min-height: 2.5rem;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Additional button protection */
+button *,
+a.btn *,
+a.cta-button *,
+[role="button"] *,
+a[class*="bg-"][class*="text-white"] *,
+a[class*="rounded"] * {
+  flex-shrink: 0;
+}
+
+/* =====================================================
+   ACCESSIBILITY
+   ===================================================== */
+button,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #ff9800;
+  outline-offset: 2px;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =====================================================
+   IMAGE OPTIMIZATION
+   ===================================================== */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+img[width][height] {
+  aspect-ratio: attr(width) / attr(height);
+}
+
+/* =====================================================
+   SKELETON LOADERS
+   ===================================================== */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-text {
+    height: 1rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+/* =====================================================
+   CARD & COMPONENT SPACING - Professional Layout
+   ===================================================== */
+.card,
+.service-card,
+.feature-card,
+.testimonial-card,
+[class*="Card"],
+[class*="-card"] {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    min-height: 200px;
+}
+
+/* Card text content */
+.card h3,
+.card h4,
+.service-card h3,
+.service-card h4,
+.feature-card h3,
+.feature-card h4,
+.testimonial-card h3,
+.testimonial-card h4 {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.card p,
+.service-card p,
+.feature-card p,
+.testimonial-card p {
+    margin-top: 0.5rem;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+/* Icon alignment in cards */
+.card > svg,
+.card > div:first-child,
+.service-card > svg,
+.service-card > div:first-child,
+.feature-card > svg,
+.feature-card > div:first-child {
+    margin-bottom: 1rem;
+}
+
+/* =====================================================
+   TEXT ALIGNMENT UTILITIES
+   ===================================================== */
+/* Centered content sections */
+.text-center h1,
+.text-center h2,
+.text-center h3 {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.text-center p {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 65ch;
+}
+
+/* Left-aligned cards with proper padding */
+.text-left {
+    padding-right: 1rem;
+}
+
+/* Ensure grid items have consistent spacing */
+.grid > * {
+    display: flex;
+    flex-direction: column;
+}
+
+/* =====================================================
+   CONTAINER SYSTEM - Responsive Layout
+   ===================================================== */
+.page-container,
+.container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+    .page-container,
+    .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .page-container,
+    .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .page-container,
+    .container {
+        max-width: 1280px;
+    }
+}
+
+@media (min-width: 1536px) {
+    .page-container,
+    .container {
+        max-width: 1400px;
+    }
+}
+
+/* =====================================================
+   SECTION SPACING UTILITIES
+   ===================================================== */
+@layer utilities {
+  .section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+  
+  .section-lg {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+  
+  .section-sm {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+/* Mobile section spacing */
+@media (max-width: 768px) {
+  .section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
+  .section-lg {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+  
+  .section-sm {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+/* Heading spacing - MUST be outside @layer for proper specificity */
+.section h2,
+.section-lg h2,
+.section-sm h2 {
+  margin-bottom: 1rem;
+}
+
+.section h2 + p,
+.section-lg h2 + p,
+.section-sm h2 + p {
+  margin-bottom: 2.5rem;
+}
+
+.section .text-center,
+.section-lg .text-center,
+.section-sm .text-center {
+  margin-bottom: 2rem;
+}
+
+/* Mobile heading spacing */
+@media (max-width: 768px) {
+  .section h2 + p,
+  .section-lg h2 + p,
+  .section-sm h2 + p {
+    margin-bottom: 2rem;
+  }
+}
+
+/* =====================================================
+   LEGACY STYLE ENHANCEMENTS
+   Professional visual patterns from backup repo
+   Imported last to enhance (not override) new styles
+   ===================================================== */
+@import "./styles/legacy/spacing.css";
+@import "./styles/legacy/layout.css";
+@import "./styles/legacy/typography.css";
+@import "./styles/legacy/components.css";
+@import "./styles/legacy/backup-enhancements.css";
+

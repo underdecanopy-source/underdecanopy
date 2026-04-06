@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Replicate Live Layout",
+      "type": "shell",
+      "command": "echo",
+      "args": [
+        "Analyze https://underdecanopy.com and replicate every aspect of its current live layout in this project. Ensure that all spacing, sizing, alignment, and responsive behavior match exactly as in production. The MobileOptimisedFooter must remain flush with the bottom of the viewport with no whitespace below it. Validate that no layout shifting or shrinking occurs and that every breakpoint visually aligns with the live deployment. Use any implementation approach necessary to achieve an identical visual result."
+      ],
+      "problemMatcher": [],
+      "detail": "Replicate live deployment layout and spacing exactly as seen on https://underdecanopy.com"
+    }
+  ]
+}

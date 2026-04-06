@@ -1,0 +1,289 @@
+// app/page.tsx
+'use client';
+
+import Image from 'next/image';
+import {
+    Clock,
+    MapPinHouse,
+    Phone,
+    Send,
+} from 'lucide-react';
+import { Navigation } from '@/components/Navigation';
+import Link from 'next/link';
+import { coreServices, professionalServices, cafeItems } from '@/lib/data/home';
+import { contactInfo } from '@/lib/data/contact';
+
+import MicIcon from '@/components/icons/Mic';
+import { ServiceCard } from '@/app/(main)/_components/ServiceCard';
+import { lazy, Suspense } from 'react';
+
+const ContactForm = lazy(() => import('@/app/components/home/ContactForm').then(module => ({ default: module.ContactForm })));
+const NewsletterForm = lazy(() => import('@/app/components/home/NewsletterForm').then(module => ({ default: module.NewsletterForm })));
+const FullContactSection = lazy(() => import('@/components/contact/FullContactSection').then(module => ({ default: module.FullContactSection })));
+const MobileOptimizedFooter = lazy(() => import('@/components/contact/MobileOptimizedFooter').then(module => ({ default: module.MobileOptimizedFooter })));
+const CafeItem = lazy(() => import('@/app/(main)/_components/CafeItem').then(module => ({ default: module.CafeItem })));
+const ProfessionalServiceCard = lazy(() => import('@/app/(main)/_components/ProfessionalServiceCard').then(module => ({ default: module.ProfessionalServiceCard })));
+
+export default function Page() {
+
+  return (
+    <div>
+      <main id="main-content">
+        <Navigation />
+
+
+        {/* Hero — replace the existing hero section with this */}
+        <section className="bg-gray-100 section">
+          <div className="page-container">
+            <div className="flex flex-col md:flex-row md:items-center gap-8">
+              {/* Text column */}
+              <div className="text-left max-w-lg flex-shrink-0">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">
+                  Welcome to Underdecanopy Hub
+                </h1>
+                <p className="text-gray-600 mb-8">
+                  Your trusted centre for digital solutions, business services,
+                  and a relaxing cafe experience in Ibadan.
+                </p>
+                <Link
+                  href="#contact"
+                  className="inline-block bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95"
+                >
+                  Get Started Today
+                </Link>
+              </div>
+
+              {/* Image column: ensure it can grow but does not force text to shrink */}
+              <div className="flex-1 min-w-0">
+                <div className="max-w-full md:max-w-md mx-auto">
+                  <Image
+                    src="/hub.png"
+                    alt="Underdecanopy Hub"
+                    width={1000}
+                    height={1000}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                    className="w-full h-auto object-cover rounded-lg shadow-lg block"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section" id="services">
+          <div className="page-container flex flex-col gap-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-800">Our Core Services</h2>
+              <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+                Comprehensive digital solutions tailored to meet your business and 
+                personal needs
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {coreServices.map((service) => (
+                <ServiceCard
+                  key={service.title}
+                  icon={service.icon}
+                  title={service.title}
+                  description={service.description}
+                  link={service.link}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-gray-100 section" id="additional">
+          <div className="page-container flex flex-col gap-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-800">Professional Services</h2>
+              <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+                Comprehensive solutions to meet your business and personal 
+                needs
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {professionalServices.map((service) => (
+                <Suspense
+                  fallback={<div className="bg-white rounded-lg shadow-md p-6 skeleton min-h-[220px]"></div>}
+                  key={service.title}
+                >
+                  <ProfessionalServiceCard
+                    icon={service.icon}
+                    title={service.title}
+                    description={service.description}
+                  />
+                </Suspense>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section" id="cafe">
+          <div className="page-container flex flex-col gap-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-orange-500">Cafe Experience</h2>
+              <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+                Enjoy snacks, meals, and beverages while you work or learn. Relax 
+                in our cozy cafe area.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {cafeItems.map((item) => (
+                <Suspense
+                  fallback={<div className="bg-white rounded-lg shadow-md p-6 skeleton min-h-[180px]"></div>}
+                  key={item.title}
+                >
+                  <CafeItem
+                    icon={item.icon}
+                    title={item.title}
+                    description={item.description}
+                  />
+                </Suspense>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-orange-500 text-white section-lg" id="podcast">
+          <div className="page-container text-center">
+            <h2 className="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
+              <MicIcon /> Underdecanopy Podcast
+            </h2>
+            <p className="max-w-2xl mx-auto mb-8">
+              Tune in to our episodes for digital tips and business insights 
+              from Ibadan and beyond.
+            </p>
+            <Link href="#podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-orange-500 active:scale-95 inline-block">
+              Listen to Our Podcast
+            </Link>
+          </div>
+        </section>
+
+        <section className="section-lg" id="contact">
+          <div className="page-container">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-800">Contact Us</h2>
+              <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+                Reach out for inquiries, support, or to schedule a visit 
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+              <div className="bg-white p-8 rounded-lg shadow-md">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Get In Touch</h3>
+
+                <div className="flex items-start gap-4 mb-6">
+                  <MapPinHouse size={24} className="text-orange-500 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Location</h4>
+                    <p className="text-gray-600 whitespace-pre-line">{contactInfo.address}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 mb-6">
+                  <Phone size={24} className="text-orange-500 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Phone</h4>
+                    <p className="text-gray-600">{contactInfo.phone}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 mb-6">
+                  <Send size={24} className="text-orange-500 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Email</h4>
+                    <p className="text-gray-600">{contactInfo.email}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 mb-8">
+                  <Clock size={24} className="text-orange-500 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Working Hours</h4>
+                    <p className="text-gray-600">{contactInfo.workingHours.weekdays}</p>
+                    <p className="text-gray-600">{contactInfo.workingHours.saturday}</p>
+                  </div>
+                </div>
+
+                <div className="border-t pt-8">
+                  <h4 className="text-lg font-bold text-gray-800 mb-4">Newsletter</h4>
+                  <p className="text-gray-600 mb-4">Subscribe for updates and offers.</p>
+                  <Suspense fallback={<div className="skeleton h-10 rounded"></div>}>
+                    <NewsletterForm />
+                  </Suspense>
+                </div>
+              </div>
+
+              <Suspense fallback={<div className="bg-white p-8 rounded-lg shadow-md skeleton min-h-[420px]"></div>}>
+                <ContactForm />
+              </Suspense>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Suspense fallback={<div className="h-48 bg-gray-100 animate-pulse" />}>
+        <FullContactSection
+          title="Contact Us"
+          subtitle="Contact us for your digital solutions"
+        />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse" />}>
+        <MobileOptimizedFooter serviceName="Underdecanopy" showQuickContact={false} />
+      </Suspense>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "Underdecanopy Hub",
+            "image": "https://underdecanopy.com/hub.png",
+            "@id": "",
+            "url": "https://underdecanopy.com",
+            "telephone": "+2348064852108",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "TIK Centre, Opposite Medical Centre, Along Poly Main Road",
+              "addressLocality": "Ibadan",
+              "addressRegion": "Oyo",
+              "postalCode": "200284",
+              "addressCountry": "NG"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 7.4439,
+              "longitude": 3.9083
+            },
+            "openingHoursSpecification": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+              ],
+              "opens": "08:00",
+              "closes": "18:00"
+            },
+            "sameAs": [
+              "https://www.facebook.com/underdecanopy",
+              "https://www.twitter.com/underdecanopy",
+              "https://www.instagram.com/underdecanopy",
+              "https://www.linkedin.com/company/underdecanopy"
+            ]
+          })
+        }}
+      />
+    </div>
+  );
+}
