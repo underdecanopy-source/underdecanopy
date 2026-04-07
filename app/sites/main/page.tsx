@@ -58,7 +58,7 @@ export default function Page() {
                 <div className="max-w-full md:max-w-md mx-auto">
                   <Image
                     src="/hub.png"
-                    alt="Underdecanopy Hub"
+                    alt="Underdecanopy"
                     width={1000}
                     height={1000}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -160,7 +160,7 @@ export default function Page() {
               Tune in to our episodes for digital tips and business insights 
               from Ibadan and beyond.
             </p>
-            <Link href="#podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-orange-500 active:scale-95 inline-block">
+            <Link href="/podcast" className="bg-white text-orange-500 py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-orange-500 active:scale-95 inline-block">
               Listen to Our Podcast
             </Link>
           </div>
@@ -245,7 +245,7 @@ export default function Page() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            "name": "Underdecanopy Hub",
+            "name": "Underdecanopy",
             "image": "https://underdecanopy.com/hub.png",
             "@id": "",
             "url": "https://underdecanopy.com",

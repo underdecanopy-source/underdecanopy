@@ -6,24 +6,24 @@ import { ContactBar } from "@/components/contact/ContactBar";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://underdecanopy.com"),
-  title: "Underdecanopy Hub | Business Centre & Cafe",
+  title: "Underdecanopy | Business Centre & Cafe",
   description:
-    "Underdecanopy Hub is your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan. We offer services like business registration, IT support, digital training, and more.",
+    "Underdecanopy is your trusted center for digital solutions, business services, and a relaxing cafe experience in Ibadan. We offer services like business registration, IT support, digital training, and more.",
   icons: {
     icon: "/logo.png",
   },
   // ✅ ADDED: Open Graph tags for social media sharing
   openGraph: {
-    title: "Underdecanopy Hub | Business Centre & Cafe",
+    title: "Underdecanopy | Business Centre & Cafe",
     description: "Your trusted center for digital solutions, business services, and cafe experience in Ibadan",
     url: "https://underdecanopy.com",
-    siteName: "Underdecanopy Hub",
+    siteName: "Underdecanopy",
     images: [
       {
         url: "/hub.png",
         width: 488,
         height: 512,
-        alt: "Underdecanopy Hub",
+        alt: "Underdecanopy",
       },
     ],
     locale: "en_NG",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   // ✅ ADDED: Twitter Card metadata
   twitter: {
     card: "summary_large_image",
-    title: "Underdecanopy Hub",
+    title: "Underdecanopy",
     description: "Digital solutions and business services in Ibadan",
     images: ["/hub.png"],
   },

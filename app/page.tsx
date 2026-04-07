@@ -39,7 +39,7 @@ export default function Page() {
               {/* Text column */}
               <div className="text-left max-w-lg flex-shrink-0">
                 <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                  Welcome to Underdecanopy Hub
+                  Welcome to Underdecanopy
                 </h1>
                 <p className="text-gray-600 mb-8">
                   Your trusted centre for digital solutions, business services,
@@ -58,7 +58,7 @@ export default function Page() {
                 <div className="max-w-full md:max-w-md mx-auto">
                   <Image
                     src="/hub.png"
-                    alt="Underdecanopy Hub"
+                    alt="Underdecanopy"
                     width={1000}
                     height={1000}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -245,7 +245,7 @@ export default function Page() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            "name": "Underdecanopy Hub",
+            "name": "Underdecanopy",
             "image": "https://underdecanopy.com/hub.png",
             "@id": "",
             "url": "https://underdecanopy.com",

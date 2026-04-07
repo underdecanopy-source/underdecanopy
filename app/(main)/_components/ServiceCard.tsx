@@ -18,7 +18,7 @@ export function ServiceCard({ icon, title, description, link }: ServiceCardProps
     "url": `https://underdecanopy.com${link}`,
     "provider": {
       "@type": "LocalBusiness",
-      "name": "Underdecanopy Hub"
+      "name": "Underdecanopy"
     }
   };
 
