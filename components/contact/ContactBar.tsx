@@ -53,21 +53,8 @@ export function ContactBar() {
         </div>
       </div>
 
-      {/* Floating WhatsApp Button - Mobile Only */}
-      <a
-        href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-20 right-4 z-30 md:fixed md:bottom-8 md:right-8 md:z-40 bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-green-600 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 active:scale-95 flex-shrink-0"
-        aria-label="Chat with us on WhatsApp"
-        title="Chat with us on WhatsApp"
-        style={{ minWidth: '3.5rem', minHeight: '3.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      >
-        <MessageCircle className="w-6 h-6 flex-shrink-0" />
-      </a>
-
-      {/* Desktop Contact Widget - Hidden on mobile */}
-      <div className="hidden md:flex fixed bottom-8 left-8 z-40 flex-col gap-3 items-start">
+      {/* Floating Contact Widget - Hidden on mobile (uses bottom bar instead) */}
+      <div className="hidden md:flex fixed bottom-8 right-8 z-40 flex-col gap-3 items-center">
         {/* WhatsApp */}
         <a
           href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}
