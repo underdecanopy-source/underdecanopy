@@ -3,7 +3,7 @@
     color: var(--dark);
     line-height: 1.6;
     background-color: var(--light);
-    overflow-x: hidden;
+    overflow-x: clip;
     min-height: 100vh;
 }
 
@@ -22,7 +22,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    contain: layout style;
+    /* Removed contain property */
 }
 
 .btn {
@@ -172,7 +172,7 @@
     transition: all 0.3s ease;
     border: 1px solid var(--light-gray);
     text-align: center;
-    contain: layout paint;
+    /* Removed contain property */
     min-height: 280px;
 }
 
@@ -223,7 +223,7 @@
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    contain: layout paint;
+    /* Removed contain property */
     min-height: 400px;
 }
 
@@ -283,7 +283,7 @@
     padding: 30px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--light-gray);
-    contain: layout paint;
+    /* Removed contain property */
     min-height: 220px;
 }
 

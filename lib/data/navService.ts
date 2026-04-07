@@ -13,8 +13,16 @@ export const navItems = {
         { href: '#how-it-works', label: 'How It Works' },
         { href: '#admission-calculator', label: 'Admission Calculator' },
         { href: '#scholarships', label: 'Scholarships' },
-        { href: '#blog', label: 'Blog' },
+        { href: '/applysmart/blog', label: 'Blog' },
         { href: '#contact', label: 'Contact' },
+    ],
+    '/applysmart/blog': [
+        { href: '/applysmart', label: 'Home' },
+        { href: '/applysmart#how-it-works', label: 'How It Works' },
+        { href: '/applysmart#admission-calculator', label: 'Admission Calculator' },
+        { href: '/applysmart#scholarships', label: 'Scholarships' },
+        { href: '/applysmart/blog', label: 'Blog' },
+        { href: '/applysmart#contact', label: 'Contact' },
     ],
     '/coophub': [
         { href: '/coophub', label: 'Home' },
