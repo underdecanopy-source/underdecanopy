@@ -29,6 +29,15 @@ export const Demo = () => {
                         <p className="text-blue-100">When tax season comes, SmartTax prepares your returns with all the data already organized. Review your summary, generate the required forms, and file with confidence.</p>
                     </div>
                 </div>
+                <div className="text-center mt-12">
+                    <a
+                        href="/smarttax/demo"
+                        className="inline-block bg-orange-500 text-white py-3 px-10 rounded-full text-lg font-semibold hover:bg-orange-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-blue-900 active:scale-95"
+                    >
+                        Launch the Live Demo
+                    </a>
+                    <p className="text-blue-200 text-sm mt-3">No sign-up required. Data stays in your browser.</p>
+                </div>
             </div>
         </section>
     );
