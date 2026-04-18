@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Profile, Reminder, Receipt, SmartTaxState, TaxReturn, Transaction } from './types';
+import { calculateTransactionTax } from './taxCalculator';
 
 const STORAGE_KEY = 'smarttax-demo-state-v1';
 
@@ -72,7 +73,16 @@ export function loadState(): SmartTaxState {
             window.localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
             return fresh;
         }
-        return JSON.parse(raw) as SmartTaxState;
+        const parsed = JSON.parse(raw) as SmartTaxState;
+        const migratedTxns = (parsed.transactions || []).map((t) => ({
+            ...t,
+            vatable: typeof (t as Transaction).vatable === 'boolean' ? (t as Transaction).vatable : t.vatAmount > 0,
+            whtApplicable:
+                typeof (t as Transaction).whtApplicable === 'boolean'
+                    ? (t as Transaction).whtApplicable
+                    : t.whtAmount > 0,
+        }));
+        return { ...parsed, transactions: migratedTxns };
     } catch {
         return seedDefaults();
     }
@@ -182,6 +192,83 @@ export function useSmartTaxStore() {
         setState(resetState());
     }, []);
 
+    const loadSampleData = useCallback(() => {
+        setState((s) => {
+            const now = new Date();
+            const mk = (daysBack: number, hour = 10) => {
+                const d = new Date(now);
+                d.setDate(d.getDate() - daysBack);
+                d.setHours(hour, 0, 0, 0);
+                return d.toISOString();
+            };
+            type Sample = {
+                customerName: string;
+                customerEmail?: string;
+                customerPhone?: string;
+                customerType: 'individual' | 'corporate' | 'non-taxable';
+                description: string;
+                amount: number;
+                vatable: boolean;
+                whtApplicable: boolean;
+                category: string;
+                daysBack: number;
+            };
+            const samples: Sample[] = [
+                { customerName: 'Chidinma Okafor', customerEmail: 'chidinma@example.ng', customerPhone: '+234 803 111 2233', customerType: 'individual', description: 'Brand strategy consultancy — April', amount: 750000, vatable: true, whtApplicable: true, category: 'Consulting', daysBack: 2 },
+                { customerName: 'Lagos Tech Hub Ltd', customerEmail: 'accounts@lagostechhub.com', customerPhone: '+234 701 555 8899', customerType: 'corporate', description: 'Quarterly retainer — IT advisory', amount: 1250000, vatable: true, whtApplicable: true, category: 'Services', daysBack: 6 },
+                { customerName: 'St. Peter Primary School', customerEmail: 'bursar@stpeter.edu.ng', customerPhone: '+234 806 222 7788', customerType: 'non-taxable', description: 'Educational textbooks — pre-primary set', amount: 185000, vatable: false, whtApplicable: false, category: 'Sales', daysBack: 9 },
+                { customerName: 'Adebayo Farms', customerEmail: 'info@adebayofarms.ng', customerType: 'non-taxable', description: 'Basic food items — rice & yam supply', amount: 420000, vatable: false, whtApplicable: false, category: 'Sales', daysBack: 12 },
+                { customerName: 'Kano Logistics PLC', customerEmail: 'finance@kanologistics.com', customerPhone: '+234 802 009 1122', customerType: 'corporate', description: 'Warehouse rent — March', amount: 2000000, vatable: true, whtApplicable: true, category: 'Rent', daysBack: 18 },
+                { customerName: 'Emeka Nwosu', customerPhone: '+234 815 444 3322', customerType: 'individual', description: 'Graphic design — business identity', amount: 320000, vatable: true, whtApplicable: true, category: 'Services', daysBack: 24 },
+                { customerName: 'Abuja Fintech Ltd', customerEmail: 'ops@abujafintech.ng', customerType: 'corporate', description: 'Software licence renewal', amount: 980000, vatable: true, whtApplicable: false, category: 'Services', daysBack: 40 },
+            ];
+            const newTxns: Transaction[] = [];
+            const newReceipts: Receipt[] = [];
+            samples.forEach((sample, i) => {
+                const calc = calculateTransactionTax({
+                    amount: sample.amount,
+                    customerType: sample.customerType,
+                    vatable: sample.vatable,
+                    whtApplicable: sample.whtApplicable,
+                });
+                const id = `sample_txn_${i}_${Date.now()}`;
+                const receiptId = `sample_rcpt_${i}_${Date.now()}`;
+                const date = mk(sample.daysBack);
+                newTxns.push({
+                    id,
+                    receiptId,
+                    date,
+                    customerName: sample.customerName,
+                    customerEmail: sample.customerEmail,
+                    customerPhone: sample.customerPhone,
+                    customerType: sample.customerType,
+                    description: sample.description,
+                    amount: sample.amount,
+                    vatable: sample.vatable,
+                    whtApplicable: sample.whtApplicable,
+                    vatAmount: calc.vatAmount,
+                    whtAmount: calc.whtAmount,
+                    netAmount: calc.netAmount,
+                    category: sample.category,
+                });
+                newReceipts.push({
+                    id: receiptId,
+                    receiptNumber: `STX-${new Date(date).getFullYear()}-${String(10000 + i).padStart(5, '0')}`,
+                    transactionId: id,
+                    createdAt: date,
+                    sentViaEmail: i % 2 === 0,
+                    sentViaSms: i % 3 === 0,
+                    sentViaWhatsApp: false,
+                });
+            });
+            return {
+                ...s,
+                transactions: [...newTxns, ...s.transactions],
+                receipts: [...newReceipts, ...s.receipts],
+            };
+        });
+    }, []);
+
     return {
         state,
         hydrated,
@@ -194,5 +281,6 @@ export function useSmartTaxStore() {
         toggleReminder,
         deleteReminder,
         reset,
+        loadSampleData,
     };
 }

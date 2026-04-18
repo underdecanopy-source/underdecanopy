@@ -9,15 +9,19 @@ export interface Profile {
     businessType: 'individual' | 'sole-proprietor' | 'corporate';
 }
 
+export type CustomerType = 'individual' | 'corporate' | 'non-taxable';
+
 export interface Transaction {
     id: string;
     date: string;
     customerName: string;
     customerEmail?: string;
     customerPhone?: string;
-    customerType: 'individual' | 'corporate';
+    customerType: CustomerType;
     description: string;
     amount: number;
+    vatable: boolean;
+    whtApplicable: boolean;
     vatAmount: number;
     whtAmount: number;
     netAmount: number;

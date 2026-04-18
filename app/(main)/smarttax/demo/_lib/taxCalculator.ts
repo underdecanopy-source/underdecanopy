@@ -17,6 +17,8 @@ export const PIT_BRACKETS = [
     { min: 3_200_001, max: Infinity, rate: 0.24, label: '24% above ₦3,200,000' },
 ] as const;
 
+export type CustomerType = 'individual' | 'corporate' | 'non-taxable';
+
 export interface TaxCalculationResult {
     vatAmount: number;
     whtAmount: number;
@@ -24,13 +26,24 @@ export interface TaxCalculationResult {
     totalTax: number;
 }
 
-export function calculateTransactionTax(
-    amount: number,
-    customerType: 'individual' | 'corporate' = 'individual'
-): TaxCalculationResult {
-    const vatAmount = amount * VAT_RATE;
+export interface TaxCalculationInput {
+    amount: number;
+    customerType?: CustomerType;
+    vatable?: boolean;
+    whtApplicable?: boolean;
+}
+
+export function calculateTransactionTax(input: TaxCalculationInput | number, legacyCustomerType?: CustomerType): TaxCalculationResult {
+    const opts: TaxCalculationInput = typeof input === 'number' ? { amount: input, customerType: legacyCustomerType } : input;
+    const amount = opts.amount;
+    const customerType: CustomerType = opts.customerType ?? 'individual';
+    const nonTaxable = customerType === 'non-taxable';
+    const vatable = nonTaxable ? false : opts.vatable ?? true;
+    const whtApplicable = nonTaxable ? false : opts.whtApplicable ?? true;
+
+    const vatAmount = vatable ? amount * VAT_RATE : 0;
     const whtRate = customerType === 'corporate' ? WHT_RATES.corporate : WHT_RATES.individual;
-    const whtAmount = amount * whtRate;
+    const whtAmount = whtApplicable ? amount * whtRate : 0;
     const netAmount = amount + vatAmount - whtAmount;
 
     return {
@@ -76,4 +89,24 @@ export function formatNaira(value: number): string {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }).format(value || 0);
+}
+
+export function formatAmountInput(raw: string): string {
+    if (!raw) return '';
+    const cleaned = raw.replace(/[^0-9.]/g, '');
+    const firstDot = cleaned.indexOf('.');
+    const normalized =
+        firstDot === -1
+            ? cleaned
+            : cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, '');
+    const [intPart, decPart] = normalized.split('.');
+    const intWithCommas = intPart ? Number(intPart).toLocaleString('en-US') : '';
+    if (decPart === undefined) return intWithCommas;
+    return `${intWithCommas || '0'}.${decPart.slice(0, 2)}`;
+}
+
+export function parseAmountInput(formatted: string): number {
+    if (!formatted) return 0;
+    const n = parseFloat(formatted.replace(/,/g, ''));
+    return Number.isFinite(n) ? n : 0;
 }

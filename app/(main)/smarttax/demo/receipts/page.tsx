@@ -3,6 +3,7 @@
 import { Suspense, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PageHeader, EmptyState } from '../_components/ui';
+import { ReceiptPreview } from '../_components/ReceiptPreview';
 import { useSmartTaxStore } from '../_lib/store';
 import { formatNaira } from '../_lib/taxCalculator';
 import { Mail, MessageCircle, Phone, Printer, Receipt as ReceiptIcon, X, Check } from 'lucide-react';
@@ -85,6 +86,11 @@ function ReceiptsInner() {
                                         <div className="flex items-center gap-2 mb-1">
                                             <ReceiptIcon className="h-4 w-4 text-blue-600 flex-shrink-0" />
                                             <p className="font-semibold text-sm text-slate-800 truncate">{r.receiptNumber}</p>
+                                            {txn.customerType === 'non-taxable' && (
+                                                <span className="text-[9px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0">
+                                                    Exempt
+                                                </span>
+                                            )}
                                         </div>
                                         <p className="text-xs text-slate-600 truncate">{txn.customerName}</p>
                                         <div className="flex items-center justify-between mt-1">
@@ -105,105 +111,43 @@ function ReceiptsInner() {
                 <div className="lg:col-span-2">
                     {selected && (
                         <>
-                            <div className="bg-white border border-slate-200 rounded-lg p-6 md:p-8 print:border-0 print:shadow-none">
-                                <div className="flex items-start justify-between border-b border-slate-200 pb-4 mb-4">
-                                    <div>
-                                        <h3 className="text-xl font-bold text-slate-900">
-                                            {state.profile.businessName || state.profile.name}
-                                        </h3>
-                                        <p className="text-sm text-slate-600">{state.profile.email}</p>
-                                        {state.profile.phone && <p className="text-sm text-slate-600">{state.profile.phone}</p>}
-                                        {state.profile.address && <p className="text-sm text-slate-600">{state.profile.address}</p>}
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            TIN: <span className="font-mono">{state.profile.tin || 'Not set'}</span>
-                                        </p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-xs font-semibold uppercase text-slate-500">Receipt</p>
-                                        <p className="font-mono font-bold text-slate-900">{selected.receipt.receiptNumber}</p>
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            {new Date(selected.receipt.createdAt).toLocaleString('en-NG')}
-                                        </p>
-                                    </div>
-                                </div>
+                            <ReceiptPreview
+                                profile={state.profile}
+                                variant="final"
+                                data={{
+                                    customerName: selected.txn.customerName,
+                                    customerEmail: selected.txn.customerEmail,
+                                    customerPhone: selected.txn.customerPhone,
+                                    customerType: selected.txn.customerType,
+                                    description: selected.txn.description,
+                                    category: selected.txn.category,
+                                    amount: selected.txn.amount,
+                                    vatable: selected.txn.vatable,
+                                    whtApplicable: selected.txn.whtApplicable,
+                                    vatAmount: selected.txn.vatAmount,
+                                    whtAmount: selected.txn.whtAmount,
+                                    netAmount: selected.txn.netAmount,
+                                    receiptNumber: selected.receipt.receiptNumber,
+                                    createdAt: selected.receipt.createdAt,
+                                }}
+                            />
 
-                                <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                                    <div>
-                                        <p className="text-xs font-semibold uppercase text-slate-500 mb-1">Billed To</p>
-                                        <p className="font-semibold text-slate-800">{selected.txn.customerName}</p>
-                                        {selected.txn.customerEmail && <p className="text-slate-600">{selected.txn.customerEmail}</p>}
-                                        {selected.txn.customerPhone && <p className="text-slate-600">{selected.txn.customerPhone}</p>}
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-xs font-semibold uppercase text-slate-500 mb-1">Category</p>
-                                        <p className="font-semibold text-slate-800">{selected.txn.category || 'Sales'}</p>
-                                        <p className="text-xs text-slate-500 mt-1 capitalize">
-                                            Customer: {selected.txn.customerType}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <table className="w-full text-sm mb-4">
-                                    <thead>
-                                        <tr className="border-b border-slate-200">
-                                            <th className="text-left py-2 text-slate-500 font-medium">Description</th>
-                                            <th className="text-right py-2 text-slate-500 font-medium">Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td className="py-3 text-slate-800">{selected.txn.description}</td>
-                                            <td className="py-3 text-right font-semibold text-slate-900">
-                                                {formatNaira(selected.txn.amount)}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <div className="border-t border-slate-200 pt-3 space-y-1 text-sm">
-                                    <div className="flex justify-between text-slate-600">
-                                        <span>Subtotal</span>
-                                        <span>{formatNaira(selected.txn.amount)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-slate-600">
-                                        <span>VAT (7.5%)</span>
-                                        <span className="text-orange-700">+ {formatNaira(selected.txn.vatAmount)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-slate-600">
-                                        <span>Withholding Tax</span>
-                                        <span className="text-rose-700">− {formatNaira(selected.txn.whtAmount)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-lg font-bold text-slate-900 pt-2 border-t border-slate-200 mt-2">
-                                        <span>Amount Payable</span>
-                                        <span>{formatNaira(selected.txn.netAmount)}</span>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6 pt-4 border-t border-slate-200">
-                                    <p className="text-xs text-slate-500 leading-relaxed">
-                                        This is a legally compliant digital receipt issued under the Nigerian Revenue Service
-                                        Act and the Nigeria Tax Act 2025. Keep for your tax records. VAT remitted to FIRS; WHT
-                                        deducted and remittable to the relevant tax authority by the payer.
-                                    </p>
-                                </div>
-
-                                <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                                    {selected.receipt.sentViaEmail && (
-                                        <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                                            <Check className="h-3 w-3" /> Email sent
-                                        </span>
-                                    )}
-                                    {selected.receipt.sentViaSms && (
-                                        <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                                            <Check className="h-3 w-3" /> SMS sent
-                                        </span>
-                                    )}
-                                    {selected.receipt.sentViaWhatsApp && (
-                                        <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                                            <Check className="h-3 w-3" /> WhatsApp sent
-                                        </span>
-                                    )}
-                                </div>
+                            <div className="mt-4 flex flex-wrap gap-2 text-xs print:hidden">
+                                {selected.receipt.sentViaEmail && (
+                                    <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
+                                        <Check className="h-3 w-3" /> Email sent
+                                    </span>
+                                )}
+                                {selected.receipt.sentViaSms && (
+                                    <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
+                                        <Check className="h-3 w-3" /> SMS sent
+                                    </span>
+                                )}
+                                {selected.receipt.sentViaWhatsApp && (
+                                    <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
+                                        <Check className="h-3 w-3" /> WhatsApp sent
+                                    </span>
+                                )}
                             </div>
 
                             <div className="mt-4 bg-white border border-slate-200 rounded-lg p-4 print:hidden">
