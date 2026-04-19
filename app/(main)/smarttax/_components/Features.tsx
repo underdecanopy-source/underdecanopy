@@ -10,7 +10,7 @@ export const Features = () => {
         {
             icon: <FileText size={48} className="text-blue-500" />,
             title: 'Tax Filing & Returns',
-            description: 'File your annual tax returns with ease. SmartTax organizes your income, expenses, and deductions, then generates the required forms for FIRS and state tax authorities.',
+            description: 'File your annual tax returns with ease. SmartTax organizes your income, expenses, and deductions, then generates the required forms for NRS and state tax authorities.',
         },
         {
             icon: <Calculator size={48} className="text-blue-500" />,
@@ -20,7 +20,7 @@ export const Features = () => {
         {
             icon: <Shield size={48} className="text-blue-500" />,
             title: 'Compliance & Audit-Ready Records',
-            description: 'Maintain organized, audit-ready financial records. SmartTax ensures your receipts and tax documents meet FIRS requirements, helping you avoid penalties and stay compliant.',
+            description: 'Maintain organized, audit-ready financial records. SmartTax ensures your receipts and tax documents meet NRS requirements, helping you avoid penalties and stay compliant.',
         },
         {
             icon: <BarChart size={48} className="text-blue-500" />,

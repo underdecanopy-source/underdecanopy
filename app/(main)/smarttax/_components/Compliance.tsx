@@ -16,7 +16,7 @@ export const Compliance = () => {
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow-md text-center">
                         <FileCheck className="text-blue-500 mx-auto mb-4" size={48} />
-                        <h3 className="text-xl font-bold text-gray-800 mb-3">FIRS Compliance</h3>
+                        <h3 className="text-xl font-bold text-gray-800 mb-3">NRS Compliance</h3>
                         <p className="text-gray-600">SmartTax-generated receipts and tax returns conform to the Federal Inland Revenue Service requirements. Stay compliant with Companies Income Tax, VAT, and Personal Income Tax regulations.</p>
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow-md text-center">

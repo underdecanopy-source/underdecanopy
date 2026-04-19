@@ -16,7 +16,7 @@ export const FAQ = () => {
         },
         {
             question: 'How does SmartTax help with tax filing?',
-            answer: 'SmartTax tracks all your transactions throughout the year, automatically calculates your tax obligations (including VAT, withholding tax, and personal/company income tax), and prepares the necessary forms for filing with FIRS or your state tax authority. You review and submit the prepared returns.'
+            answer: 'SmartTax tracks all your transactions throughout the year, automatically calculates your tax obligations (including VAT, withholding tax, and personal/company income tax), and prepares the necessary forms for filing with NRS or your state tax authority. You review and submit the prepared returns.'
         },
         {
             question: 'Can I send receipts directly to my customers?',
@@ -32,7 +32,7 @@ export const FAQ = () => {
         },
         {
             question: 'What tax rates does SmartTax use?',
-            answer: 'SmartTax uses current Nigerian tax rates as specified by FIRS, including the 7.5% VAT rate, applicable withholding tax rates, and personal/company income tax brackets. Rates are updated as tax laws change.'
+            answer: 'SmartTax uses current Nigerian tax rates as specified by NRS, including the 7.5% VAT rate, applicable withholding tax rates, and personal/company income tax brackets. Rates are updated as tax laws change.'
         }
     ];
 

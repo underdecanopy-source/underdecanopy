@@ -133,7 +133,7 @@ export function ReceiptPreview({
             <div className="mt-4 pt-3 border-t border-slate-200">
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                     This is a legally compliant digital receipt issued under the Nigerian Revenue Service Act and the
-                    Nigeria Tax Act 2025. Keep for your tax records. VAT (where applicable) remitted to FIRS; WHT
+                    Nigeria Tax Act 2025. Keep for your tax records. VAT (where applicable) remitted to NRS; WHT
                     deducted and remittable to the relevant tax authority by the payer.
                 </p>
             </div>

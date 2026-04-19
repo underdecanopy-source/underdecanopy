@@ -107,7 +107,7 @@ export default function DashboardPage() {
                         <StatCard
                             label="WHT Deducted (Month)"
                             value={formatNaira(stats.whtDeductedMonth)}
-                            helper="Remit to FIRS monthly"
+                            helper="Remit to NRS monthly"
                             tone="green"
                         />
                         <StatCard
@@ -133,7 +133,7 @@ export default function DashboardPage() {
                             </div>
                             <h3 className="font-semibold text-slate-800 mt-3">Issue a Receipt</h3>
                             <p className="text-sm text-slate-500 mt-1">
-                                Record a sale and auto-generate a FIRS-compliant digital receipt.
+                                Record a sale and auto-generate a NRS-compliant digital receipt.
                             </p>
                         </Link>
                         <Link

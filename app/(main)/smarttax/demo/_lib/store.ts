@@ -29,7 +29,7 @@ function seedDefaults(): SmartTaxState {
         {
             id: 'r-vat',
             title: 'Monthly VAT Return',
-            description: 'File VAT return for this month with FIRS (TaxPro-Max).',
+            description: 'File VAT return for this month with NRS (TaxPro-Max).',
             dueDate: new Date(now.getFullYear(), now.getMonth() + 1, 21).toISOString(),
             isCompleted: false,
             createdAt: mkDate(0),

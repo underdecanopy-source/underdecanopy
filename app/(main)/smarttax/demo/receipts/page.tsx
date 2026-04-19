@@ -62,7 +62,7 @@ function ReceiptsInner() {
         <>
             <PageHeader
                 title="Receipts"
-                description="FIRS-compliant digital receipts, branded with your business details and ready to send to customers."
+                description="NRS-compliant digital receipts, branded with your business details and ready to send to customers."
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

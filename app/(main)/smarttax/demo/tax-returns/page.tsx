@@ -101,7 +101,7 @@ export default function TaxReturnsPage() {
                 filingDate: new Date().toISOString(),
             });
         }
-        setFiledMsg(`${returnType} return prepared and marked as filed. In production, SmartTax would submit this directly to FIRS TaxPro-Max.`);
+        setFiledMsg(`${returnType} return prepared and marked as filed. In production, SmartTax would submit this directly to NRS TaxPro-Max.`);
         setTimeout(() => setFiledMsg(null), 6000);
     }
 

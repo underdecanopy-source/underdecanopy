@@ -75,7 +75,7 @@ export default function SmartTaxPage() {
                                     </div>
                                     <div className="bg-white p-4 rounded-lg shadow-sm">
                                         <h4 className="font-semibold text-gray-800 mb-1">TIN Registration Support</h4>
-                                        <p className="text-gray-600 text-sm">Need a Tax Identification Number? SmartTax guides you through the FIRS registration process.</p>
+                                        <p className="text-gray-600 text-sm">Need a Tax Identification Number? SmartTax guides you through the NRS registration process.</p>
                                     </div>
                                 </div>
                             </div>
