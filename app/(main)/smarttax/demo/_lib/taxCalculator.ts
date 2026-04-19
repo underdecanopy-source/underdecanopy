@@ -2,10 +2,15 @@ export const VAT_RATE = 0.075;
 export const VAT_THRESHOLD = 25_000_000;
 
 export const WHT_RATES = {
-    individual: 0.05,
-    corporate: 0.10,
-    rent: 0.10,
-    interest: 0.10,
+    'Rent': { individual: 0.10, corporate: 0.10 },
+    'Royalties': { individual: 0.05, corporate: 0.10 },
+    'Consulting': { individual: 0.05, corporate: 0.10 },
+    'Sales': { individual: 0.05, corporate: 0.05 }, // Contract of Supplies
+    'Construction': { individual: 0.05, corporate: 0.05 },
+    'Dividends': { individual: 0.10, corporate: 0.10 },
+    'Directors Fees': { individual: 0.10, corporate: 0.10 },
+    'Services': { individual: 0.05, corporate: 0.10 }, // Default for Services
+    'Other': { individual: 0.05, corporate: 0.10 },
 } as const;
 
 export const PIT_BRACKETS = [
@@ -31,6 +36,7 @@ export interface TaxCalculationInput {
     customerType?: CustomerType;
     vatable?: boolean;
     whtApplicable?: boolean;
+    category?: string;
 }
 
 export function calculateTransactionTax(input: TaxCalculationInput | number, legacyCustomerType?: CustomerType): TaxCalculationResult {
@@ -42,7 +48,15 @@ export function calculateTransactionTax(input: TaxCalculationInput | number, leg
     const whtApplicable = nonTaxable ? false : opts.whtApplicable ?? true;
 
     const vatAmount = vatable ? amount * VAT_RATE : 0;
-    const whtRate = customerType === 'corporate' ? WHT_RATES.corporate : WHT_RATES.individual;
+    
+    let whtRate = 0.05; // Default fallback
+    if (opts.category && whtApplicable && customerType !== 'non-taxable') {
+        const catRates = WHT_RATES[opts.category as keyof typeof WHT_RATES] || WHT_RATES['Other'];
+        whtRate = customerType === 'corporate' ? catRates.corporate : catRates.individual;
+    } else if (whtApplicable && customerType !== 'non-taxable') {
+        whtRate = customerType === 'corporate' ? 0.10 : 0.05;
+    }
+
     const whtAmount = whtApplicable ? amount * whtRate : 0;
     const netAmount = amount + vatAmount - whtAmount;
 

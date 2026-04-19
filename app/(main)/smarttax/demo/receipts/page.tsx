@@ -88,7 +88,7 @@ function ReceiptsInner() {
                                             <p className="font-semibold text-sm text-slate-800 truncate">{r.receiptNumber}</p>
                                             {txn.customerType === 'non-taxable' && (
                                                 <span className="text-[9px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0">
-                                                    Exempt
+                                                    NO VAT &amp; WHT
                                                 </span>
                                             )}
                                         </div>

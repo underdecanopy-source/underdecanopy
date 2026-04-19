@@ -18,7 +18,7 @@ function CustomerTypeBadge({ type }: { type: CustomerType }) {
     if (type === 'non-taxable') {
         return (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 uppercase tracking-wide">
-                Non-Taxable
+                NO VAT & WHT
             </span>
         );
     }
@@ -51,8 +51,9 @@ export default function TransactionsPage() {
         whtApplicable: true,
     });
 
+    const hasVatNumber = !!state.profile.vatNumber;
     const isNonTaxable = form.customerType === 'non-taxable';
-    const effectiveVatable = isNonTaxable ? false : form.vatable;
+    const effectiveVatable = (!hasVatNumber || isNonTaxable) ? false : form.vatable;
     const effectiveWht = isNonTaxable ? false : form.whtApplicable;
 
     const amountNumber = parseAmountInput(form.amountFormatted);
@@ -66,8 +67,9 @@ export default function TransactionsPage() {
             customerType: form.customerType,
             vatable: effectiveVatable,
             whtApplicable: effectiveWht,
+            category: form.category,
         });
-    }, [amountNumber, form.customerType, effectiveVatable, effectiveWht]);
+    }, [amountNumber, form.customerType, effectiveVatable, effectiveWht, form.category]);
 
     function handleCustomerTypeChange(next: CustomerType) {
         setForm((f) => ({
@@ -90,6 +92,7 @@ export default function TransactionsPage() {
             customerType: form.customerType,
             vatable: effectiveVatable,
             whtApplicable: effectiveWht,
+            category: form.category,
         });
         addTransaction({
             customerName: form.customerName.trim(),
@@ -158,9 +161,9 @@ export default function TransactionsPage() {
                                     onChange={(e) => handleCustomerTypeChange(e.target.value as CustomerType)}
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                 >
-                                    <option value="individual">Individual (5% WHT)</option>
-                                    <option value="corporate">Corporate (10% WHT)</option>
-                                    <option value="non-taxable">Non Taxable (exempt from VAT &amp; WHT)</option>
+                                    <option value="individual">Individual</option>
+                                    <option value="corporate">Corporate</option>
+                                    <option value="non-taxable">NO VAT &amp; WHT</option>
                                 </select>
                             </label>
                             <label className="block">
@@ -226,7 +229,10 @@ export default function TransactionsPage() {
                                     <option>Services</option>
                                     <option>Consulting</option>
                                     <option>Rent</option>
-                                    <option>Interest</option>
+                                    <option>Royalties</option>
+                                    <option>Construction</option>
+                                    <option>Dividends</option>
+                                    <option>Directors Fees</option>
                                     <option>Other</option>
                                 </select>
                             </label>
@@ -241,7 +247,7 @@ export default function TransactionsPage() {
                                 </legend>
                                 {isNonTaxable && (
                                     <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2 mb-3">
-                                        This customer is marked <strong>Non Taxable</strong>. VAT and WHT are
+                                        This customer is marked <strong>NO VAT &amp; WHT</strong>. VAT and WHT are
                                         automatically excluded — typical for basic food items, educational materials,
                                         medical supplies, and other exempt supplies.
                                     </p>
@@ -252,12 +258,12 @@ export default function TransactionsPage() {
                                             effectiveVatable
                                                 ? 'border-orange-300 bg-orange-50'
                                                 : 'border-slate-200 bg-slate-50'
-                                        } ${isNonTaxable ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        } ${isNonTaxable || !hasVatNumber ? 'opacity-60 cursor-not-allowed' : ''}`}
                                     >
                                         <input
                                             type="checkbox"
                                             checked={effectiveVatable}
-                                            disabled={isNonTaxable}
+                                            disabled={isNonTaxable || !hasVatNumber}
                                             onChange={(e) => setForm({ ...form, vatable: e.target.checked })}
                                             className="mt-0.5 h-4 w-4 accent-orange-600"
                                         />
@@ -266,7 +272,9 @@ export default function TransactionsPage() {
                                                 VATABLE — Apply 7.5% VAT
                                             </span>
                                             <span className="text-xs text-slate-500">
-                                                Uncheck for VAT-exempt items (e.g. basic foods, books, medical items).
+                                                {!hasVatNumber 
+                                                    ? 'No VAT Registration Number found. Please update your profile to allow VAT deduction.'
+                                                    : 'Uncheck for VAT-exempt items (e.g. basic foods, books, medical items).'}
                                             </span>
                                         </span>
                                     </label>

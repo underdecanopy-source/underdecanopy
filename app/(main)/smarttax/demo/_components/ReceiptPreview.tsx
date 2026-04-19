@@ -54,6 +54,11 @@ export function ReceiptPreview({
                     {profile.address && <p className="text-xs text-slate-600">{profile.address}</p>}
                     <p className="text-[11px] text-slate-500 mt-1">
                         TIN: <span className="font-mono">{profile.tin || 'Not set'}</span>
+                        {profile.vatNumber && data.vatable && (
+                            <span className="ml-2">
+                                | VAT Reg: <span className="font-mono">{profile.vatNumber}</span>
+                            </span>
+                        )}
                     </p>
                 </div>
                 <div className="text-right flex-shrink-0">
@@ -83,7 +88,7 @@ export function ReceiptPreview({
 
             {isNonTaxable && (
                 <div className="mb-3 rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-xs text-emerald-900">
-                    <strong>Non-Taxable supply.</strong> VAT and WHT are not applied — e.g. basic food items,
+                    <strong>NO VAT &amp; WHT supply.</strong> VAT and WHT are not applied — e.g. basic food items,
                     educational materials, or other exempt goods/services under the Nigeria Tax Act.
                 </div>
             )}
@@ -129,6 +134,12 @@ export function ReceiptPreview({
                     <span>{formatNaira(data.netAmount)}</span>
                 </div>
             </div>
+
+            {data.whtApplicable && (
+                <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800">
+                    <strong>WHT Credit Note Required:</strong> Since {formatNaira(data.whtAmount)} has been withheld, the payer must remit this amount to the relevant tax authority and issue a Withholding Tax Credit Note to us as evidence of tax paid on our behalf.
+                </div>
+            )}
 
             <div className="mt-4 pt-3 border-t border-slate-200">
                 <p className="text-[11px] text-slate-500 leading-relaxed">

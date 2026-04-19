@@ -74,7 +74,7 @@ export default function DashboardPage() {
                                 </p>
                                 <p className="text-sm text-amber-800 mt-1">
                                     Load a set of realistic sample transactions — including a mix of VAT-able, corporate,
-                                    and non-taxable customers — to see dashboards, reports, and tax returns populate
+                                    and NO VAT &amp; WHT customers — to see dashboards, reports, and tax returns populate
                                     instantly.
                                 </p>
                             </div>
@@ -99,7 +99,7 @@ export default function DashboardPage() {
                             value={formatNaira(stats.vatCollectedMonth)}
                             helper={
                                 stats.nonTaxableCount > 0
-                                    ? `${stats.nonTaxableCount} non-taxable sale${stats.nonTaxableCount === 1 ? '' : 's'} excluded`
+                                    ? `${stats.nonTaxableCount} NO VAT & WHT sale${stats.nonTaxableCount === 1 ? '' : 's'} excluded`
                                     : 'Due by 21st of next month'
                             }
                             tone="orange"
@@ -221,8 +221,8 @@ export default function DashboardPage() {
                                                             <span>{t.customerName}</span>
                                                             {t.customerType === 'non-taxable' && (
                                                                 <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
-                                                                    Exempt
-                                                                </span>
+                                                            NO VAT &amp; WHT
+                                                        </span>
                                                             )}
                                                         </div>
                                                     </td>
@@ -253,7 +253,7 @@ export default function DashboardPage() {
                                                 </div>
                                                 {t.customerType === 'non-taxable' && (
                                                     <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
-                                                        Exempt
+                                                        NO VAT &amp; WHT
                                                     </span>
                                                 )}
                                             </div>

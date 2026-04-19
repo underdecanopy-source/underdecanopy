@@ -4,6 +4,7 @@ export interface Profile {
     phone: string;
     businessName: string;
     tin: string;
+    vatNumber?: string;
     address: string;
     state: string;
     businessType: 'individual' | 'sole-proprietor' | 'corporate';
