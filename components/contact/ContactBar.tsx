@@ -14,7 +14,7 @@ export function ContactBar() {
   return (
     <>
       {/* Mobile Contact Bar - Sticky at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-gray-200 shadow-lg w-full">
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-gray-200 shadow-lg w-full print:hidden">
         <div className="flex justify-around items-center py-3 px-2 w-full">
           {/* Phone Call */}
           <a
@@ -54,7 +54,7 @@ export function ContactBar() {
       </div>
 
       {/* Floating Contact Widget - Hidden on mobile (uses bottom bar instead) */}
-      <div className="hidden md:flex fixed bottom-8 right-8 z-40 flex-col gap-3 items-center">
+      <div className="hidden md:flex fixed bottom-8 right-8 z-40 flex-col gap-3 items-center print:hidden">
         {/* WhatsApp */}
         <a
           href={CONTACT_CONFIG.getWhatsAppLink(CONTACT_CONFIG.quickMessages.inquiry)}
