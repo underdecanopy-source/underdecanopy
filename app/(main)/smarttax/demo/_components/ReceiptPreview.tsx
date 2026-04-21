@@ -137,7 +137,7 @@ export function ReceiptPreview({
 
             {data.whtApplicable && (
                 <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800">
-                    <strong>WHT Credit Note Required:</strong> Since {formatNaira(data.whtAmount)} has been withheld, the payer must remit this amount to the relevant tax authority and issue a Withholding Tax Credit Note to us as evidence of tax paid on our behalf.
+                    <strong>Withholding Tax Credit Note:</strong> An amount of {formatNaira(data.whtAmount)} has been deducted as withholding tax and will be remitted to the appropriate tax authority. Kindly accept this as our Withholding Tax Credit Note, serving as evidence of tax paid on your behalf.
                 </div>
             )}
 
