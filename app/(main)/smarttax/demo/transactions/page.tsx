@@ -1,37 +1,29 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { Eye, Plus, Trash2, X } from 'lucide-react';
 import { PageHeader, EmptyState } from '../_components/ui';
 import { ReceiptPreview } from '../_components/ReceiptPreview';
+import { getDebitCreditLabel, getTransactionLabel } from '../_lib/financials';
 import { useSmartTaxStore } from '../_lib/store';
-import {
-    calculateTransactionTax,
-    formatAmountInput,
-    formatNaira,
-    parseAmountInput,
-} from '../_lib/taxCalculator';
-import { Plus, Trash2, Eye, X } from 'lucide-react';
-import type { CustomerType } from '../_lib/types';
+import { calculateTransactionTax, formatAmountInput, formatNaira, parseAmountInput } from '../_lib/taxCalculator';
+import type { CustomerType, Transaction } from '../_lib/types';
 
-function CustomerTypeBadge({ type }: { type: CustomerType }) {
-    if (type === 'non-taxable') {
-        return (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 uppercase tracking-wide">
-                NO VAT & WHT
-            </span>
-        );
-    }
-    if (type === 'corporate') {
-        return (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-100 text-indigo-800 uppercase tracking-wide">
-                Corporate
-            </span>
-        );
-    }
+const REVENUE_CATEGORIES = ['Sales', 'Service Income'];
+const EXPENSE_CATEGORIES = ['Rent', 'Utilities', 'Purchases', 'Supplies', 'Transport', 'Other'];
+
+function TransactionTypeBadge({ transaction }: { transaction: Transaction }) {
+    const label = `${transaction.type === 'revenue' ? 'Revenue' : 'Expense'} / ${
+        transaction.debitCreditFlag === 'credit' ? 'Credit' : 'Debit'
+    }`;
     return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-800 uppercase tracking-wide">
-            Individual
+        <span
+            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
+                transaction.type === 'revenue' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+            }`}
+        >
+            {label}
         </span>
     );
 }
@@ -40,6 +32,8 @@ export default function TransactionsPage() {
     const { state, hydrated, addTransaction, deleteTransaction } = useSmartTaxStore();
     const [showForm, setShowForm] = useState(false);
     const [form, setForm] = useState({
+        type: 'revenue' as Transaction['type'],
+        subCategory: 'Sales' as string,
         customerName: '',
         customerEmail: '',
         customerPhone: '',
@@ -52,11 +46,12 @@ export default function TransactionsPage() {
     });
 
     const hasVatNumber = !!state.profile.vatNumber;
+    const isRevenue = form.type === 'revenue';
     const isNonTaxable = form.customerType === 'non-taxable';
     const effectiveVatable = (!hasVatNumber || isNonTaxable) ? false : form.vatable;
-    const effectiveWht = isNonTaxable ? false : form.whtApplicable;
-
+    const effectiveWht = isRevenue && !isNonTaxable ? form.whtApplicable : false;
     const amountNumber = parseAmountInput(form.amountFormatted);
+    const categories = isRevenue ? REVENUE_CATEGORIES : EXPENSE_CATEGORIES;
 
     const preview = useMemo(() => {
         if (!amountNumber || amountNumber <= 0) {
@@ -68,33 +63,50 @@ export default function TransactionsPage() {
             vatable: effectiveVatable,
             whtApplicable: effectiveWht,
             category: form.category,
+            transactionType: form.type,
         });
-    }, [amountNumber, form.customerType, effectiveVatable, effectiveWht, form.category]);
+    }, [amountNumber, form.category, form.customerType, form.type, effectiveVatable, effectiveWht]);
 
-    function handleCustomerTypeChange(next: CustomerType) {
-        setForm((f) => ({
-            ...f,
-            customerType: next,
-            vatable: next === 'non-taxable' ? false : true,
-            whtApplicable: next === 'non-taxable' ? false : true,
+    function handleAmountChange(raw: string) {
+        setForm((current) => ({ ...current, amountFormatted: formatAmountInput(raw) }));
+    }
+
+    function handleTransactionTypeChange(type: Transaction['type']) {
+        setForm((current) => ({
+            ...current,
+            type,
+            subCategory: type === 'revenue' ? 'Sales' : '',
+            category: type === 'revenue' ? 'Sales' : 'Rent',
+            whtApplicable: type === 'revenue',
         }));
     }
 
-    function handleAmountChange(raw: string) {
-        setForm((f) => ({ ...f, amountFormatted: formatAmountInput(raw) }));
+    function handleCustomerTypeChange(next: CustomerType) {
+        setForm((current) => ({
+            ...current,
+            customerType: next,
+            vatable: next === 'non-taxable' ? false : true,
+            whtApplicable: current.type === 'revenue' && next !== 'non-taxable',
+        }));
     }
 
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        if (!form.customerName || !form.description || !amountNumber || amountNumber <= 0) return;
+    function handleSubmit(event: FormEvent) {
+        event.preventDefault();
+        if (!form.customerName || !form.description || amountNumber <= 0) return;
+
         const calc = calculateTransactionTax({
             amount: amountNumber,
             customerType: form.customerType,
             vatable: effectiveVatable,
             whtApplicable: effectiveWht,
             category: form.category,
+            transactionType: form.type,
         });
+
         addTransaction({
+            type: form.type,
+            subCategory: form.type === 'revenue' ? form.subCategory : undefined,
+            debitCreditFlag: getDebitCreditLabel(form.type),
             customerName: form.customerName.trim(),
             customerEmail: form.customerEmail.trim() || undefined,
             customerPhone: form.customerPhone.trim() || undefined,
@@ -107,8 +119,13 @@ export default function TransactionsPage() {
             whtAmount: calc.whtAmount,
             netAmount: calc.netAmount,
             category: form.category,
+            taxYear: new Date().getFullYear(),
+            creditNoteGenerated: calc.whtAmount > 0,
         });
+
         setForm({
+            type: 'revenue',
+            subCategory: 'Sales',
             customerName: '',
             customerEmail: '',
             customerPhone: '',
@@ -126,10 +143,10 @@ export default function TransactionsPage() {
         <>
             <PageHeader
                 title="Transactions"
-                description="Record sales and service income. Each transaction auto-generates a digital receipt and tax breakdown."
+                description="Record revenue and expenses with explicit debit or credit classification and a consistent tax treatment."
                 actions={
                     <button
-                        onClick={() => setShowForm((v) => !v)}
+                        onClick={() => setShowForm((current) => !current)}
                         className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
                     >
                         {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -143,161 +160,182 @@ export default function TransactionsPage() {
                     <div className="xl:col-span-3 bg-white rounded-lg border border-slate-200 p-6">
                         <h2 className="font-semibold text-slate-800 mb-4">New Transaction</h2>
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label className="block md:col-span-2">
+                                <span className="text-sm font-medium text-slate-700">Transaction Type *</span>
+                                <div className="flex gap-4 mt-1">
+                                    <label className="inline-flex items-center">
+                                        <input
+                                            type="radio"
+                                            name="type"
+                                            value="revenue"
+                                            checked={form.type === 'revenue'}
+                                            onChange={() => handleTransactionTypeChange('revenue')}
+                                            className="mr-2"
+                                        />
+                                        Revenue (Credit)
+                                    </label>
+                                    <label className="inline-flex items-center">
+                                        <input
+                                            type="radio"
+                                            name="type"
+                                            value="expense"
+                                            checked={form.type === 'expense'}
+                                            onChange={() => handleTransactionTypeChange('expense')}
+                                            className="mr-2"
+                                        />
+                                        Expense (Debit)
+                                    </label>
+                                </div>
+                            </label>
+
+                            {isRevenue && (
+                                <label className="block">
+                                    <span className="text-sm font-medium text-slate-700">Revenue Subcategory *</span>
+                                    <select
+                                        value={form.subCategory}
+                                        onChange={(event) => setForm((current) => ({ ...current, subCategory: event.target.value }))}
+                                        className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                    >
+                                        <option value="Sales">Sales</option>
+                                        <option value="Service Income">Service Income</option>
+                                    </select>
+                                </label>
+                            )}
+
                             <label className="block">
-                                <span className="text-sm font-medium text-slate-700">Customer Name *</span>
+                                <span className="text-sm font-medium text-slate-700">
+                                    {isRevenue ? 'Customer / Payer *' : 'Vendor / Payee *'}
+                                </span>
                                 <input
                                     required
                                     type="text"
                                     value={form.customerName}
-                                    onChange={(e) => setForm({ ...form, customerName: e.target.value })}
+                                    onChange={(event) => setForm((current) => ({ ...current, customerName: event.target.value }))}
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="e.g. Chidinma Okafor"
+                                    placeholder={isRevenue ? 'e.g. Chidinma Okafor' : 'e.g. Kano Logistics PLC'}
                                 />
                             </label>
+
                             <label className="block">
-                                <span className="text-sm font-medium text-slate-700">Customer Type *</span>
+                                <span className="text-sm font-medium text-slate-700">Counterparty Type *</span>
                                 <select
                                     value={form.customerType}
-                                    onChange={(e) => handleCustomerTypeChange(e.target.value as CustomerType)}
+                                    onChange={(event) => handleCustomerTypeChange(event.target.value as CustomerType)}
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                 >
                                     <option value="individual">Individual</option>
                                     <option value="corporate">Corporate</option>
-                                    <option value="non-taxable">NO VAT &amp; WHT</option>
+                                    <option value="non-taxable">NO VAT and WHT</option>
                                 </select>
                             </label>
+
                             <label className="block">
                                 <span className="text-sm font-medium text-slate-700">Email</span>
                                 <input
                                     type="email"
                                     value={form.customerEmail}
-                                    onChange={(e) => setForm({ ...form, customerEmail: e.target.value })}
+                                    onChange={(event) => setForm((current) => ({ ...current, customerEmail: event.target.value }))}
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="customer@example.com"
                                 />
                             </label>
+
                             <label className="block">
                                 <span className="text-sm font-medium text-slate-700">Phone</span>
                                 <input
                                     type="tel"
                                     value={form.customerPhone}
-                                    onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
+                                    onChange={(event) => setForm((current) => ({ ...current, customerPhone: event.target.value }))}
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="+234 800 000 0000"
                                 />
                             </label>
+
                             <label className="block md:col-span-2">
                                 <span className="text-sm font-medium text-slate-700">Description *</span>
                                 <input
                                     required
                                     type="text"
                                     value={form.description}
-                                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                                    onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="e.g. Consultancy for April 2026"
+                                    placeholder={isRevenue ? 'e.g. Consultancy for April 2026' : 'e.g. Office rent for April 2026'}
                                 />
                             </label>
+
                             <label className="block">
-                                <span className="text-sm font-medium text-slate-700">Amount (₦) *</span>
-                                <div className="mt-1 relative">
-                                    <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none text-sm">
-                                        ₦
-                                    </span>
-                                    <input
-                                        required
-                                        type="text"
-                                        inputMode="decimal"
-                                        value={form.amountFormatted}
-                                        onChange={(e) => handleAmountChange(e.target.value)}
-                                        className="w-full border border-slate-300 rounded-md pl-7 pr-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="1,000,000"
-                                        aria-describedby="amount-hint"
-                                    />
-                                </div>
-                                <span id="amount-hint" className="text-xs text-slate-500 mt-1 block">
-                                    Commas added automatically as you type.
-                                </span>
+                                <span className="text-sm font-medium text-slate-700">Amount (NGN) *</span>
+                                <input
+                                    required
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={form.amountFormatted}
+                                    onChange={(event) => handleAmountChange(event.target.value)}
+                                    className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="1,000,000"
+                                />
                             </label>
+
                             <label className="block">
                                 <span className="text-sm font-medium text-slate-700">Category</span>
                                 <select
                                     value={form.category}
-                                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                                    onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                 >
-                                    <option>Sales</option>
-                                    <option>Services</option>
-                                    <option>Consulting</option>
-                                    <option>Rent</option>
-                                    <option>Royalties</option>
-                                    <option>Construction</option>
-                                    <option>Dividends</option>
-                                    <option>Directors Fees</option>
-                                    <option>Other</option>
+                                    {categories.map((category) => (
+                                        <option key={category} value={category}>
+                                            {category}
+                                        </option>
+                                    ))}
                                 </select>
                             </label>
 
-                            <fieldset
-                                className={`md:col-span-2 border rounded-lg p-4 ${
-                                    isNonTaxable ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-200'
-                                }`}
-                            >
-                                <legend className="px-2 text-sm font-semibold text-slate-700">
-                                    Tax Applicability
-                                </legend>
-                                {isNonTaxable && (
-                                    <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2 mb-3">
-                                        This customer is marked <strong>NO VAT &amp; WHT</strong>. VAT and WHT are
-                                        automatically excluded — typical for basic food items, educational materials,
-                                        medical supplies, and other exempt supplies.
-                                    </p>
-                                )}
+                            <fieldset className="md:col-span-2 border border-slate-200 rounded-lg p-4">
+                                <legend className="px-2 text-sm font-semibold text-slate-700">Tax Applicability</legend>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <label
-                                        className={`flex items-start gap-3 border rounded-md p-3 cursor-pointer transition ${
-                                            effectiveVatable
-                                                ? 'border-orange-300 bg-orange-50'
-                                                : 'border-slate-200 bg-slate-50'
+                                        className={`flex items-start gap-3 border rounded-md p-3 transition ${
+                                            effectiveVatable ? 'border-orange-300 bg-orange-50' : 'border-slate-200 bg-slate-50'
                                         } ${isNonTaxable || !hasVatNumber ? 'opacity-60 cursor-not-allowed' : ''}`}
                                     >
                                         <input
                                             type="checkbox"
                                             checked={effectiveVatable}
                                             disabled={isNonTaxable || !hasVatNumber}
-                                            onChange={(e) => setForm({ ...form, vatable: e.target.checked })}
+                                            onChange={(event) => setForm((current) => ({ ...current, vatable: event.target.checked }))}
                                             className="mt-0.5 h-4 w-4 accent-orange-600"
                                         />
                                         <span className="text-sm">
-                                            <span className="font-semibold text-slate-800 block">
-                                                VATABLE — Apply 7.5% VAT
-                                            </span>
+                                            <span className="font-semibold text-slate-800 block">Apply VAT (7.5%)</span>
                                             <span className="text-xs text-slate-500">
-                                                {!hasVatNumber 
-                                                    ? 'No VAT Registration Number found. Please update your profile to allow VAT deduction.'
-                                                    : 'Uncheck for VAT-exempt items (e.g. basic foods, books, medical items).'}
+                                                {!hasVatNumber
+                                                    ? 'No VAT registration number found in profile settings.'
+                                                    : 'Turn off only for VAT-exempt supplies.'}
                                             </span>
                                         </span>
                                     </label>
+
                                     <label
-                                        className={`flex items-start gap-3 border rounded-md p-3 cursor-pointer transition ${
-                                            effectiveWht
-                                                ? 'border-rose-300 bg-rose-50'
-                                                : 'border-slate-200 bg-slate-50'
-                                        } ${isNonTaxable ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        className={`flex items-start gap-3 border rounded-md p-3 transition ${
+                                            effectiveWht ? 'border-rose-300 bg-rose-50' : 'border-slate-200 bg-slate-50'
+                                        } ${!isRevenue || isNonTaxable ? 'opacity-60 cursor-not-allowed' : ''}`}
                                     >
                                         <input
                                             type="checkbox"
                                             checked={effectiveWht}
-                                            disabled={isNonTaxable}
-                                            onChange={(e) => setForm({ ...form, whtApplicable: e.target.checked })}
+                                            disabled={!isRevenue || isNonTaxable}
+                                            onChange={(event) =>
+                                                setForm((current) => ({ ...current, whtApplicable: event.target.checked }))
+                                            }
                                             className="mt-0.5 h-4 w-4 accent-rose-600"
                                         />
                                         <span className="text-sm">
-                                            <span className="font-semibold text-slate-800 block">
-                                                Deduct WHT ({form.customerType === 'corporate' ? '10%' : '5%'})
-                                            </span>
+                                            <span className="font-semibold text-slate-800 block">Withhold WHT</span>
                                             <span className="text-xs text-slate-500">
-                                                Uncheck when WHT does not apply to this supply.
+                                                {isRevenue
+                                                    ? 'Use for payer-deducted WHT on revenue only.'
+                                                    : 'WHT credit notes are only generated for revenue receipts.'}
                                             </span>
                                         </span>
                                     </label>
@@ -310,52 +348,31 @@ export default function TransactionsPage() {
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                                         <div>
                                             <p className="text-xs text-slate-500">Subtotal</p>
-                                            <p className="font-semibold text-slate-900">
-                                                {formatNaira(amountNumber)}
-                                            </p>
+                                            <p className="font-semibold text-slate-900">{formatNaira(amountNumber)}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500">VAT (7.5%)</p>
-                                            <p
-                                                className={`font-semibold ${
-                                                    effectiveVatable ? 'text-orange-700' : 'text-slate-400'
-                                                }`}
-                                            >
-                                                {effectiveVatable
-                                                    ? `+ ${formatNaira(preview.vatAmount)}`
-                                                    : 'Not applied'}
+                                            <p className={effectiveVatable ? 'font-semibold text-orange-700' : 'font-semibold text-slate-400'}>
+                                                {effectiveVatable ? `+ ${formatNaira(preview.vatAmount)}` : 'Not applied'}
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-xs text-slate-500">
-                                                WHT ({form.customerType === 'corporate' ? '10%' : '5%'})
-                                            </p>
-                                            <p
-                                                className={`font-semibold ${
-                                                    effectiveWht ? 'text-rose-700' : 'text-slate-400'
-                                                }`}
-                                            >
-                                                {effectiveWht
-                                                    ? `− ${formatNaira(preview.whtAmount)}`
-                                                    : 'Not deducted'}
+                                            <p className="text-xs text-slate-500">WHT</p>
+                                            <p className={effectiveWht ? 'font-semibold text-rose-700' : 'font-semibold text-slate-400'}>
+                                                {effectiveWht ? `- ${formatNaira(preview.whtAmount)}` : 'Not deducted'}
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-xs text-slate-500">Net to Receive</p>
-                                            <p className="font-bold text-emerald-700">
-                                                {formatNaira(preview.netAmount)}
-                                            </p>
+                                            <p className="text-xs text-slate-500">{isRevenue ? 'Net to Receive' : 'Net Cash Outflow'}</p>
+                                            <p className="font-bold text-emerald-700">{formatNaira(preview.netAmount)}</p>
                                         </div>
                                     </div>
                                 </div>
                             )}
 
                             <div className="md:col-span-2 flex gap-3 pt-2">
-                                <button
-                                    type="submit"
-                                    className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700"
-                                >
-                                    Save &amp; Generate Receipt
+                                <button type="submit" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700">
+                                    Save and Generate Receipt
                                 </button>
                                 <button
                                     type="button"
@@ -373,11 +390,11 @@ export default function TransactionsPage() {
                             <ReceiptPreview
                                 profile={state.profile}
                                 data={{
-                                    customerName: form.customerName || 'Customer name',
+                                    customerName: form.customerName || 'Counterparty name',
                                     customerEmail: form.customerEmail || undefined,
                                     customerPhone: form.customerPhone || undefined,
                                     customerType: form.customerType,
-                                    description: form.description || 'Description of goods or services',
+                                    description: form.description || 'Description of the financial event',
                                     category: form.category,
                                     amount: amountNumber,
                                     vatable: effectiveVatable,
@@ -385,6 +402,10 @@ export default function TransactionsPage() {
                                     vatAmount: preview.vatAmount,
                                     whtAmount: preview.whtAmount,
                                     netAmount: preview.netAmount,
+                                    transactionType: form.type,
+                                    subCategory: form.subCategory,
+                                    debitCreditFlag: getDebitCreditLabel(form.type),
+                                    creditNoteGenerated: preview.whtAmount > 0,
                                 }}
                             />
                         </div>
@@ -394,12 +415,12 @@ export default function TransactionsPage() {
 
             <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                 {!hydrated ? (
-                    <div className="p-8 text-slate-500">Loading…</div>
+                    <div className="p-8 text-slate-500">Loading...</div>
                 ) : state.transactions.length === 0 ? (
                     <div className="p-8">
                         <EmptyState
                             title="No transactions yet"
-                            description="Record a sale to generate your first digital receipt with automatic VAT and WHT calculation."
+                            description="Record a revenue or expense transaction to populate receipts, reports, and compliance metrics."
                             action={
                                 <button
                                     onClick={() => setShowForm(true)}
@@ -412,13 +433,13 @@ export default function TransactionsPage() {
                     </div>
                 ) : (
                     <>
-                        {/* Desktop / tablet table */}
                         <div className="hidden md:block overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead className="bg-slate-50 text-slate-600 text-xs uppercase">
                                     <tr>
                                         <th className="text-left px-5 py-3">Date</th>
-                                        <th className="text-left px-5 py-3">Customer</th>
+                                        <th className="text-left px-5 py-3">Type</th>
+                                        <th className="text-left px-5 py-3">Counterparty</th>
                                         <th className="text-left px-5 py-3">Description</th>
                                         <th className="text-right px-5 py-3">Amount</th>
                                         <th className="text-right px-5 py-3">VAT</th>
@@ -428,40 +449,37 @@ export default function TransactionsPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {state.transactions.map((t) => {
-                                        const receipt = state.receipts.find((r) => r.transactionId === t.id);
+                                    {state.transactions.map((transaction) => {
+                                        const receipt = state.receipts.find((item) => item.transactionId === transaction.id);
                                         return (
-                                            <tr key={t.id} className="border-t border-slate-100">
+                                            <tr key={transaction.id} className="border-t border-slate-100">
                                                 <td className="px-5 py-3 text-slate-600 whitespace-nowrap">
-                                                    {new Date(t.date).toLocaleDateString('en-NG')}
+                                                    {new Date(transaction.date).toLocaleDateString('en-NG')}
                                                 </td>
-                                                <td className="px-5 py-3 font-medium text-slate-800">
-                                                    <div className="flex items-center gap-2">
-                                                        <span>{t.customerName}</span>
-                                                        <CustomerTypeBadge type={t.customerType} />
+                                                <td className="px-5 py-3">
+                                                    <div className="space-y-1">
+                                                        <TransactionTypeBadge transaction={transaction} />
+                                                        <p className="text-xs text-slate-500">{getTransactionLabel(transaction)}</p>
                                                     </div>
                                                 </td>
-                                                <td className="px-5 py-3 text-slate-600 max-w-xs truncate">{t.description}</td>
-                                                <td className="px-5 py-3 text-right text-slate-700 whitespace-nowrap">
-                                                    {formatNaira(t.amount)}
-                                                </td>
+                                                <td className="px-5 py-3 font-medium text-slate-800">{transaction.customerName}</td>
+                                                <td className="px-5 py-3 text-slate-600 max-w-xs truncate">{transaction.description}</td>
+                                                <td className="px-5 py-3 text-right text-slate-700 whitespace-nowrap">{formatNaira(transaction.amount)}</td>
                                                 <td className="px-5 py-3 text-right whitespace-nowrap">
-                                                    {t.vatable ? (
-                                                        <span className="text-orange-700">{formatNaira(t.vatAmount)}</span>
+                                                    {transaction.vatable ? (
+                                                        <span className="text-orange-700">{formatNaira(transaction.vatAmount)}</span>
                                                     ) : (
                                                         <span className="text-slate-400 text-xs">Exempt</span>
                                                     )}
                                                 </td>
                                                 <td className="px-5 py-3 text-right whitespace-nowrap">
-                                                    {t.whtApplicable ? (
-                                                        <span className="text-rose-700">{formatNaira(t.whtAmount)}</span>
+                                                    {transaction.whtApplicable ? (
+                                                        <span className="text-rose-700">{formatNaira(transaction.whtAmount)}</span>
                                                     ) : (
-                                                        <span className="text-slate-400 text-xs">—</span>
+                                                        <span className="text-slate-400 text-xs">-</span>
                                                     )}
                                                 </td>
-                                                <td className="px-5 py-3 text-right font-semibold text-slate-900 whitespace-nowrap">
-                                                    {formatNaira(t.netAmount)}
-                                                </td>
+                                                <td className="px-5 py-3 text-right font-semibold text-slate-900 whitespace-nowrap">{formatNaira(transaction.netAmount)}</td>
                                                 <td className="px-5 py-3 text-right whitespace-nowrap">
                                                     {receipt && (
                                                         <Link
@@ -472,7 +490,7 @@ export default function TransactionsPage() {
                                                         </Link>
                                                     )}
                                                     <button
-                                                        onClick={() => deleteTransaction(t.id)}
+                                                        onClick={() => deleteTransaction(transaction.id)}
                                                         className="inline-flex items-center gap-1 text-rose-600 hover:underline text-xs font-semibold"
                                                     >
                                                         <Trash2 className="h-3.5 w-3.5" /> Delete
@@ -485,53 +503,29 @@ export default function TransactionsPage() {
                             </table>
                         </div>
 
-                        {/* Mobile stacked cards */}
                         <ul className="md:hidden divide-y divide-slate-100">
-                            {state.transactions.map((t) => {
-                                const receipt = state.receipts.find((r) => r.transactionId === t.id);
+                            {state.transactions.map((transaction) => {
+                                const receipt = state.receipts.find((item) => item.transactionId === transaction.id);
                                 return (
-                                    <li key={t.id} className="p-4">
+                                    <li key={transaction.id} className="p-4">
                                         <div className="flex items-start justify-between gap-3 mb-2">
                                             <div className="min-w-0">
-                                                <p className="font-semibold text-slate-800 truncate">
-                                                    {t.customerName}
-                                                </p>
-                                                <p className="text-xs text-slate-500">
-                                                    {new Date(t.date).toLocaleDateString('en-NG')}
-                                                </p>
+                                                <p className="font-semibold text-slate-800 truncate">{transaction.customerName}</p>
+                                                <p className="text-xs text-slate-500">{new Date(transaction.date).toLocaleDateString('en-NG')}</p>
                                             </div>
-                                            <CustomerTypeBadge type={t.customerType} />
+                                            <TransactionTypeBadge transaction={transaction} />
                                         </div>
-                                        <p className="text-sm text-slate-600 mb-3">{t.description}</p>
+                                        <p className="text-xs text-slate-500 mb-2">{getTransactionLabel(transaction)}</p>
+                                        <p className="text-sm text-slate-600 mb-3">{transaction.description}</p>
                                         <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
                                             <dt className="text-slate-500">Amount</dt>
-                                            <dd className="text-right text-slate-800 font-medium">
-                                                {formatNaira(t.amount)}
-                                            </dd>
+                                            <dd className="text-right text-slate-800 font-medium">{formatNaira(transaction.amount)}</dd>
                                             <dt className="text-slate-500">VAT</dt>
-                                            <dd className="text-right">
-                                                {t.vatable ? (
-                                                    <span className="text-orange-700 font-medium">
-                                                        {formatNaira(t.vatAmount)}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-slate-400">Exempt</span>
-                                                )}
-                                            </dd>
+                                            <dd className="text-right">{transaction.vatable ? <span className="text-orange-700 font-medium">{formatNaira(transaction.vatAmount)}</span> : <span className="text-slate-400">Exempt</span>}</dd>
                                             <dt className="text-slate-500">WHT</dt>
-                                            <dd className="text-right">
-                                                {t.whtApplicable ? (
-                                                    <span className="text-rose-700 font-medium">
-                                                        {formatNaira(t.whtAmount)}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-slate-400">—</span>
-                                                )}
-                                            </dd>
+                                            <dd className="text-right">{transaction.whtApplicable ? <span className="text-rose-700 font-medium">{formatNaira(transaction.whtAmount)}</span> : <span className="text-slate-400">-</span>}</dd>
                                             <dt className="text-slate-500 font-semibold">Net</dt>
-                                            <dd className="text-right text-slate-900 font-bold">
-                                                {formatNaira(t.netAmount)}
-                                            </dd>
+                                            <dd className="text-right text-slate-900 font-bold">{formatNaira(transaction.netAmount)}</dd>
                                         </dl>
                                         <div className="flex gap-3 pt-3 mt-3 border-t border-slate-100">
                                             {receipt && (
@@ -543,7 +537,7 @@ export default function TransactionsPage() {
                                                 </Link>
                                             )}
                                             <button
-                                                onClick={() => deleteTransaction(t.id)}
+                                                onClick={() => deleteTransaction(transaction.id)}
                                                 className="inline-flex items-center gap-1 text-rose-600 text-xs font-semibold ml-auto"
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" /> Delete

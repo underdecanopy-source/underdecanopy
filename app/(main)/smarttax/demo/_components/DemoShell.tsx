@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
     LayoutDashboard,
     Receipt,
@@ -27,7 +27,7 @@ const items = [
     { href: '/smarttax/demo/settings', label: 'Settings', icon: Settings },
 ];
 
-export function DemoShell({ children }: { children: React.ReactNode }) {
+export function DemoShell({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const [open, setOpen] = useState(false);
 

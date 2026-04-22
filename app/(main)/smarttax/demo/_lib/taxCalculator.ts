@@ -37,6 +37,7 @@ export interface TaxCalculationInput {
     vatable?: boolean;
     whtApplicable?: boolean;
     category?: string;
+    transactionType?: 'expense' | 'revenue';
 }
 
 export function calculateTransactionTax(input: TaxCalculationInput | number, legacyCustomerType?: CustomerType): TaxCalculationResult {
@@ -44,8 +45,9 @@ export function calculateTransactionTax(input: TaxCalculationInput | number, leg
     const amount = opts.amount;
     const customerType: CustomerType = opts.customerType ?? 'individual';
     const nonTaxable = customerType === 'non-taxable';
+    const transactionType = opts.transactionType ?? 'revenue';
     const vatable = nonTaxable ? false : opts.vatable ?? true;
-    const whtApplicable = nonTaxable ? false : opts.whtApplicable ?? true;
+    const whtApplicable = transactionType === 'expense' ? false : nonTaxable ? false : opts.whtApplicable ?? true;
 
     const vatAmount = vatable ? amount * VAT_RATE : 0;
     
@@ -58,7 +60,7 @@ export function calculateTransactionTax(input: TaxCalculationInput | number, leg
     }
 
     const whtAmount = whtApplicable ? amount * whtRate : 0;
-    const netAmount = amount + vatAmount - whtAmount;
+    const netAmount = transactionType === 'expense' ? amount + vatAmount : amount + vatAmount - whtAmount;
 
     return {
         vatAmount,

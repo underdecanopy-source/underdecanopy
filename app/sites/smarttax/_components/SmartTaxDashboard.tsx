@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { Printer, Download, Mail, Share2, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { Printer, Download, Mail, Share2, X } from "lucide-react";
+import { exportReceiptAsPDF } from './exportReceiptAsPDF';
 
 type Transaction = {
   id: string;
@@ -10,17 +11,21 @@ type Transaction = {
   date: string;
   description: string;
   reference: string;
+  subCategory?: string;
+  vatAmount?: number;
+  whtAmount?: number;
+  netAmount?: number;
 };
 
 const initialTransactions: Transaction[] = [
-  { id: "1", type: "revenue", amount: 1500000, date: "2024-01-15", description: "Consulting Services", reference: "INV-001" },
-  { id: "2", type: "expense", amount: 300000, date: "2024-02-10", description: "Office Supplies", reference: "EXP-001" },
-  { id: "3", type: "revenue", amount: 2500000, date: "2024-03-05", description: "Software Development", reference: "INV-002" },
-  { id: "4", type: "expense", amount: 800000, date: "2024-04-20", description: "Rent & Utilities", reference: "EXP-002" },
+  { id: "1", type: "revenue", amount: 1500000, date: "2024-01-15", description: "Consulting Services", reference: "INV-001", subCategory: "Service Income", vatAmount: 112500, whtAmount: 150000, netAmount: 1462500 },
+  { id: "2", type: "expense", amount: 300000, date: "2024-02-10", description: "Office Supplies", reference: "EXP-001", vatAmount: 22500, whtAmount: 0, netAmount: 322500 },
+  { id: "3", type: "revenue", amount: 2500000, date: "2024-03-05", description: "Software Development", reference: "INV-002", subCategory: "Service Income", vatAmount: 187500, whtAmount: 250000, netAmount: 2437500 },
+  { id: "4", type: "expense", amount: 800000, date: "2024-04-20", description: "Rent & Utilities", reference: "EXP-002", vatAmount: 60000, whtAmount: 0, netAmount: 860000 },
 ];
 
 export function SmartTaxDashboard() {
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [transactions] = useState<Transaction[]>(initialTransactions);
   const [taxRate, setTaxRate] = useState<number>(30); // 30% default
   const [selectedReceipt, setSelectedReceipt] = useState<Transaction | null>(null);
 
@@ -44,19 +49,46 @@ export function SmartTaxDashboard() {
     }).format(amount);
   };
 
+  const buildReceiptShareText = (receipt: Transaction) => {
+    const lines = [
+      "SmartTax Receipt",
+      `Reference: ${receipt.reference}`,
+      `Date: ${receipt.date}`,
+      `Transaction Type: ${receipt.type === "revenue" ? "Revenue" : "Expense"}`,
+      receipt.subCategory ? `Category: ${receipt.subCategory}` : null,
+      `Description: ${receipt.description}`,
+      `Subtotal: ${formatCurrency(receipt.amount)}`,
+      receipt.vatAmount !== undefined ? `VAT: ${formatCurrency(receipt.vatAmount)}` : null,
+      receipt.whtAmount && receipt.whtAmount > 0 ? `WHT: ${formatCurrency(receipt.whtAmount)}` : null,
+      `${receipt.type === "revenue" ? "Net Amount Received" : "Net Cash Outflow"}: ${formatCurrency(receipt.netAmount ?? receipt.amount)}`,
+    ];
+
+    return lines.filter(Boolean).join("\n");
+  };
+
   const handlePrint = () => {
-    window.print();
+    const node = document.getElementById('receipt-print-area');
+    if (!node || !selectedReceipt) return;
+    exportReceiptAsPDF(node, `receipt-${selectedReceipt.reference}.pdf`);
   };
 
-  const handleWhatsApp = (receipt: Transaction) => {
-    const text = `Receipt Reference: ${receipt.reference}%0AAmount: ${formatCurrency(receipt.amount)}%0ADate: ${receipt.date}%0ADescription: ${receipt.description}`;
-    window.open(`https://wa.me/?text=${text}`, "_blank");
+  const handleWhatsApp = () => {
+    if (!selectedReceipt) return;
+    const text = encodeURIComponent(buildReceiptShareText(selectedReceipt));
+    window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
   };
 
-  const handleEmail = (receipt: Transaction) => {
-    const subject = `Receipt - ${receipt.reference}`;
-    const body = `Receipt Reference: ${receipt.reference}%0AAmount: ${formatCurrency(receipt.amount)}%0ADate: ${receipt.date}%0ADescription: ${receipt.description}`;
-    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+  const handleEmail = () => {
+    if (!selectedReceipt) return;
+    const subject = encodeURIComponent(`Receipt - ${selectedReceipt.reference}`);
+    const body = encodeURIComponent(buildReceiptShareText(selectedReceipt));
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
+  };
+
+  const handlePDF = () => {
+    const node = document.getElementById('receipt-print-area');
+    if (!node) return;
+    exportReceiptAsPDF(node);
   };
 
   return (
@@ -157,13 +189,13 @@ export function SmartTaxDashboard() {
               <button onClick={handlePrint} className="flex items-center gap-2 px-3 py-2 bg-white border shadow-sm rounded-lg hover:bg-gray-50 text-sm font-medium">
                 <Printer className="w-4 h-4" /> Print
               </button>
-              <button onClick={handlePrint} className="flex items-center gap-2 px-3 py-2 bg-white border shadow-sm rounded-lg hover:bg-gray-50 text-sm font-medium">
+              <button onClick={handlePDF} className="flex items-center gap-2 px-3 py-2 bg-white border shadow-sm rounded-lg hover:bg-gray-50 text-sm font-medium">
                 <Download className="w-4 h-4" /> PDF
               </button>
-              <button onClick={() => handleWhatsApp(selectedReceipt)} className="flex items-center gap-2 px-3 py-2 bg-[#25D366] text-white shadow-sm rounded-lg hover:bg-[#128C7E] text-sm font-medium">
+              <button onClick={handleWhatsApp} className="flex items-center gap-2 px-3 py-2 bg-[#25D366] text-white shadow-sm rounded-lg hover:bg-[#128C7E] text-sm font-medium">
                 <Share2 className="w-4 h-4" /> WhatsApp
               </button>
-              <button onClick={() => handleEmail(selectedReceipt)} className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white shadow-sm rounded-lg hover:bg-blue-700 text-sm font-medium">
+              <button onClick={handleEmail} className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white shadow-sm rounded-lg hover:bg-blue-700 text-sm font-medium">
                 <Mail className="w-4 h-4" /> Email
               </button>
             </div>
@@ -186,16 +218,39 @@ export function SmartTaxDashboard() {
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="text-gray-500 text-sm">Transaction Type</span>
-                  <span className="font-medium text-gray-900 capitalize">{selectedReceipt.type}</span>
+                  <span className="font-medium text-gray-900 capitalize">
+                    {selectedReceipt.type === 'revenue' ? 'Revenue' : 'Expense'}
+                    {selectedReceipt.type === 'revenue' && selectedReceipt.subCategory ? (
+                      <span className="ml-2 text-xs text-blue-600">({selectedReceipt.subCategory})</span>
+                    ) : null}
+                  </span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="text-gray-500 text-sm">Description</span>
                   <span className="font-medium text-gray-900">{selectedReceipt.description}</span>
                 </div>
                 
-                <div className="mt-8 p-4 bg-gray-50 rounded-lg flex justify-between items-center print:bg-transparent print:border print:border-gray-200">
-                  <span className="font-semibold text-gray-700">Total Amount</span>
-                  <span className="text-2xl font-bold text-gray-900">{formatCurrency(selectedReceipt.amount)}</span>
+                <div className="mt-8 p-4 bg-gray-50 rounded-lg flex flex-col gap-2 print:bg-transparent print:border print:border-gray-200">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-gray-700">Subtotal</span>
+                    <span className="font-mono">{formatCurrency(selectedReceipt.amount)}</span>
+                  </div>
+                  {selectedReceipt.vatAmount !== undefined && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-700">VAT (7.5%)</span>
+                      <span className="font-mono">{formatCurrency(selectedReceipt.vatAmount)}</span>
+                    </div>
+                  )}
+                  {selectedReceipt.whtAmount !== undefined && selectedReceipt.whtAmount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-700">WHT (10%)</span>
+                      <span className="font-mono text-red-600">-{formatCurrency(selectedReceipt.whtAmount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t pt-2 mt-2">
+                    <span className="font-semibold text-gray-900">Net Payable</span>
+                    <span className="text-xl font-bold text-gray-900">{formatCurrency(selectedReceipt.netAmount ?? selectedReceipt.amount)}</span>
+                  </div>
                 </div>
               </div>
               

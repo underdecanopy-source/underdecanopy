@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { PageHeader, EmptyState } from '../_components/ui';
-import { useSmartTaxStore } from '../_lib/store';
+import { useState, type FormEvent } from 'react';
 import { Bell, Check, Plus, Trash2, X } from 'lucide-react';
+import { EmptyState, PageHeader } from '../_components/ui';
+import { useSmartTaxStore } from '../_lib/store';
 
 export default function RemindersPage() {
     const { state, hydrated, addReminder, toggleReminder, deleteReminder } = useSmartTaxStore();
     const [showForm, setShowForm] = useState(false);
     const [form, setForm] = useState({ title: '', description: '', dueDate: '' });
 
-    function handleSubmit(e: React.FormEvent) {
+    function handleSubmit(e: FormEvent) {
         e.preventDefault();
         if (!form.title || !form.dueDate) return;
         addReminder({
@@ -89,7 +89,7 @@ export default function RemindersPage() {
             )}
 
             {!hydrated ? (
-                <div className="bg-white rounded-lg border border-slate-200 p-8 text-slate-500">Loading…</div>
+                <div className="bg-white rounded-lg border border-slate-200 p-8 text-slate-500">Loading...</div>
             ) : sorted.length === 0 ? (
                 <EmptyState title="No reminders" description="Add a reminder to track your upcoming tax obligations." />
             ) : (
@@ -102,10 +102,10 @@ export default function RemindersPage() {
                         const borderColor = r.isCompleted
                             ? 'border-slate-200 opacity-60'
                             : overdue
-                            ? 'border-rose-300 bg-rose-50'
-                            : urgent
-                            ? 'border-orange-300 bg-orange-50'
-                            : 'border-slate-200';
+                              ? 'border-rose-300 bg-rose-50'
+                              : urgent
+                                ? 'border-orange-300 bg-orange-50'
+                                : 'border-slate-200';
                         return (
                             <li
                                 key={r.id}

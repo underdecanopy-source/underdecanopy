@@ -12,9 +12,13 @@ export interface Profile {
 
 export type CustomerType = 'individual' | 'corporate' | 'non-taxable';
 
+
 export interface Transaction {
     id: string;
     date: string;
+    type: 'expense' | 'revenue'; // Explicit classification
+    subCategory?: 'Sales' | 'Service Income' | string; // Subtype for revenue/expense
+    debitCreditFlag: 'debit' | 'credit';
     customerName: string;
     customerEmail?: string;
     customerPhone?: string;
@@ -28,6 +32,8 @@ export interface Transaction {
     netAmount: number;
     receiptId: string;
     category?: string;
+    taxYear: number;
+    creditNoteGenerated: boolean;
 }
 
 export interface Receipt {
@@ -36,7 +42,6 @@ export interface Receipt {
     transactionId: string;
     createdAt: string;
     sentViaEmail: boolean;
-    sentViaSms: boolean;
     sentViaWhatsApp: boolean;
 }
 

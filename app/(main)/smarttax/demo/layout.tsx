@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { DemoShell } from './_components/DemoShell';
 
 export const metadata = {
@@ -5,6 +6,6 @@ export const metadata = {
     description: 'Interactive demo of the SmartTax digital receipts and tax filing app for Nigerian businesses.',
 };
 
-export default function DemoLayout({ children }: { children: React.ReactNode }) {
+export default function DemoLayout({ children }: { children: ReactNode }) {
     return <DemoShell>{children}</DemoShell>;
 }

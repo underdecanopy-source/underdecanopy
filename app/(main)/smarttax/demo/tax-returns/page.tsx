@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { PageHeader, EmptyState } from '../_components/ui';
+import { CheckCircle2, FileText, Plus } from 'lucide-react';
+import { EmptyState, PageHeader } from '../_components/ui';
+import { filterTransactionsByPeriod, summarizeTransactions } from '../_lib/financials';
 import { useSmartTaxStore } from '../_lib/store';
 import { calculatePersonalIncomeTax, formatNaira } from '../_lib/taxCalculator';
-import { CheckCircle2, FileText, Plus } from 'lucide-react';
 
 type ReturnType = 'VAT' | 'PIT' | 'WHT' | 'CIT';
 
@@ -19,30 +20,27 @@ export default function TaxReturnsPage() {
 
     const summary = useMemo(() => {
         if (returnType === 'VAT' || returnType === 'WHT') {
-            const start = new Date(Number(year), Number(month) - 1, 1);
-            const end = new Date(Number(year), Number(month), 0, 23, 59, 59);
-            const txns = state.transactions.filter((t) => {
-                const d = new Date(t.date);
-                return d >= start && d <= end;
-            });
-            const totalSales = txns.reduce((s, t) => s + t.amount, 0);
-            const totalVat = txns.reduce((s, t) => s + t.vatAmount, 0);
-            const totalWht = txns.reduce((s, t) => s + t.whtAmount, 0);
+            const txns = filterTransactionsByPeriod(state.transactions, 'monthly', Number(year), Number(month) - 1).filter(
+                (transaction) => transaction.type === 'revenue'
+            );
+            const totals = summarizeTransactions(txns);
             return {
                 kind: 'period' as const,
                 period: `${year}-${month}`,
                 transactionCount: txns.length,
-                totalSales,
-                totalVat,
-                totalWht,
-                taxPayable: returnType === 'VAT' ? totalVat : totalWht,
+                totalRevenue: totals.revenue,
+                totalVat: totals.vatCollected,
+                totalWht: totals.whtCredits,
+                taxPayable: returnType === 'VAT' ? totals.vatCollected : totals.whtCredits,
                 dueDate: new Date(Number(year), Number(month), 21),
             };
         }
+
+        const yearTxns = filterTransactionsByPeriod(state.transactions, 'yearly', Number(year));
+        const yearlySummary = summarizeTransactions(yearTxns);
+
         if (returnType === 'PIT') {
-            const yearTxns = state.transactions.filter((t) => new Date(t.date).getFullYear() === Number(year));
-            const derivedIncome = yearTxns.reduce((s, t) => s + t.amount, 0);
-            const income = annualIncome ? parseFloat(annualIncome) : derivedIncome;
+            const income = annualIncome ? parseFloat(annualIncome) : yearlySummary.revenue;
             const pit = calculatePersonalIncomeTax(income);
             return {
                 kind: 'pit' as const,
@@ -54,24 +52,24 @@ export default function TaxReturnsPage() {
                 dueDate: new Date(Number(year) + 1, 2, 31),
             };
         }
-        const yearTxns = state.transactions.filter((t) => new Date(t.date).getFullYear() === Number(year));
-        const turnover = yearTxns.reduce((s, t) => s + t.amount, 0);
-        const cit = turnover * 0.3;
+
         return {
             kind: 'cit' as const,
             period: year,
-            turnover,
-            cit,
+            revenue: yearlySummary.revenue,
+            expenses: yearlySummary.expenses,
+            profitBeforeTax: yearlySummary.profitBeforeTax,
+            cit: yearlySummary.taxation,
             dueDate: new Date(Number(year) + 1, 5, 30),
         };
-    }, [returnType, year, month, state.transactions, annualIncome]);
+    }, [annualIncome, month, returnType, state.transactions, year]);
 
     function handleFile() {
         if (summary.kind === 'period') {
             addTaxReturn({
                 returnType,
                 filingPeriod: summary.period,
-                totalIncome: summary.totalSales,
+                totalIncome: summary.totalRevenue,
                 totalVatCollected: summary.totalVat,
                 totalWhtDeducted: summary.totalWht,
                 taxPayable: summary.taxPayable,
@@ -93,7 +91,7 @@ export default function TaxReturnsPage() {
             addTaxReturn({
                 returnType,
                 filingPeriod: summary.period,
-                totalIncome: summary.turnover,
+                totalIncome: summary.revenue,
                 totalVatCollected: 0,
                 totalWhtDeducted: 0,
                 taxPayable: summary.cit,
@@ -101,7 +99,7 @@ export default function TaxReturnsPage() {
                 filingDate: new Date().toISOString(),
             });
         }
-        setFiledMsg(`${returnType} return prepared and marked as filed. In production, SmartTax would submit this directly to NRS TaxPro-Max.`);
+        setFiledMsg(`${returnType} return prepared using the updated revenue and expense split.`);
         setTimeout(() => setFiledMsg(null), 6000);
     }
 
@@ -109,7 +107,7 @@ export default function TaxReturnsPage() {
         <>
             <PageHeader
                 title="Tax Returns"
-                description="Prepare VAT, Withholding Tax, Personal Income Tax, and Company Income Tax returns using the Nigerian Revenue Service 2025 reforms."
+                description="Prepare returns from revenue-only VAT and WHT data, plus profit-based annual tax calculations."
             />
 
             <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6">
@@ -119,8 +117,8 @@ export default function TaxReturnsPage() {
                         <span className="text-sm font-medium text-slate-700">Return Type</span>
                         <select
                             value={returnType}
-                            onChange={(e) => setReturnType(e.target.value as ReturnType)}
-                            className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onChange={(event) => setReturnType(event.target.value as ReturnType)}
+                            className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 bg-white"
                         >
                             <option value="VAT">VAT (Monthly)</option>
                             <option value="WHT">Withholding Tax (Monthly)</option>
@@ -133,8 +131,8 @@ export default function TaxReturnsPage() {
                         <input
                             type="number"
                             value={year}
-                            onChange={(e) => setYear(e.target.value)}
-                            className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onChange={(event) => setYear(event.target.value)}
+                            className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
                         />
                     </label>
                     {(returnType === 'VAT' || returnType === 'WHT') && (
@@ -142,12 +140,12 @@ export default function TaxReturnsPage() {
                             <span className="text-sm font-medium text-slate-700">Month</span>
                             <select
                                 value={month}
-                                onChange={(e) => setMonth(e.target.value)}
-                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onChange={(event) => setMonth(event.target.value)}
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 bg-white"
                             >
-                                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                                    <option key={m} value={String(m).padStart(2, '0')}>
-                                        {new Date(2024, m - 1).toLocaleString('en-NG', { month: 'long' })}
+                                {Array.from({ length: 12 }, (_, index) => (
+                                    <option key={index} value={String(index + 1).padStart(2, '0')}>
+                                        {new Date(2024, index).toLocaleString('en-NG', { month: 'long' })}
                                     </option>
                                 ))}
                             </select>
@@ -155,14 +153,14 @@ export default function TaxReturnsPage() {
                     )}
                     {returnType === 'PIT' && (
                         <label className="block md:col-span-2">
-                            <span className="text-sm font-medium text-slate-700">Annual Income (optional override)</span>
+                            <span className="text-sm font-medium text-slate-700">Annual Income Override</span>
                             <input
                                 type="number"
                                 step="0.01"
                                 value={annualIncome}
-                                onChange={(e) => setAnnualIncome(e.target.value)}
-                                placeholder="Leave blank to use transactions"
-                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onChange={(event) => setAnnualIncome(event.target.value)}
+                                placeholder="Leave blank to use revenue transactions"
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
                             />
                         </label>
                     )}
@@ -170,7 +168,7 @@ export default function TaxReturnsPage() {
             </div>
 
             {!hydrated ? (
-                <div className="bg-white rounded-lg border border-slate-200 p-8 text-slate-500">Loading…</div>
+                <div className="bg-white rounded-lg border border-slate-200 p-8 text-slate-500">Loading...</div>
             ) : (
                 <ReturnSummary returnType={returnType} summary={summary} onFile={handleFile} />
             )}
@@ -185,10 +183,7 @@ export default function TaxReturnsPage() {
             <div className="mt-8">
                 <h2 className="text-lg font-semibold text-slate-800 mb-3">Filed Returns</h2>
                 {state.taxReturns.length === 0 ? (
-                    <EmptyState
-                        title="No returns filed yet"
-                        description="Prepare and file a return above to see it here."
-                    />
+                    <EmptyState title="No returns filed yet" description="Prepare and file a return above to see it here." />
                 ) : (
                     <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
                         <table className="w-full text-sm">
@@ -203,21 +198,19 @@ export default function TaxReturnsPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {state.taxReturns.map((r) => (
-                                    <tr key={r.id} className="border-t border-slate-100">
-                                        <td className="px-5 py-3 font-semibold text-slate-800">{r.returnType}</td>
-                                        <td className="px-5 py-3 text-slate-600">{r.filingPeriod}</td>
-                                        <td className="px-5 py-3 text-right text-slate-700">{formatNaira(r.totalIncome)}</td>
-                                        <td className="px-5 py-3 text-right font-semibold text-slate-900">
-                                            {formatNaira(r.taxPayable)}
-                                        </td>
+                                {state.taxReturns.map((taxReturn) => (
+                                    <tr key={taxReturn.id} className="border-t border-slate-100">
+                                        <td className="px-5 py-3 font-semibold text-slate-800">{taxReturn.returnType}</td>
+                                        <td className="px-5 py-3 text-slate-600">{taxReturn.filingPeriod}</td>
+                                        <td className="px-5 py-3 text-right text-slate-700">{formatNaira(taxReturn.totalIncome)}</td>
+                                        <td className="px-5 py-3 text-right font-semibold text-slate-900">{formatNaira(taxReturn.taxPayable)}</td>
                                         <td className="px-5 py-3">
                                             <span className="inline-flex items-center gap-1 text-xs font-semibold bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                                                <CheckCircle2 className="h-3 w-3" /> {r.status}
+                                                <CheckCircle2 className="h-3 w-3" /> {taxReturn.status}
                                             </span>
                                         </td>
                                         <td className="px-5 py-3 text-xs text-slate-500">
-                                            {r.filingDate ? new Date(r.filingDate).toLocaleDateString('en-NG') : '—'}
+                                            {taxReturn.filingDate ? new Date(taxReturn.filingDate).toLocaleDateString('en-NG') : '-'}
                                         </td>
                                     </tr>
                                 ))}
@@ -241,7 +234,7 @@ function ReturnSummary({
               kind: 'period';
               period: string;
               transactionCount: number;
-              totalSales: number;
+              totalRevenue: number;
               totalVat: number;
               totalWht: number;
               taxPayable: number;
@@ -259,7 +252,9 @@ function ReturnSummary({
         | {
               kind: 'cit';
               period: string;
-              turnover: number;
+              revenue: number;
+              expenses: number;
+              profitBeforeTax: number;
               cit: number;
               dueDate: Date;
           };
@@ -269,15 +264,15 @@ function ReturnSummary({
         <div className="bg-white border border-slate-200 rounded-lg p-6">
             <div className="flex items-center gap-2 mb-4">
                 <FileText className="h-5 w-5 text-blue-600" />
-                <h2 className="font-semibold text-slate-800">{returnType} Return — {summary.period}</h2>
+                <h2 className="font-semibold text-slate-800">{returnType} Return - {summary.period}</h2>
             </div>
 
             {summary.kind === 'period' && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <Stat label="Transactions" value={String(summary.transactionCount)} />
-                    <Stat label="Total Sales" value={formatNaira(summary.totalSales)} />
+                    <Stat label="Revenue Transactions" value={String(summary.transactionCount)} />
+                    <Stat label="Total Revenue" value={formatNaira(summary.totalRevenue)} />
                     <Stat label="VAT Collected" value={formatNaira(summary.totalVat)} tone="orange" />
-                    <Stat label="WHT Deducted" value={formatNaira(summary.totalWht)} tone="rose" />
+                    <Stat label="WHT Credits" value={formatNaira(summary.totalWht)} tone="rose" />
                 </div>
             )}
 
@@ -290,16 +285,12 @@ function ReturnSummary({
                     </div>
                     {summary.bracketBreakdown.length > 0 && (
                         <div className="border border-slate-200 rounded-md p-4 bg-slate-50">
-                            <p className="text-xs font-semibold uppercase text-slate-500 mb-2">
-                                Bracket Breakdown (2025 PIT reform)
-                            </p>
+                            <p className="text-xs font-semibold uppercase text-slate-500 mb-2">Bracket Breakdown</p>
                             <ul className="space-y-1 text-sm">
-                                {summary.bracketBreakdown.map((b, i) => (
-                                    <li key={i} className="flex justify-between">
-                                        <span className="text-slate-700">
-                                            {b.label} — taxed {formatNaira(b.taxedAmount)}
-                                        </span>
-                                        <span className="font-semibold text-slate-900">{formatNaira(b.tax)}</span>
+                                {summary.bracketBreakdown.map((item, index) => (
+                                    <li key={index} className="flex justify-between">
+                                        <span className="text-slate-700">{item.label} - taxed {formatNaira(item.taxedAmount)}</span>
+                                        <span className="font-semibold text-slate-900">{formatNaira(item.tax)}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -309,8 +300,10 @@ function ReturnSummary({
             )}
 
             {summary.kind === 'cit' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <Stat label="Annual Turnover" value={formatNaira(summary.turnover)} />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <Stat label="Revenue" value={formatNaira(summary.revenue)} />
+                    <Stat label="Expenses" value={formatNaira(summary.expenses)} />
+                    <Stat label="Profit Before Tax" value={formatNaira(summary.profitBeforeTax)} />
                     <Stat label="Estimated CIT (30%)" value={formatNaira(summary.cit)} tone="orange" />
                 </div>
             )}
@@ -320,11 +313,8 @@ function ReturnSummary({
                     <span className="font-medium">Due: </span>
                     {summary.dueDate.toLocaleDateString('en-NG', { dateStyle: 'medium' })}
                 </div>
-                <button
-                    onClick={onFile}
-                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700"
-                >
-                    <Plus className="h-4 w-4" /> Prepare &amp; File Return
+                <button onClick={onFile} className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700">
+                    <Plus className="h-4 w-4" /> Prepare and File Return
                 </button>
             </div>
         </div>

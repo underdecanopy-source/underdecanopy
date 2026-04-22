@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { PageHeader } from '../_components/ui';
 import { useSmartTaxStore } from '../_lib/store';
 import type { Profile } from '../_lib/types';
@@ -22,7 +22,7 @@ export default function SettingsPage() {
         if (hydrated) setForm(state.profile);
     }, [hydrated, state.profile]);
 
-    function handleSave(e: React.FormEvent) {
+    function handleSave(e: FormEvent) {
         e.preventDefault();
         updateProfile(form);
         setSaved(true);
