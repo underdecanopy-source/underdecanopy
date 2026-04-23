@@ -4,7 +4,12 @@ import { getTransactionLabel } from './financials';
 
 function cloneDocumentHead(): string {
     const nodes = Array.from(document.head.querySelectorAll('style, link[rel="stylesheet"]'));
-    return nodes.map((node) => node.outerHTML).join('\n');
+    const stylesHtml = nodes.map((node) => node.outerHTML).join('\n');
+    
+    // Include Tailwind CSS from CDN as fallback for styling
+    const tailwindCDN = '<link href="https://cdn.tailwindcss.com" rel="stylesheet">';
+    
+    return `${stylesHtml}\n${tailwindCDN}`;
 }
 
 export function openReceiptDocument(receiptNode: HTMLElement, title: string, autoPrint = false) {

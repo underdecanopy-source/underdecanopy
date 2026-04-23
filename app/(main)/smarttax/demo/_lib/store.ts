@@ -109,6 +109,7 @@ export function loadState(): SmartTaxState {
                             : migratedWhtAmount > 0
                         : false,
                 vatAmount: migratedVatAmount,
+                whtAmount: migratedWhtAmount,
                 whtPercentage: transaction.amount > 0 ? (migratedWhtAmount / transaction.amount) * 100 : 0,
                 netAmount:
                     type === 'expense'
@@ -281,7 +282,7 @@ export function useSmartTaxStore() {
                 customerName: string;
                 customerEmail?: string;
                 customerPhone?: string;
-                customerType: 'individual' | 'corporate' | 'non-taxable';
+                customerType: 'individual' | 'company' | 'government' | 'ngo' | 'partnership' | 'foreign-entity';
                 description: string;
                 amount: number;
                 vatable: boolean;
@@ -312,7 +313,7 @@ export function useSmartTaxStore() {
                     customerName: 'Lagos Tech Hub Ltd',
                     customerEmail: 'accounts@lagostechhub.com',
                     customerPhone: '+234 701 555 8899',
-                    customerType: 'corporate',
+                    customerType: 'company',
                     description: 'Quarterly retainer for IT advisory',
                     amount: 1250000,
                     vatable: true,
@@ -326,7 +327,7 @@ export function useSmartTaxStore() {
                     customerName: 'St. Peter Primary School',
                     customerEmail: 'bursar@stpeter.edu.ng',
                     customerPhone: '+234 806 222 7788',
-                    customerType: 'non-taxable',
+                    customerType: 'government',
                     description: 'Educational textbooks for pre-primary set',
                     amount: 185000,
                     vatable: false,
@@ -339,7 +340,7 @@ export function useSmartTaxStore() {
                     subCategory: 'Sales',
                     customerName: 'Adebayo Farms',
                     customerEmail: 'info@adebayofarms.ng',
-                    customerType: 'non-taxable',
+                    customerType: 'partnership',
                     description: 'Basic food items supply',
                     amount: 420000,
                     vatable: false,
@@ -352,7 +353,7 @@ export function useSmartTaxStore() {
                     customerName: 'Kano Logistics PLC',
                     customerEmail: 'finance@kanologistics.com',
                     customerPhone: '+234 802 009 1122',
-                    customerType: 'corporate',
+                    customerType: 'company',
                     description: 'Warehouse rent for March',
                     amount: 2000000,
                     vatable: false,
@@ -365,7 +366,7 @@ export function useSmartTaxStore() {
                     type: 'expense',
                     customerName: 'Eko Power Distribution',
                     customerPhone: '+234 815 444 3322',
-                    customerType: 'corporate',
+                    customerType: 'company',
                     description: 'Electricity and backup fuel',
                     amount: 320000,
                     vatable: false,
@@ -379,7 +380,7 @@ export function useSmartTaxStore() {
                     subCategory: 'Service Income',
                     customerName: 'Abuja Fintech Ltd',
                     customerEmail: 'ops@abujafintech.ng',
-                    customerType: 'corporate',
+                    customerType: 'foreign-entity',
                     description: 'Software licence renewal',
                     amount: 980000,
                     vatable: true,
@@ -421,6 +422,7 @@ export function useSmartTaxStore() {
                     vatable: sample.vatable,
                     whtApplicable: sample.whtApplicable,
                     vatAmount: calc.vatAmount,
+                    whtAmount: calc.whtAmount,
                     whtPercentage: sample.whtPercentage ?? 0,
                     netAmount: calc.netAmount,
                     category: sample.category,

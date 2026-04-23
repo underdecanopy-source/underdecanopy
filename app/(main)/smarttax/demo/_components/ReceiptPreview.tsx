@@ -9,14 +9,15 @@ export interface PreviewData {
     customerName: string;
     customerEmail?: string;
     customerPhone?: string;
-    customerType: 'individual' | 'corporate' | 'non-taxable';
+    customerType: Transaction['customerType'];
     description: string;
     category?: string;
     amount: number;
     vatable: boolean;
     whtApplicable: boolean;
     vatAmount: number;
-    whtPercentage: number;
+    whtAmount?: number;
+    whtPercentage?: number;
     netAmount: number;
     receiptNumber?: string;
     createdAt?: string;
@@ -37,7 +38,6 @@ export function ReceiptPreview({
     variant?: 'live' | 'final';
     id?: string;
 }) {
-    const isNonTaxable = data.customerType === 'non-taxable';
     const isLive = variant === 'live';
     const isRevenue = data.transactionType === 'revenue';
     const dateLabel = data.createdAt
@@ -48,7 +48,7 @@ export function ReceiptPreview({
         subCategory: data.subCategory,
         category: data.category,
     });
-    const whtAmount = data.amount * (data.whtPercentage / 100);
+    const whtAmount = data.whtAmount ?? data.amount * ((data.whtPercentage ?? 0) / 100);
 
     return (
         <div id={id} className="bg-white border border-slate-200 rounded-lg p-5 md:p-6 print:border-0 print:shadow-none">
@@ -120,12 +120,6 @@ export function ReceiptPreview({
                 </div>
             </div>
 
-            {isNonTaxable && (
-                <div className="mb-3 rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-xs text-emerald-900">
-                    <strong>NO VAT and WHT supply.</strong> VAT and WHT are not applied for exempt goods or services.
-                </div>
-            )}
-
             <table className="w-full text-sm mb-3">
                 <thead>
                     <tr className="border-b border-slate-200">
@@ -166,7 +160,9 @@ export function ReceiptPreview({
 
             {!isRevenue && data.whtApplicable && (
                 <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800">
-                    <strong>WHT Credit Note:</strong> Since {formatNaira(whtAmount)} has been withheld, we promise to remit this amount to the relevant tax authority. Kindly accept this Withholding Tax Credit Note from us as evidence of tax paid on your behalf.
+                    <strong>WHT Credit Note:</strong> Since {formatNaira(whtAmount)} has been withheld, we promise to
+                    remit this amount to the relevant tax authority. Kindly accept this Withholding Tax Credit Note
+                    from us as evidence of tax paid on your behalf.
                 </div>
             )}
 

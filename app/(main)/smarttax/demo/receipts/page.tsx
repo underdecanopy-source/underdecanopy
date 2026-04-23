@@ -134,6 +134,7 @@ function ReceiptsInner() {
                                     whtApplicable: selected.txn.whtApplicable,
                                     vatAmount: selected.txn.vatAmount,
                                     whtAmount: selected.txn.whtAmount,
+                                    whtPercentage: selected.txn.whtPercentage,
                                     netAmount: selected.txn.netAmount,
                                     receiptNumber: selected.receipt.receiptNumber,
                                     createdAt: selected.receipt.createdAt,

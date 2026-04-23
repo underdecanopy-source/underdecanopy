@@ -32,6 +32,7 @@ export interface Transaction {
     vatable: boolean;
     whtApplicable: boolean;
     vatAmount: number;
+    whtAmount: number;
     whtPercentage: number;
     netAmount: number;
     receiptId: string;

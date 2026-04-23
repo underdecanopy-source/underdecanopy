@@ -48,9 +48,8 @@ export default function TransactionsPage() {
 
     const hasVatNumber = !!state.profile.vatNumber;
     const isRevenue = form.type === 'revenue';
-    const isNonTaxable = form.customerType === 'non-taxable';
-    const effectiveVatable = isRevenue && hasVatNumber && !isNonTaxable ? form.vatable : false;
-    const effectiveWht = !isRevenue && !isNonTaxable ? form.whtApplicable : false;
+    const effectiveVatable = isRevenue && hasVatNumber ? form.vatable : false;
+    const effectiveWht = !isRevenue ? form.whtApplicable : false;
     const amountNumber = parseAmountInput(form.amountFormatted);
     const hasInvalidWht = effectiveWht && form.whtPercentage > 100;
     const categories = isRevenue ? REVENUE_CATEGORIES : EXPENSE_CATEGORIES;
@@ -124,6 +123,7 @@ export default function TransactionsPage() {
             whtApplicable: effectiveWht,
             vatAmount: calc.vatAmount,
             whtAmount: calc.whtAmount,
+            whtPercentage: form.whtPercentage,
             netAmount: calc.netAmount,
             category: form.category,
             taxYear: new Date().getFullYear(),
@@ -341,24 +341,17 @@ export default function TransactionsPage() {
                                         <label
                                             className={`flex items-start gap-3 border rounded-md p-3 transition ${
                                                 effectiveVatable ? 'border-orange-300 bg-orange-50' : 'border-slate-200 bg-slate-50'
-                                            } ${!isRevenue || isNonTaxable || !hasVatNumber ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                            } ${!hasVatNumber ? 'opacity-60 cursor-not-allowed' : ''}`}
                                         >
                                             <input
                                                 type="checkbox"
                                                 checked={effectiveVatable}
-                                                disabled={!isRevenue || isNonTaxable || !hasVatNumber}
+                                                disabled={!hasVatNumber}
                                                 onChange={(event) => setForm((current) => ({ ...current, vatable: event.target.checked }))}
                                                 className="mt-0.5 h-4 w-4 accent-orange-600"
                                             />
                                             <span className="text-sm">
                                                 <span className="font-semibold text-slate-800 block">Apply VAT (7.5%)</span>
-                                                <span className="text-xs text-slate-500">
-                                                    {!isRevenue
-                                                        ? 'VAT is only available on credit-side transactions in this demo.'
-                                                        : !hasVatNumber
-                                                        ? 'No VAT registration number found in profile settings.'
-                                                        : 'Recorded as a VAT tax credit for the transaction.'}
-                                                </span>
                                             </span>
                                         </label>
                                     )}
@@ -367,12 +360,11 @@ export default function TransactionsPage() {
                                         <label
                                             className={`flex items-start gap-3 border rounded-md p-3 transition ${
                                                 effectiveWht ? 'border-rose-300 bg-rose-50' : 'border-slate-200 bg-slate-50'
-                                            } ${isRevenue || isNonTaxable ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                            }`}
                                         >
                                             <input
                                                 type="checkbox"
                                                 checked={effectiveWht}
-                                                disabled={isRevenue || isNonTaxable}
                                                 onChange={(event) =>
                                                     setForm((current) => ({
                                                         ...current,
@@ -384,11 +376,6 @@ export default function TransactionsPage() {
                                             />
                                             <span className="text-sm">
                                                 <span className="font-semibold text-slate-800 block">Apply WHT</span>
-                                                <span className="text-xs text-slate-500">
-                                                    {isRevenue
-                                                        ? 'Only the payer can remove WHT on debit transactions and issue a credit note.'
-                                                        : 'Use only when money is leaving your account and you are withholding at source.'}
-                                                </span>
                                             </span>
                                         </label>
                                     )}
@@ -458,6 +445,7 @@ export default function TransactionsPage() {
                                     vatable: effectiveVatable,
                                     whtApplicable: effectiveWht,
                                     vatAmount: preview.vatAmount,
+                                    whtAmount: preview.whtAmount,
                                     whtPercentage: form.whtPercentage,
                                     netAmount: preview.netAmount,
                                     transactionType: form.type,

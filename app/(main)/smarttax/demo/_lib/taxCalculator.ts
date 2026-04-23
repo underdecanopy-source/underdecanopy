@@ -1,3 +1,5 @@
+import type { CustomerType } from './types';
+
 export const VAT_RATE = 0.075;
 export const VAT_THRESHOLD = 25_000_000;
 
@@ -22,8 +24,6 @@ export const PIT_BRACKETS = [
     { min: 3_200_001, max: Infinity, rate: 0.24, label: '24% above ₦3,200,000' },
 ] as const;
 
-export type CustomerType = 'individual' | 'corporate' | 'non-taxable';
-
 export interface TaxCalculationResult {
     vatAmount: number;
     whtAmount: number;
@@ -45,10 +45,9 @@ export function calculateTransactionTax(input: TaxCalculationInput | number, leg
     const opts: TaxCalculationInput = typeof input === 'number' ? { amount: input, customerType: legacyCustomerType } : input;
     const amount = opts.amount;
     const customerType: CustomerType = opts.customerType ?? 'individual';
-    const nonTaxable = customerType === 'non-taxable';
     const transactionType = opts.transactionType ?? 'revenue';
-    const vatable = transactionType === 'revenue' && !nonTaxable ? opts.vatable ?? true : false;
-    const whtApplicable = transactionType === 'expense' && !nonTaxable ? opts.whtApplicable ?? false : false;
+    const vatable = transactionType === 'revenue' ? opts.vatable ?? true : false;
+    const whtApplicable = transactionType === 'expense' ? opts.whtApplicable ?? false : false;
 
     const vatAmount = vatable ? amount * VAT_RATE : 0;
     const whtPercentage = opts.whtPercentage ?? 0;
