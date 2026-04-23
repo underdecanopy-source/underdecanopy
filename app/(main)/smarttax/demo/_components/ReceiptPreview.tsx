@@ -43,6 +43,11 @@ export function ReceiptPreview({
     const dateLabel = data.createdAt
         ? new Date(data.createdAt).toLocaleString('en-NG')
         : new Date().toLocaleString('en-NG');
+    const transactionLabel = getTransactionLabel({
+        type: data.transactionType,
+        subCategory: data.subCategory,
+        category: data.category,
+    });
     const whtAmount = data.amount * (data.whtPercentage / 100);
 
     return (
