@@ -14,7 +14,7 @@ export interface TaxSettings {
     profitTaxRatePercent: number;
 }
 
-export type CustomerType = 'individual' | 'corporate' | 'non-taxable';
+export type CustomerType = 'individual' | 'company' | 'government' | 'ngo' | 'partnership' | 'foreign-entity';
 
 
 export interface Transaction {
@@ -32,7 +32,7 @@ export interface Transaction {
     vatable: boolean;
     whtApplicable: boolean;
     vatAmount: number;
-    whtAmount: number;
+    whtPercentage: number;
     netAmount: number;
     receiptId: string;
     category?: string;

@@ -36,7 +36,7 @@ export interface TaxCalculationInput {
     customerType?: CustomerType;
     vatable?: boolean;
     whtApplicable?: boolean;
-    whtAmount?: number;
+    whtPercentage?: number;
     category?: string;
     transactionType?: 'expense' | 'revenue';
 }
@@ -51,8 +51,8 @@ export function calculateTransactionTax(input: TaxCalculationInput | number, leg
     const whtApplicable = transactionType === 'expense' && !nonTaxable ? opts.whtApplicable ?? false : false;
 
     const vatAmount = vatable ? amount * VAT_RATE : 0;
-    const requestedWht = Math.max(0, opts.whtAmount ?? 0);
-    const whtAmount = whtApplicable ? Math.min(requestedWht, amount) : 0;
+    const whtPercentage = opts.whtPercentage ?? 0;
+    const whtAmount = whtApplicable ? amount * (whtPercentage / 100) : 0;
     const netAmount = transactionType === 'expense' ? amount - whtAmount : amount + vatAmount;
 
     return {

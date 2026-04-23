@@ -109,7 +109,7 @@ export function loadState(): SmartTaxState {
                             : migratedWhtAmount > 0
                         : false,
                 vatAmount: migratedVatAmount,
-                whtAmount: migratedWhtAmount,
+                whtPercentage: transaction.amount > 0 ? (migratedWhtAmount / transaction.amount) * 100 : 0,
                 netAmount:
                     type === 'expense'
                         ? Math.max(0, transaction.amount - migratedWhtAmount)
@@ -286,7 +286,7 @@ export function useSmartTaxStore() {
                 amount: number;
                 vatable: boolean;
                 whtApplicable: boolean;
-                whtAmount?: number;
+                whtPercentage?: number;
                 category: string;
                 daysBack: number;
             };
@@ -357,7 +357,7 @@ export function useSmartTaxStore() {
                     amount: 2000000,
                     vatable: false,
                     whtApplicable: true,
-                    whtAmount: 200000,
+                    whtPercentage: 10,
                     category: 'Rent',
                     daysBack: 18,
                 },
@@ -370,7 +370,7 @@ export function useSmartTaxStore() {
                     amount: 320000,
                     vatable: false,
                     whtApplicable: true,
-                    whtAmount: 16000,
+                    whtPercentage: 5,
                     category: 'Utilities',
                     daysBack: 24,
                 },
@@ -399,7 +399,7 @@ export function useSmartTaxStore() {
                     customerType: sample.customerType,
                     vatable: sample.vatable,
                     whtApplicable: sample.whtApplicable,
-                    whtAmount: sample.whtAmount,
+                    whtPercentage: sample.whtPercentage,
                     category: sample.category,
                     transactionType: sample.type,
                 });
@@ -421,7 +421,7 @@ export function useSmartTaxStore() {
                     vatable: sample.vatable,
                     whtApplicable: sample.whtApplicable,
                     vatAmount: calc.vatAmount,
-                    whtAmount: calc.whtAmount,
+                    whtPercentage: sample.whtPercentage ?? 0,
                     netAmount: calc.netAmount,
                     category: sample.category,
                     taxYear: new Date(date).getFullYear(),

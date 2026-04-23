@@ -40,7 +40,7 @@ export default function TransactionsPage() {
         customerType: 'individual' as CustomerType,
         description: '',
         amountFormatted: '',
-        whtAmountFormatted: '',
+        whtPercentage: 0,
         category: 'Sales',
         vatable: true,
         whtApplicable: false,
@@ -52,8 +52,7 @@ export default function TransactionsPage() {
     const effectiveVatable = isRevenue && hasVatNumber && !isNonTaxable ? form.vatable : false;
     const effectiveWht = !isRevenue && !isNonTaxable ? form.whtApplicable : false;
     const amountNumber = parseAmountInput(form.amountFormatted);
-    const whtAmountNumber = parseAmountInput(form.whtAmountFormatted);
-    const hasInvalidWht = effectiveWht && whtAmountNumber > amountNumber;
+    const hasInvalidWht = effectiveWht && form.whtPercentage > 100;
     const categories = isRevenue ? REVENUE_CATEGORIES : EXPENSE_CATEGORIES;
 
     const preview = useMemo(() => {
@@ -65,11 +64,11 @@ export default function TransactionsPage() {
             customerType: form.customerType,
             vatable: effectiveVatable,
             whtApplicable: effectiveWht,
-            whtAmount: whtAmountNumber,
+            whtPercentage: form.whtPercentage,
             category: form.category,
             transactionType: form.type,
         });
-    }, [amountNumber, form.category, form.customerType, form.type, effectiveVatable, effectiveWht, whtAmountNumber]);
+    }, [amountNumber, form.category, form.customerType, form.type, effectiveVatable, effectiveWht, form.whtPercentage]);
 
     function handleAmountChange(raw: string) {
         setForm((current) => ({ ...current, amountFormatted: formatAmountInput(raw) }));
@@ -83,7 +82,7 @@ export default function TransactionsPage() {
             category: type === 'revenue' ? 'Sales' : 'Rent',
             vatable: type === 'revenue',
             whtApplicable: false,
-            whtAmountFormatted: '',
+            whtPercentage: 0,
         }));
     }
 
@@ -91,9 +90,9 @@ export default function TransactionsPage() {
         setForm((current) => ({
             ...current,
             customerType: next,
-            vatable: current.type === 'revenue' && next !== 'non-taxable' ? current.vatable : false,
-            whtApplicable: current.type === 'expense' && next !== 'non-taxable' ? current.whtApplicable : false,
-            whtAmountFormatted: next === 'non-taxable' ? '' : current.whtAmountFormatted,
+            vatable: current.type === 'revenue' ? current.vatable : false,
+            whtApplicable: current.type === 'expense' ? current.whtApplicable : false,
+            whtPercentage: 0,
         }));
     }
 
@@ -106,7 +105,7 @@ export default function TransactionsPage() {
             customerType: form.customerType,
             vatable: effectiveVatable,
             whtApplicable: effectiveWht,
-            whtAmount: whtAmountNumber,
+            whtPercentage: form.whtPercentage,
             category: form.category,
             transactionType: form.type,
         });
@@ -140,7 +139,7 @@ export default function TransactionsPage() {
             customerType: 'individual',
             description: '',
             amountFormatted: '',
-            whtAmountFormatted: '',
+            whtPercentage: 0,
             category: 'Sales',
             vatable: true,
             whtApplicable: false,
@@ -233,8 +232,11 @@ export default function TransactionsPage() {
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                 >
                                     <option value="individual">Individual</option>
-                                    <option value="corporate">Corporate</option>
-                                    <option value="non-taxable">NO VAT and WHT</option>
+                                    <option value="company">Company</option>
+                                    <option value="government">Government</option>
+                                    <option value="ngo">NGO</option>
+                                    <option value="partnership">Partnership</option>
+                                    <option value="foreign-entity">Foreign Entity</option>
                                 </select>
                             </label>
 
@@ -258,6 +260,21 @@ export default function TransactionsPage() {
                                     className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="+234 800 000 0000"
                                 />
+                            </label>
+
+                            <label className="block">
+                                <span className="text-sm font-medium text-slate-700">Category</span>
+                                <select
+                                    value={form.category}
+                                    onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
+                                    className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                >
+                                    {categories.map((category) => (
+                                        <option key={category} value={category}>
+                                            {category}
+                                        </option>
+                                    ))}
+                                </select>
                             </label>
 
                             <label className="block md:col-span-2">
@@ -289,101 +306,92 @@ export default function TransactionsPage() {
 
                             {!isRevenue && (
                                 <label className="block">
-                                    <span className="text-sm font-medium text-slate-700">WHT Deducted (NGN)</span>
+                                    <span className="text-sm font-medium text-slate-700">WHT Deducted (%)</span>
                                     <input
-                                        type="text"
-                                        inputMode="decimal"
-                                        value={form.whtAmountFormatted}
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        value={form.whtPercentage}
                                         onChange={(event) =>
                                             setForm((current) => ({
                                                 ...current,
-                                                whtAmountFormatted: formatAmountInput(event.target.value),
-                                                whtApplicable: parseAmountInput(event.target.value) > 0,
+                                                whtPercentage: Number(event.target.value) || 0,
+                                                whtApplicable: (Number(event.target.value) || 0) > 0,
                                             }))
                                         }
                                         className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="0.00"
                                     />
                                     <p className="mt-1 text-xs text-slate-500">
-                                        Enter the amount withheld by the payer. Net cash outflow is calculated automatically.
+                                        Enter the percentage of the WHT to be withheld.
                                     </p>
                                     {hasInvalidWht && (
                                         <p className="mt-1 text-xs font-medium text-rose-700">
-                                            WHT deducted cannot be greater than the gross amount.
+                                            WHT percentage cannot exceed 100%.
                                         </p>
                                     )}
                                 </label>
                             )}
 
-                            <label className="block">
-                                <span className="text-sm font-medium text-slate-700">Category</span>
-                                <select
-                                    value={form.category}
-                                    onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
-                                    className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                                >
-                                    {categories.map((category) => (
-                                        <option key={category} value={category}>
-                                            {category}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-
                             <fieldset className="md:col-span-2 border border-slate-200 rounded-lg p-4">
                                 <legend className="px-2 text-sm font-semibold text-slate-700">Tax Applicability</legend>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <label
-                                        className={`flex items-start gap-3 border rounded-md p-3 transition ${
-                                            effectiveVatable ? 'border-orange-300 bg-orange-50' : 'border-slate-200 bg-slate-50'
-                                        } ${!isRevenue || isNonTaxable || !hasVatNumber ? 'opacity-60 cursor-not-allowed' : ''}`}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={effectiveVatable}
-                                            disabled={!isRevenue || isNonTaxable || !hasVatNumber}
-                                            onChange={(event) => setForm((current) => ({ ...current, vatable: event.target.checked }))}
-                                            className="mt-0.5 h-4 w-4 accent-orange-600"
-                                        />
-                                        <span className="text-sm">
-                                            <span className="font-semibold text-slate-800 block">Apply VAT (7.5%)</span>
-                                            <span className="text-xs text-slate-500">
-                                                {!isRevenue
-                                                    ? 'VAT is only available on credit-side transactions in this demo.'
-                                                    : !hasVatNumber
-                                                    ? 'No VAT registration number found in profile settings.'
-                                                    : 'Recorded as a VAT tax credit for the transaction.'}
+                                    {isRevenue && (
+                                        <label
+                                            className={`flex items-start gap-3 border rounded-md p-3 transition ${
+                                                effectiveVatable ? 'border-orange-300 bg-orange-50' : 'border-slate-200 bg-slate-50'
+                                            } ${!isRevenue || isNonTaxable || !hasVatNumber ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={effectiveVatable}
+                                                disabled={!isRevenue || isNonTaxable || !hasVatNumber}
+                                                onChange={(event) => setForm((current) => ({ ...current, vatable: event.target.checked }))}
+                                                className="mt-0.5 h-4 w-4 accent-orange-600"
+                                            />
+                                            <span className="text-sm">
+                                                <span className="font-semibold text-slate-800 block">Apply VAT (7.5%)</span>
+                                                <span className="text-xs text-slate-500">
+                                                    {!isRevenue
+                                                        ? 'VAT is only available on credit-side transactions in this demo.'
+                                                        : !hasVatNumber
+                                                        ? 'No VAT registration number found in profile settings.'
+                                                        : 'Recorded as a VAT tax credit for the transaction.'}
+                                                </span>
                                             </span>
-                                        </span>
-                                    </label>
+                                        </label>
+                                    )}
 
-                                    <label
-                                        className={`flex items-start gap-3 border rounded-md p-3 transition ${
-                                            effectiveWht ? 'border-rose-300 bg-rose-50' : 'border-slate-200 bg-slate-50'
-                                        } ${isRevenue || isNonTaxable ? 'opacity-60 cursor-not-allowed' : ''}`}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={effectiveWht}
-                                            disabled={isRevenue || isNonTaxable}
-                                            onChange={(event) =>
-                                                setForm((current) => ({
-                                                    ...current,
-                                                    whtApplicable: event.target.checked,
-                                                    whtAmountFormatted: event.target.checked ? current.whtAmountFormatted : '',
-                                                }))
-                                            }
-                                            className="mt-0.5 h-4 w-4 accent-rose-600"
-                                        />
-                                        <span className="text-sm">
-                                            <span className="font-semibold text-slate-800 block">Apply Debit-Side WHT</span>
-                                            <span className="text-xs text-slate-500">
-                                                {isRevenue
-                                                    ? 'Only the payer can remove WHT on debit transactions and issue a credit note.'
-                                                    : 'Use only when money is leaving your account and you are withholding at source.'}
+                                    {!isRevenue && (
+                                        <label
+                                            className={`flex items-start gap-3 border rounded-md p-3 transition ${
+                                                effectiveWht ? 'border-rose-300 bg-rose-50' : 'border-slate-200 bg-slate-50'
+                                            } ${isRevenue || isNonTaxable ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={effectiveWht}
+                                                disabled={isRevenue || isNonTaxable}
+                                                onChange={(event) =>
+                                                    setForm((current) => ({
+                                                        ...current,
+                                                        whtApplicable: event.target.checked,
+                                                        whtPercentage: event.target.checked ? current.whtPercentage : 0,
+                                                    }))
+                                                }
+                                                className="mt-0.5 h-4 w-4 accent-rose-600"
+                                            />
+                                            <span className="text-sm">
+                                                <span className="font-semibold text-slate-800 block">Apply WHT</span>
+                                                <span className="text-xs text-slate-500">
+                                                    {isRevenue
+                                                        ? 'Only the payer can remove WHT on debit transactions and issue a credit note.'
+                                                        : 'Use only when money is leaving your account and you are withholding at source.'}
+                                                </span>
                                             </span>
-                                        </span>
-                                    </label>
+                                        </label>
+                                    )}
                                 </div>
                             </fieldset>
 
@@ -450,12 +458,12 @@ export default function TransactionsPage() {
                                     vatable: effectiveVatable,
                                     whtApplicable: effectiveWht,
                                     vatAmount: preview.vatAmount,
-                                    whtAmount: preview.whtAmount,
+                                    whtPercentage: form.whtPercentage,
                                     netAmount: preview.netAmount,
                                     transactionType: form.type,
                                     subCategory: form.subCategory,
                                     debitCreditFlag: getDebitCreditLabel(form.type),
-                                    creditNoteGenerated: !isRevenue && preview.whtAmount > 0,
+                                    creditNoteGenerated: !isRevenue && effectiveWht,
                                 }}
                             />
                         </div>

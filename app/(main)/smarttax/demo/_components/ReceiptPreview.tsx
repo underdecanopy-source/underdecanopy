@@ -16,7 +16,7 @@ export interface PreviewData {
     vatable: boolean;
     whtApplicable: boolean;
     vatAmount: number;
-    whtAmount: number;
+    whtPercentage: number;
     netAmount: number;
     receiptNumber?: string;
     createdAt?: string;
@@ -43,11 +43,7 @@ export function ReceiptPreview({
     const dateLabel = data.createdAt
         ? new Date(data.createdAt).toLocaleString('en-NG')
         : new Date().toLocaleString('en-NG');
-    const transactionLabel = getTransactionLabel({
-        type: data.transactionType,
-        subCategory: data.subCategory,
-        category: data.category,
-    });
+    const whtAmount = data.amount * (data.whtPercentage / 100);
 
     return (
         <div id={id} className="bg-white border border-slate-200 rounded-lg p-5 md:p-6 print:border-0 print:shadow-none">
@@ -154,7 +150,7 @@ export function ReceiptPreview({
                 <div className="flex justify-between text-slate-600">
                     <span className={data.whtApplicable ? '' : 'line-through opacity-60'}>WHT Tax Credit</span>
                     <span className={data.whtApplicable ? 'text-rose-700' : 'text-slate-400'}>
-                        {data.whtApplicable ? `- ${formatNaira(data.whtAmount)}` : 'Not deducted'}
+                        {data.whtApplicable ? `- ${formatNaira(whtAmount)}` : 'Not deducted'}
                     </span>
                 </div>
                 <div className="flex justify-between text-base md:text-lg font-bold text-slate-900 pt-2 border-t border-slate-200 mt-2">
@@ -165,9 +161,7 @@ export function ReceiptPreview({
 
             {!isRevenue && data.whtApplicable && (
                 <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800">
-                    <strong>WHT Credit Note:</strong> {formatNaira(data.whtAmount)} has been withheld from this debit-side
-                    payment and posted as a tax credit asset, not an expense.
-                    {data.creditNoteGenerated ? ' Credit note generated.' : ''}
+                    <strong>WHT Credit Note:</strong> Since {formatNaira(whtAmount)} has been withheld, we promise to remit this amount to the relevant tax authority. Kindly accept this Withholding Tax Credit Note from us as evidence of tax paid on your behalf.
                 </div>
             )}
 
