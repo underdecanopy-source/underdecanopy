@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import type { Profile, Reminder, Receipt, SmartTaxState, TaxReturn, Transaction } from './types';
+import type { Profile, Reminder, Receipt, SmartTaxState, TaxReturn, TaxSettings, Transaction } from './types';
 import { getDebitCreditLabel } from './financials';
 import { calculateTransactionTax } from './taxCalculator';
 
@@ -16,6 +16,10 @@ export const defaultProfile: Profile = {
     address: '',
     state: 'Lagos',
     businessType: 'sole-proprietor',
+};
+
+export const defaultTaxSettings: TaxSettings = {
+    profitTaxRatePercent: 30,
 };
 
 function seedDefaults(): SmartTaxState {
@@ -55,6 +59,7 @@ function seedDefaults(): SmartTaxState {
 
     return {
         profile: defaultProfile,
+        settings: defaultTaxSettings,
         transactions: [],
         receipts: [],
         taxReturns: [],
@@ -75,30 +80,64 @@ export function loadState(): SmartTaxState {
             return fresh;
         }
         const parsed = JSON.parse(raw) as SmartTaxState;
-        const migratedTxns = (parsed.transactions || []).map((transaction) => ({
-            ...transaction,
-            type: transaction.type ?? 'revenue',
-            subCategory:
-                transaction.subCategory ??
-                (transaction.category === 'Services' || transaction.category === 'Consulting'
-                    ? 'Service Income'
-                    : 'Sales'),
-            debitCreditFlag: transaction.debitCreditFlag ?? getDebitCreditLabel(transaction.type ?? 'revenue'),
-            vatable: typeof transaction.vatable === 'boolean' ? transaction.vatable : transaction.vatAmount > 0,
-            whtApplicable:
-                typeof transaction.whtApplicable === 'boolean' ? transaction.whtApplicable : transaction.whtAmount > 0,
-            taxYear: typeof transaction.taxYear === 'number' ? transaction.taxYear : new Date(transaction.date).getFullYear(),
-            creditNoteGenerated:
-                typeof transaction.creditNoteGenerated === 'boolean'
-                    ? transaction.creditNoteGenerated
-                    : transaction.whtAmount > 0,
-        }));
+        const migratedSettings: TaxSettings = {
+            ...defaultTaxSettings,
+            ...(parsed.settings || {}),
+            profitTaxRatePercent:
+                typeof parsed.settings?.profitTaxRatePercent === 'number' && parsed.settings.profitTaxRatePercent >= 0
+                    ? parsed.settings.profitTaxRatePercent
+                    : defaultTaxSettings.profitTaxRatePercent,
+        };
+        const migratedTxns = (parsed.transactions || []).map((transaction) => {
+            const type = transaction.type ?? 'revenue';
+            const migratedVatAmount = type === 'revenue' ? transaction.vatAmount : 0;
+            const migratedWhtAmount = type === 'expense' ? transaction.whtAmount : 0;
+            return {
+                ...transaction,
+                type,
+                subCategory:
+                    transaction.subCategory ??
+                    (transaction.category === 'Services' || transaction.category === 'Consulting'
+                        ? 'Service Income'
+                        : 'Sales'),
+                debitCreditFlag: transaction.debitCreditFlag ?? getDebitCreditLabel(type),
+                vatable: type === 'revenue' ? (typeof transaction.vatable === 'boolean' ? transaction.vatable : migratedVatAmount > 0) : false,
+                whtApplicable:
+                    type === 'expense'
+                        ? typeof transaction.whtApplicable === 'boolean'
+                            ? transaction.whtApplicable
+                            : migratedWhtAmount > 0
+                        : false,
+                vatAmount: migratedVatAmount,
+                whtAmount: migratedWhtAmount,
+                netAmount:
+                    type === 'expense'
+                        ? Math.max(0, transaction.amount - migratedWhtAmount)
+                        : transaction.amount + migratedVatAmount,
+                taxYear: typeof transaction.taxYear === 'number' ? transaction.taxYear : new Date(transaction.date).getFullYear(),
+                creditNoteGenerated:
+                    typeof transaction.creditNoteGenerated === 'boolean'
+                        ? transaction.creditNoteGenerated && type === 'expense'
+                        : type === 'expense' && migratedWhtAmount > 0,
+            };
+        });
         const migratedReceipts = (parsed.receipts || []).map((receipt) => ({
             ...receipt,
             sentViaEmail: !!receipt.sentViaEmail,
             sentViaWhatsApp: !!receipt.sentViaWhatsApp,
         }));
-        return { ...parsed, transactions: migratedTxns, receipts: migratedReceipts };
+        const migratedTaxReturns = (parsed.taxReturns || []).map((taxReturn) => ({
+            ...taxReturn,
+            totalVatCredit:
+                typeof taxReturn.totalVatCredit === 'number'
+                    ? taxReturn.totalVatCredit
+                    : ((taxReturn as TaxReturn & { totalVatCollected?: number }).totalVatCollected ?? 0),
+            totalWhtCredit:
+                typeof taxReturn.totalWhtCredit === 'number'
+                    ? taxReturn.totalWhtCredit
+                    : ((taxReturn as TaxReturn & { totalWhtDeducted?: number }).totalWhtDeducted ?? 0),
+        }));
+        return { ...parsed, settings: migratedSettings, transactions: migratedTxns, receipts: migratedReceipts, taxReturns: migratedTaxReturns };
     } catch {
         return seedDefaults();
     }
@@ -130,6 +169,20 @@ export function useSmartTaxStore() {
 
     const updateProfile = useCallback((profile: Partial<Profile>) => {
         setState((current) => ({ ...current, profile: { ...current.profile, ...profile } }));
+    }, []);
+
+    const updateSettings = useCallback((settings: Partial<TaxSettings>) => {
+        setState((current) => ({
+            ...current,
+            settings: {
+                ...current.settings,
+                ...settings,
+                profitTaxRatePercent:
+                    typeof settings.profitTaxRatePercent === 'number' && settings.profitTaxRatePercent >= 0
+                        ? settings.profitTaxRatePercent
+                        : current.settings.profitTaxRatePercent,
+            },
+        }));
     }, []);
 
     const addTransaction = useCallback((input: Omit<Transaction, 'id' | 'receiptId' | 'date'> & { date?: string }) => {
@@ -233,6 +286,7 @@ export function useSmartTaxStore() {
                 amount: number;
                 vatable: boolean;
                 whtApplicable: boolean;
+                whtAmount?: number;
                 category: string;
                 daysBack: number;
             };
@@ -248,7 +302,7 @@ export function useSmartTaxStore() {
                     description: 'Brand strategy consultancy for April',
                     amount: 750000,
                     vatable: true,
-                    whtApplicable: true,
+                    whtApplicable: false,
                     category: 'Consulting',
                     daysBack: 2,
                 },
@@ -262,7 +316,7 @@ export function useSmartTaxStore() {
                     description: 'Quarterly retainer for IT advisory',
                     amount: 1250000,
                     vatable: true,
-                    whtApplicable: true,
+                    whtApplicable: false,
                     category: 'Services',
                     daysBack: 6,
                 },
@@ -302,7 +356,8 @@ export function useSmartTaxStore() {
                     description: 'Warehouse rent for March',
                     amount: 2000000,
                     vatable: false,
-                    whtApplicable: false,
+                    whtApplicable: true,
+                    whtAmount: 200000,
                     category: 'Rent',
                     daysBack: 18,
                 },
@@ -314,7 +369,8 @@ export function useSmartTaxStore() {
                     description: 'Electricity and backup fuel',
                     amount: 320000,
                     vatable: false,
-                    whtApplicable: false,
+                    whtApplicable: true,
+                    whtAmount: 16000,
                     category: 'Utilities',
                     daysBack: 24,
                 },
@@ -343,6 +399,7 @@ export function useSmartTaxStore() {
                     customerType: sample.customerType,
                     vatable: sample.vatable,
                     whtApplicable: sample.whtApplicable,
+                    whtAmount: sample.whtAmount,
                     category: sample.category,
                     transactionType: sample.type,
                 });
@@ -368,7 +425,7 @@ export function useSmartTaxStore() {
                     netAmount: calc.netAmount,
                     category: sample.category,
                     taxYear: new Date(date).getFullYear(),
-                    creditNoteGenerated: calc.whtAmount > 0,
+                    creditNoteGenerated: sample.type === 'expense' && calc.whtAmount > 0,
                 });
                 newReceipts.push({
                     id: receiptId,
@@ -392,6 +449,7 @@ export function useSmartTaxStore() {
         state,
         hydrated,
         updateProfile,
+        updateSettings,
         addTransaction,
         deleteTransaction,
         markReceiptSent,

@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { PageHeader } from '../_components/ui';
 import { useSmartTaxStore } from '../_lib/store';
-import type { Profile } from '../_lib/types';
+import type { Profile, TaxSettings } from '../_lib/types';
 import { AlertTriangle, Save, Trash2 } from 'lucide-react';
 
 const NG_STATES = [
@@ -14,17 +14,25 @@ const NG_STATES = [
 ];
 
 export default function SettingsPage() {
-    const { state, hydrated, updateProfile, reset } = useSmartTaxStore();
+    const { state, hydrated, updateProfile, updateSettings, reset } = useSmartTaxStore();
     const [form, setForm] = useState<Profile>(state.profile);
+    const [taxForm, setTaxForm] = useState<TaxSettings>(state.settings);
     const [saved, setSaved] = useState(false);
 
     useEffect(() => {
-        if (hydrated) setForm(state.profile);
-    }, [hydrated, state.profile]);
+        if (!hydrated) return;
+        setForm(state.profile);
+        setTaxForm(state.settings);
+    }, [hydrated, state.profile, state.settings]);
 
     function handleSave(e: FormEvent) {
         e.preventDefault();
         updateProfile(form);
+        updateSettings({
+            profitTaxRatePercent: Number.isFinite(taxForm.profitTaxRatePercent)
+                ? Math.max(0, taxForm.profitTaxRatePercent)
+                : 0,
+        });
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
     }
@@ -40,7 +48,7 @@ export default function SettingsPage() {
         <>
             <PageHeader
                 title="Settings"
-                description="Configure your business profile. These details appear on every receipt and tax return."
+                description="Configure your business profile and the tax rule used for profit-before-tax reporting."
             />
 
             <form
@@ -139,14 +147,39 @@ export default function SettingsPage() {
                     </select>
                 </label>
 
+                <div className="md:col-span-2 border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    <h2 className="font-semibold text-slate-800">Profit Tax Rule</h2>
+                    <p className="text-sm text-slate-600 mt-1">
+                        Set the percentage applied to positive profit before tax. Enter <strong>0%</strong> if the
+                        current rule results in no tax.
+                    </p>
+                    <label className="block mt-4 max-w-sm">
+                        <span className="text-sm font-medium text-slate-700">Tax Rule Percentage (%)</span>
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={taxForm.profitTaxRatePercent}
+                            onChange={(e) =>
+                                setTaxForm({
+                                    profitTaxRatePercent: Number.isFinite(e.target.valueAsNumber)
+                                        ? Math.max(0, e.target.valueAsNumber)
+                                        : 0,
+                                })
+                            }
+                            className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </label>
+                </div>
+
                 <div className="md:col-span-2 flex items-center gap-3 pt-2">
                     <button
                         type="submit"
                         className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700"
                     >
-                        <Save className="h-4 w-4" /> Save Profile
+                        <Save className="h-4 w-4" /> Save Settings
                     </button>
-                    {saved && <span className="text-sm text-emerald-700 font-medium">Profile saved.</span>}
+                    {saved && <span className="text-sm text-emerald-700 font-medium">Settings saved.</span>}
                 </div>
             </form>
 

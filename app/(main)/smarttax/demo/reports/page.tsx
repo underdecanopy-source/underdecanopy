@@ -21,7 +21,7 @@ export default function ReportsPage() {
             Number(year),
             Number(month) - 1
         );
-        const summary = summarizeTransactions(scopedTransactions);
+        const summary = summarizeTransactions(scopedTransactions, state.settings.profitTaxRatePercent);
 
         const monthly = Array.from({ length: 12 }, (_, index) => ({
             monthIndex: index,
@@ -39,9 +39,9 @@ export default function ReportsPage() {
                 if (transaction.type === 'revenue') {
                     bucket.revenue += transaction.amount;
                     bucket.vat += transaction.vatAmount;
-                    bucket.wht += transaction.whtAmount;
                 } else {
                     bucket.expenses += transaction.amount;
+                    bucket.wht += transaction.whtAmount;
                 }
             });
 
@@ -56,13 +56,13 @@ export default function ReportsPage() {
         });
 
         return { summary, monthly, byCategory, scopedTransactions };
-    }, [month, period, state.transactions, year]);
+    }, [month, period, state.settings.profitTaxRatePercent, state.transactions, year]);
 
     return (
         <>
             <PageHeader
                 title="Reports"
-                description="Revenue, expenses, profit, and tax metrics driven by one transaction model."
+                description="Revenue, expenses, configured profit-tax calculations, and tax-credit metrics driven by one transaction model."
                 actions={
                     <>
                         <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1">
@@ -115,7 +115,11 @@ export default function ReportsPage() {
                         <StatCard label="Revenue" value={formatNaira(report.summary.revenue)} tone="blue" />
                         <StatCard label="Expenses" value={formatNaira(report.summary.expenses)} tone="orange" />
                         <StatCard label="Profit / Loss Before Tax" value={formatNaira(report.summary.profitBeforeTax)} tone={report.summary.profitBeforeTax >= 0 ? 'green' : 'red'} />
-                        <StatCard label="Taxation" value={formatNaira(report.summary.taxation)} tone="red" />
+                        <StatCard
+                            label="Taxation"
+                            value={formatNaira(report.summary.taxation)}
+                            tone="red"
+                        />
                         <StatCard label="Profit / Loss After Tax" value={formatNaira(report.summary.profitAfterTax)} tone={report.summary.profitAfterTax >= 0 ? 'green' : 'red'} />
                     </div>
 
@@ -169,12 +173,16 @@ export default function ReportsPage() {
                             <h2 className="font-semibold text-slate-800 mb-4">Tax Summary</h2>
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-slate-600">VAT Collected</span>
-                                    <span className="font-semibold text-orange-700">{formatNaira(report.summary.vatCollected)}</span>
+                                    <span className="text-slate-600">VAT Tax Credits</span>
+                                    <span className="font-semibold text-orange-700">{formatNaira(report.summary.vatCredits)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-600">WHT Tax Credits</span>
                                     <span className="font-semibold text-rose-700">{formatNaira(report.summary.whtCredits)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-600">Profit Tax Rule</span>
+                                    <span className="font-semibold text-slate-900">{state.settings.profitTaxRatePercent}%</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-600">Revenue Transactions</span>

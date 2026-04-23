@@ -10,6 +10,10 @@ export interface Profile {
     businessType: 'individual' | 'sole-proprietor' | 'corporate';
 }
 
+export interface TaxSettings {
+    profitTaxRatePercent: number;
+}
+
 export type CustomerType = 'individual' | 'corporate' | 'non-taxable';
 
 
@@ -50,8 +54,8 @@ export interface TaxReturn {
     returnType: 'VAT' | 'PIT' | 'WHT' | 'CIT';
     filingPeriod: string;
     totalIncome: number;
-    totalVatCollected: number;
-    totalWhtDeducted: number;
+    totalVatCredit: number;
+    totalWhtCredit: number;
     taxPayable: number;
     status: 'draft' | 'filed' | 'approved';
     filingDate?: string;
@@ -69,6 +73,7 @@ export interface Reminder {
 
 export interface SmartTaxState {
     profile: Profile;
+    settings: TaxSettings;
     transactions: Transaction[];
     receipts: Receipt[];
     taxReturns: TaxReturn[];

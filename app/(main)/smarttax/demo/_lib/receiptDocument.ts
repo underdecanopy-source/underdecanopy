@@ -59,9 +59,9 @@ export function buildReceiptShareText(profile: Profile, transaction: Transaction
         `Category: ${getTransactionLabel(transaction)}`,
         `Description: ${transaction.description}`,
         `Subtotal: ${formatNaira(transaction.amount)}`,
-        `VAT: ${transaction.vatable ? formatNaira(transaction.vatAmount) : 'Not applied'}`,
-        `WHT: ${transaction.whtApplicable ? formatNaira(transaction.whtAmount) : 'Not deducted'}`,
-        `${transaction.type === 'revenue' ? 'Net Amount Received' : 'Net Cash Outflow'}: ${formatNaira(transaction.netAmount)}`,
+        `VAT Credit: ${transaction.vatable ? formatNaira(transaction.vatAmount) : 'Not applied'}`,
+        `WHT Credit: ${transaction.whtApplicable ? formatNaira(transaction.whtAmount) : 'Not deducted'}`,
+        `${transaction.type === 'revenue' ? 'Net Amount to Credit' : 'Net Amount Going Out'}: ${formatNaira(transaction.netAmount)}`,
     ];
 
     return lines.join('\n');

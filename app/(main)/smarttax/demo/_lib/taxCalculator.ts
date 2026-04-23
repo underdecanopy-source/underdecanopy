@@ -36,6 +36,7 @@ export interface TaxCalculationInput {
     customerType?: CustomerType;
     vatable?: boolean;
     whtApplicable?: boolean;
+    whtAmount?: number;
     category?: string;
     transactionType?: 'expense' | 'revenue';
 }
@@ -46,21 +47,13 @@ export function calculateTransactionTax(input: TaxCalculationInput | number, leg
     const customerType: CustomerType = opts.customerType ?? 'individual';
     const nonTaxable = customerType === 'non-taxable';
     const transactionType = opts.transactionType ?? 'revenue';
-    const vatable = nonTaxable ? false : opts.vatable ?? true;
-    const whtApplicable = transactionType === 'expense' ? false : nonTaxable ? false : opts.whtApplicable ?? true;
+    const vatable = transactionType === 'revenue' && !nonTaxable ? opts.vatable ?? true : false;
+    const whtApplicable = transactionType === 'expense' && !nonTaxable ? opts.whtApplicable ?? false : false;
 
     const vatAmount = vatable ? amount * VAT_RATE : 0;
-    
-    let whtRate = 0.05; // Default fallback
-    if (opts.category && whtApplicable && customerType !== 'non-taxable') {
-        const catRates = WHT_RATES[opts.category as keyof typeof WHT_RATES] || WHT_RATES['Other'];
-        whtRate = customerType === 'corporate' ? catRates.corporate : catRates.individual;
-    } else if (whtApplicable && customerType !== 'non-taxable') {
-        whtRate = customerType === 'corporate' ? 0.10 : 0.05;
-    }
-
-    const whtAmount = whtApplicable ? amount * whtRate : 0;
-    const netAmount = transactionType === 'expense' ? amount + vatAmount : amount + vatAmount - whtAmount;
+    const requestedWht = Math.max(0, opts.whtAmount ?? 0);
+    const whtAmount = whtApplicable ? Math.min(requestedWht, amount) : 0;
+    const netAmount = transactionType === 'expense' ? amount - whtAmount : amount + vatAmount;
 
     return {
         vatAmount,

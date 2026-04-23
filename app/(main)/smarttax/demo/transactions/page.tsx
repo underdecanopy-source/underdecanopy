@@ -40,17 +40,20 @@ export default function TransactionsPage() {
         customerType: 'individual' as CustomerType,
         description: '',
         amountFormatted: '',
+        whtAmountFormatted: '',
         category: 'Sales',
         vatable: true,
-        whtApplicable: true,
+        whtApplicable: false,
     });
 
     const hasVatNumber = !!state.profile.vatNumber;
     const isRevenue = form.type === 'revenue';
     const isNonTaxable = form.customerType === 'non-taxable';
-    const effectiveVatable = (!hasVatNumber || isNonTaxable) ? false : form.vatable;
-    const effectiveWht = isRevenue && !isNonTaxable ? form.whtApplicable : false;
+    const effectiveVatable = isRevenue && hasVatNumber && !isNonTaxable ? form.vatable : false;
+    const effectiveWht = !isRevenue && !isNonTaxable ? form.whtApplicable : false;
     const amountNumber = parseAmountInput(form.amountFormatted);
+    const whtAmountNumber = parseAmountInput(form.whtAmountFormatted);
+    const hasInvalidWht = effectiveWht && whtAmountNumber > amountNumber;
     const categories = isRevenue ? REVENUE_CATEGORIES : EXPENSE_CATEGORIES;
 
     const preview = useMemo(() => {
@@ -62,10 +65,11 @@ export default function TransactionsPage() {
             customerType: form.customerType,
             vatable: effectiveVatable,
             whtApplicable: effectiveWht,
+            whtAmount: whtAmountNumber,
             category: form.category,
             transactionType: form.type,
         });
-    }, [amountNumber, form.category, form.customerType, form.type, effectiveVatable, effectiveWht]);
+    }, [amountNumber, form.category, form.customerType, form.type, effectiveVatable, effectiveWht, whtAmountNumber]);
 
     function handleAmountChange(raw: string) {
         setForm((current) => ({ ...current, amountFormatted: formatAmountInput(raw) }));
@@ -77,7 +81,9 @@ export default function TransactionsPage() {
             type,
             subCategory: type === 'revenue' ? 'Sales' : '',
             category: type === 'revenue' ? 'Sales' : 'Rent',
-            whtApplicable: type === 'revenue',
+            vatable: type === 'revenue',
+            whtApplicable: false,
+            whtAmountFormatted: '',
         }));
     }
 
@@ -85,20 +91,22 @@ export default function TransactionsPage() {
         setForm((current) => ({
             ...current,
             customerType: next,
-            vatable: next === 'non-taxable' ? false : true,
-            whtApplicable: current.type === 'revenue' && next !== 'non-taxable',
+            vatable: current.type === 'revenue' && next !== 'non-taxable' ? current.vatable : false,
+            whtApplicable: current.type === 'expense' && next !== 'non-taxable' ? current.whtApplicable : false,
+            whtAmountFormatted: next === 'non-taxable' ? '' : current.whtAmountFormatted,
         }));
     }
 
     function handleSubmit(event: FormEvent) {
         event.preventDefault();
-        if (!form.customerName || !form.description || amountNumber <= 0) return;
+        if (!form.customerName || !form.description || amountNumber <= 0 || hasInvalidWht) return;
 
         const calc = calculateTransactionTax({
             amount: amountNumber,
             customerType: form.customerType,
             vatable: effectiveVatable,
             whtApplicable: effectiveWht,
+            whtAmount: whtAmountNumber,
             category: form.category,
             transactionType: form.type,
         });
@@ -120,7 +128,7 @@ export default function TransactionsPage() {
             netAmount: calc.netAmount,
             category: form.category,
             taxYear: new Date().getFullYear(),
-            creditNoteGenerated: calc.whtAmount > 0,
+            creditNoteGenerated: form.type === 'expense' && calc.whtAmount > 0,
         });
 
         setForm({
@@ -132,9 +140,10 @@ export default function TransactionsPage() {
             customerType: 'individual',
             description: '',
             amountFormatted: '',
+            whtAmountFormatted: '',
             category: 'Sales',
             vatable: true,
-            whtApplicable: true,
+            whtApplicable: false,
         });
         setShowForm(false);
     }
@@ -143,7 +152,7 @@ export default function TransactionsPage() {
         <>
             <PageHeader
                 title="Transactions"
-                description="Record revenue and expenses with explicit debit or credit classification and a consistent tax treatment."
+                description="Record revenue and expenses with explicit debit or credit classification, manual debit-side WHT deduction, and consistent tax treatment."
                 actions={
                     <button
                         onClick={() => setShowForm((current) => !current)}
@@ -264,7 +273,9 @@ export default function TransactionsPage() {
                             </label>
 
                             <label className="block">
-                                <span className="text-sm font-medium text-slate-700">Amount (NGN) *</span>
+                                <span className="text-sm font-medium text-slate-700">
+                                    {isRevenue ? 'Gross Amount (NGN) *' : 'Gross Amount (NGN) *'}
+                                </span>
                                 <input
                                     required
                                     type="text"
@@ -275,6 +286,34 @@ export default function TransactionsPage() {
                                     placeholder="1,000,000"
                                 />
                             </label>
+
+                            {!isRevenue && (
+                                <label className="block">
+                                    <span className="text-sm font-medium text-slate-700">WHT Deducted (NGN)</span>
+                                    <input
+                                        type="text"
+                                        inputMode="decimal"
+                                        value={form.whtAmountFormatted}
+                                        onChange={(event) =>
+                                            setForm((current) => ({
+                                                ...current,
+                                                whtAmountFormatted: formatAmountInput(event.target.value),
+                                                whtApplicable: parseAmountInput(event.target.value) > 0,
+                                            }))
+                                        }
+                                        className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="0.00"
+                                    />
+                                    <p className="mt-1 text-xs text-slate-500">
+                                        Enter the amount withheld by the payer. Net cash outflow is calculated automatically.
+                                    </p>
+                                    {hasInvalidWht && (
+                                        <p className="mt-1 text-xs font-medium text-rose-700">
+                                            WHT deducted cannot be greater than the gross amount.
+                                        </p>
+                                    )}
+                                </label>
+                            )}
 
                             <label className="block">
                                 <span className="text-sm font-medium text-slate-700">Category</span>
@@ -297,21 +336,23 @@ export default function TransactionsPage() {
                                     <label
                                         className={`flex items-start gap-3 border rounded-md p-3 transition ${
                                             effectiveVatable ? 'border-orange-300 bg-orange-50' : 'border-slate-200 bg-slate-50'
-                                        } ${isNonTaxable || !hasVatNumber ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        } ${!isRevenue || isNonTaxable || !hasVatNumber ? 'opacity-60 cursor-not-allowed' : ''}`}
                                     >
                                         <input
                                             type="checkbox"
                                             checked={effectiveVatable}
-                                            disabled={isNonTaxable || !hasVatNumber}
+                                            disabled={!isRevenue || isNonTaxable || !hasVatNumber}
                                             onChange={(event) => setForm((current) => ({ ...current, vatable: event.target.checked }))}
                                             className="mt-0.5 h-4 w-4 accent-orange-600"
                                         />
                                         <span className="text-sm">
                                             <span className="font-semibold text-slate-800 block">Apply VAT (7.5%)</span>
                                             <span className="text-xs text-slate-500">
-                                                {!hasVatNumber
+                                                {!isRevenue
+                                                    ? 'VAT is only available on credit-side transactions in this demo.'
+                                                    : !hasVatNumber
                                                     ? 'No VAT registration number found in profile settings.'
-                                                    : 'Turn off only for VAT-exempt supplies.'}
+                                                    : 'Recorded as a VAT tax credit for the transaction.'}
                                             </span>
                                         </span>
                                     </label>
@@ -319,23 +360,27 @@ export default function TransactionsPage() {
                                     <label
                                         className={`flex items-start gap-3 border rounded-md p-3 transition ${
                                             effectiveWht ? 'border-rose-300 bg-rose-50' : 'border-slate-200 bg-slate-50'
-                                        } ${!isRevenue || isNonTaxable ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        } ${isRevenue || isNonTaxable ? 'opacity-60 cursor-not-allowed' : ''}`}
                                     >
                                         <input
                                             type="checkbox"
                                             checked={effectiveWht}
-                                            disabled={!isRevenue || isNonTaxable}
+                                            disabled={isRevenue || isNonTaxable}
                                             onChange={(event) =>
-                                                setForm((current) => ({ ...current, whtApplicable: event.target.checked }))
+                                                setForm((current) => ({
+                                                    ...current,
+                                                    whtApplicable: event.target.checked,
+                                                    whtAmountFormatted: event.target.checked ? current.whtAmountFormatted : '',
+                                                }))
                                             }
                                             className="mt-0.5 h-4 w-4 accent-rose-600"
                                         />
                                         <span className="text-sm">
-                                            <span className="font-semibold text-slate-800 block">Withhold WHT</span>
+                                            <span className="font-semibold text-slate-800 block">Apply Debit-Side WHT</span>
                                             <span className="text-xs text-slate-500">
                                                 {isRevenue
-                                                    ? 'Use for payer-deducted WHT on revenue only.'
-                                                    : 'WHT credit notes are only generated for revenue receipts.'}
+                                                    ? 'Only the payer can remove WHT on debit transactions and issue a credit note.'
+                                                    : 'Use only when money is leaving your account and you are withholding at source.'}
                                             </span>
                                         </span>
                                     </label>
@@ -363,10 +408,15 @@ export default function TransactionsPage() {
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-xs text-slate-500">{isRevenue ? 'Net to Receive' : 'Net Cash Outflow'}</p>
+                                            <p className="text-xs text-slate-500">{isRevenue ? 'Net to Credit' : 'Net Amount Going Out'}</p>
                                             <p className="font-bold text-emerald-700">{formatNaira(preview.netAmount)}</p>
                                         </div>
                                     </div>
+                                    {!isRevenue && effectiveWht && (
+                                        <p className="mt-3 text-xs text-slate-600">
+                                            WHT is posted as a tax credit asset. Only the payer can remove it and issue the credit note.
+                                        </p>
+                                    )}
                                 </div>
                             )}
 
@@ -405,7 +455,7 @@ export default function TransactionsPage() {
                                     transactionType: form.type,
                                     subCategory: form.subCategory,
                                     debitCreditFlag: getDebitCreditLabel(form.type),
-                                    creditNoteGenerated: preview.whtAmount > 0,
+                                    creditNoteGenerated: !isRevenue && preview.whtAmount > 0,
                                 }}
                             />
                         </div>

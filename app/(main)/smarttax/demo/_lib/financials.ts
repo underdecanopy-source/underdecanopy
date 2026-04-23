@@ -8,7 +8,7 @@ export interface FinancialSummary {
     profitBeforeTax: number;
     taxation: number;
     profitAfterTax: number;
-    vatCollected: number;
+    vatCredits: number;
     whtCredits: number;
     revenueCount: number;
     expenseCount: number;
@@ -40,14 +40,15 @@ export function filterTransactionsByPeriod(
     });
 }
 
-export function summarizeTransactions(transactions: Transaction[], taxRate = 0.3): FinancialSummary {
+export function summarizeTransactions(transactions: Transaction[], taxRatePercent = 30): FinancialSummary {
     const revenueTransactions = transactions.filter((transaction) => transaction.type === 'revenue');
     const expenseTransactions = transactions.filter((transaction) => transaction.type === 'expense');
 
     const revenue = revenueTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
     const expenses = expenseTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
     const profitBeforeTax = revenue - expenses;
-    const taxation = profitBeforeTax > 0 ? profitBeforeTax * taxRate : 0;
+    const effectiveTaxRate = Math.max(0, taxRatePercent) / 100;
+    const taxation = profitBeforeTax > 0 ? profitBeforeTax * effectiveTaxRate : 0;
 
     return {
         revenue,
@@ -55,8 +56,8 @@ export function summarizeTransactions(transactions: Transaction[], taxRate = 0.3
         profitBeforeTax,
         taxation,
         profitAfterTax: profitBeforeTax - taxation,
-        vatCollected: revenueTransactions.reduce((sum, transaction) => sum + transaction.vatAmount, 0),
-        whtCredits: revenueTransactions.reduce((sum, transaction) => sum + transaction.whtAmount, 0),
+        vatCredits: revenueTransactions.reduce((sum, transaction) => sum + transaction.vatAmount, 0),
+        whtCredits: expenseTransactions.reduce((sum, transaction) => sum + transaction.whtAmount, 0),
         revenueCount: revenueTransactions.length,
         expenseCount: expenseTransactions.length,
     };

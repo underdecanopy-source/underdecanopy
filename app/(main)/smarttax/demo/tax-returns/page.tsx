@@ -21,23 +21,23 @@ export default function TaxReturnsPage() {
     const summary = useMemo(() => {
         if (returnType === 'VAT' || returnType === 'WHT') {
             const txns = filterTransactionsByPeriod(state.transactions, 'monthly', Number(year), Number(month) - 1).filter(
-                (transaction) => transaction.type === 'revenue'
+                (transaction) => (returnType === 'VAT' ? transaction.type === 'revenue' : transaction.type === 'expense')
             );
-            const totals = summarizeTransactions(txns);
+            const totals = summarizeTransactions(txns, state.settings.profitTaxRatePercent);
             return {
                 kind: 'period' as const,
                 period: `${year}-${month}`,
                 transactionCount: txns.length,
-                totalRevenue: totals.revenue,
-                totalVat: totals.vatCollected,
+                totalIncome: returnType === 'VAT' ? totals.revenue : totals.expenses,
+                totalVat: totals.vatCredits,
                 totalWht: totals.whtCredits,
-                taxPayable: returnType === 'VAT' ? totals.vatCollected : totals.whtCredits,
+                taxPayable: returnType === 'VAT' ? totals.vatCredits : totals.whtCredits,
                 dueDate: new Date(Number(year), Number(month), 21),
             };
         }
 
         const yearTxns = filterTransactionsByPeriod(state.transactions, 'yearly', Number(year));
-        const yearlySummary = summarizeTransactions(yearTxns);
+        const yearlySummary = summarizeTransactions(yearTxns, state.settings.profitTaxRatePercent);
 
         if (returnType === 'PIT') {
             const income = annualIncome ? parseFloat(annualIncome) : yearlySummary.revenue;
@@ -62,16 +62,16 @@ export default function TaxReturnsPage() {
             cit: yearlySummary.taxation,
             dueDate: new Date(Number(year) + 1, 5, 30),
         };
-    }, [annualIncome, month, returnType, state.transactions, year]);
+    }, [annualIncome, month, returnType, state.settings.profitTaxRatePercent, state.transactions, year]);
 
     function handleFile() {
         if (summary.kind === 'period') {
             addTaxReturn({
                 returnType,
                 filingPeriod: summary.period,
-                totalIncome: summary.totalRevenue,
-                totalVatCollected: summary.totalVat,
-                totalWhtDeducted: summary.totalWht,
+                totalIncome: summary.totalIncome,
+                totalVatCredit: summary.totalVat,
+                totalWhtCredit: summary.totalWht,
                 taxPayable: summary.taxPayable,
                 status: 'filed',
                 filingDate: new Date().toISOString(),
@@ -81,8 +81,8 @@ export default function TaxReturnsPage() {
                 returnType,
                 filingPeriod: summary.period,
                 totalIncome: summary.annualIncome,
-                totalVatCollected: 0,
-                totalWhtDeducted: 0,
+                totalVatCredit: 0,
+                totalWhtCredit: 0,
                 taxPayable: summary.tax,
                 status: 'filed',
                 filingDate: new Date().toISOString(),
@@ -92,8 +92,8 @@ export default function TaxReturnsPage() {
                 returnType,
                 filingPeriod: summary.period,
                 totalIncome: summary.revenue,
-                totalVatCollected: 0,
-                totalWhtDeducted: 0,
+                totalVatCredit: 0,
+                totalWhtCredit: 0,
                 taxPayable: summary.cit,
                 status: 'filed',
                 filingDate: new Date().toISOString(),
@@ -107,7 +107,7 @@ export default function TaxReturnsPage() {
         <>
             <PageHeader
                 title="Tax Returns"
-                description="Prepare returns from revenue-only VAT and WHT data, plus profit-based annual tax calculations."
+                description="Prepare returns from credit-side VAT, debit-side WHT deductions, and configured annual profit-tax calculations."
             />
 
             <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6">
@@ -170,7 +170,12 @@ export default function TaxReturnsPage() {
             {!hydrated ? (
                 <div className="bg-white rounded-lg border border-slate-200 p-8 text-slate-500">Loading...</div>
             ) : (
-                <ReturnSummary returnType={returnType} summary={summary} onFile={handleFile} />
+                <ReturnSummary
+                    returnType={returnType}
+                    summary={summary}
+                    profitTaxRatePercent={state.settings.profitTaxRatePercent}
+                    onFile={handleFile}
+                />
             )}
 
             {filedMsg && (
@@ -226,6 +231,7 @@ export default function TaxReturnsPage() {
 function ReturnSummary({
     returnType,
     summary,
+    profitTaxRatePercent,
     onFile,
 }: {
     returnType: ReturnType;
@@ -234,7 +240,7 @@ function ReturnSummary({
               kind: 'period';
               period: string;
               transactionCount: number;
-              totalRevenue: number;
+              totalIncome: number;
               totalVat: number;
               totalWht: number;
               taxPayable: number;
@@ -258,6 +264,7 @@ function ReturnSummary({
               cit: number;
               dueDate: Date;
           };
+    profitTaxRatePercent: number;
     onFile: () => void;
 }) {
     return (
@@ -269,9 +276,15 @@ function ReturnSummary({
 
             {summary.kind === 'period' && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <Stat label="Revenue Transactions" value={String(summary.transactionCount)} />
-                    <Stat label="Total Revenue" value={formatNaira(summary.totalRevenue)} />
-                    <Stat label="VAT Collected" value={formatNaira(summary.totalVat)} tone="orange" />
+                    <Stat
+                        label={returnType === 'VAT' ? 'Revenue Transactions' : 'Expense Transactions'}
+                        value={String(summary.transactionCount)}
+                    />
+                    <Stat
+                        label={returnType === 'VAT' ? 'Total Revenue' : 'Total Gross Expenses'}
+                        value={formatNaira(summary.totalIncome)}
+                    />
+                    <Stat label="VAT Credits" value={formatNaira(summary.totalVat)} tone="orange" />
                     <Stat label="WHT Credits" value={formatNaira(summary.totalWht)} tone="rose" />
                 </div>
             )}
@@ -304,7 +317,7 @@ function ReturnSummary({
                     <Stat label="Revenue" value={formatNaira(summary.revenue)} />
                     <Stat label="Expenses" value={formatNaira(summary.expenses)} />
                     <Stat label="Profit Before Tax" value={formatNaira(summary.profitBeforeTax)} />
-                    <Stat label="Estimated CIT (30%)" value={formatNaira(summary.cit)} tone="orange" />
+                    <Stat label={`Estimated CIT (${profitTaxRatePercent}%)`} value={formatNaira(summary.cit)} tone="orange" />
                 </div>
             )}
 

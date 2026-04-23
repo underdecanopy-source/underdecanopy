@@ -20,8 +20,8 @@ export default function DashboardPage() {
             now.getFullYear(),
             now.getMonth()
         );
-        return summarizeTransactions(scopedTransactions);
-    }, [now, period, state.transactions]);
+        return summarizeTransactions(scopedTransactions, state.settings.profitTaxRatePercent);
+    }, [now, period, state.settings.profitTaxRatePercent, state.transactions]);
 
     const recent = state.transactions.slice(0, 5);
     const isEmpty = hydrated && state.transactions.length === 0;
@@ -92,7 +92,12 @@ export default function DashboardPage() {
                         <StatCard label={`${period === 'yearly' ? 'Annual' : 'Monthly'} Revenue`} value={formatNaira(stats.revenue)} helper={`${stats.revenueCount} revenue transaction(s)`} tone="blue" />
                         <StatCard label={`${period === 'yearly' ? 'Annual' : 'Monthly'} Expenses`} value={formatNaira(stats.expenses)} helper={`${stats.expenseCount} expense transaction(s)`} tone="orange" />
                         <StatCard label="Profit / Loss Before Tax" value={formatNaira(stats.profitBeforeTax)} helper="Revenue minus expenses" tone={stats.profitBeforeTax >= 0 ? 'green' : 'red'} />
-                        <StatCard label="Taxation" value={formatNaira(stats.taxation)} helper="Demo tax rule: 30% of positive PBT" tone="red" />
+                        <StatCard
+                            label="Taxation"
+                            value={formatNaira(stats.taxation)}
+                            helper={`Configured rule: ${state.settings.profitTaxRatePercent}% of positive PBT`}
+                            tone="red"
+                        />
                         <StatCard label="Profit / Loss After Tax" value={formatNaira(stats.profitAfterTax)} helper="PBT minus taxation" tone={stats.profitAfterTax >= 0 ? 'green' : 'red'} />
                     </div>
 
@@ -117,7 +122,7 @@ export default function DashboardPage() {
                                 <ArrowUpRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600" />
                             </div>
                             <h3 className="font-semibold text-slate-800 mt-3">Prepare Tax Returns</h3>
-                            <p className="text-sm text-slate-500 mt-1">Use revenue-only VAT/WHT and profit-based CIT calculations from the same store.</p>
+                            <p className="text-sm text-slate-500 mt-1">Use credit-side VAT, debit-side WHT deductions, and your configured profit-tax rule from the same store.</p>
                         </Link>
                         <Link
                             href="/smarttax/demo/reports"

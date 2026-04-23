@@ -146,27 +146,27 @@ export function ReceiptPreview({
                     <span>{formatNaira(data.amount)}</span>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                    <span className={data.vatable ? '' : 'line-through opacity-60'}>VAT (7.5%)</span>
+                    <span className={data.vatable ? '' : 'line-through opacity-60'}>VAT Credit (7.5%)</span>
                     <span className={data.vatable ? 'text-orange-700' : 'text-slate-400'}>
                         {data.vatable ? `+ ${formatNaira(data.vatAmount)}` : 'Not applied'}
                     </span>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                    <span className={data.whtApplicable ? '' : 'line-through opacity-60'}>Withholding Tax</span>
+                    <span className={data.whtApplicable ? '' : 'line-through opacity-60'}>WHT Tax Credit</span>
                     <span className={data.whtApplicable ? 'text-rose-700' : 'text-slate-400'}>
                         {data.whtApplicable ? `- ${formatNaira(data.whtAmount)}` : 'Not deducted'}
                     </span>
                 </div>
                 <div className="flex justify-between text-base md:text-lg font-bold text-slate-900 pt-2 border-t border-slate-200 mt-2">
-                    <span>{isRevenue ? 'Net Amount Received' : 'Net Cash Outflow'}</span>
+                    <span>{isRevenue ? 'Net Amount to Credit' : 'Net Amount Going Out'}</span>
                     <span>{formatNaira(data.netAmount)}</span>
                 </div>
             </div>
 
-            {isRevenue && data.whtApplicable && (
+            {!isRevenue && data.whtApplicable && (
                 <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800">
-                    <strong>Withholding Tax Credit Note:</strong> {formatNaira(data.whtAmount)} has been deducted at source
-                    and should be treated as a tax credit, not an expense.
+                    <strong>WHT Credit Note:</strong> {formatNaira(data.whtAmount)} has been withheld from this debit-side
+                    payment and posted as a tax credit asset, not an expense.
                     {data.creditNoteGenerated ? ' Credit note generated.' : ''}
                 </div>
             )}
