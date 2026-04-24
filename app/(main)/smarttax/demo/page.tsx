@@ -30,7 +30,7 @@ export default function DashboardPage() {
         <>
             <PageHeader
                 title={`Welcome, ${state.profile.businessName || state.profile.name}`}
-                description="CAC-oriented financial metrics derived from the same transaction logic used by receipts, reports, and tax returns."
+                description="CAC-focused financial metrics designed to simplify and streamline your annual returns."
                 actions={
                     <>
                         <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1">
@@ -122,7 +122,7 @@ export default function DashboardPage() {
                                 <ArrowUpRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600" />
                             </div>
                             <h3 className="font-semibold text-slate-800 mt-3">Prepare Tax Returns</h3>
-                            <p className="text-sm text-slate-500 mt-1">Use credit-side VAT, debit-side WHT deductions, and your configured profit-tax rule from the same store.</p>
+                            <p className="text-sm text-slate-500 mt-1">Apply VAT and WHT deductions alongside your configured profit tax rules - all within the same store.</p>
                         </Link>
                         <Link
                             href="/smarttax/demo/reports"

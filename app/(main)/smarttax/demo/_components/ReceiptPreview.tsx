@@ -158,13 +158,15 @@ export function ReceiptPreview({
                 </div>
             </div>
 
-            {!isRevenue && data.whtApplicable && (
-                <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800">
+            <div className="mt-3 min-h-[4.75rem]">
+                <div
+                    className={`p-3 rounded-md text-xs ${!isRevenue && data.whtApplicable ? 'bg-rose-50 border border-rose-200 text-rose-800' : 'invisible'}`}
+                >
                     <strong>WHT Credit Note:</strong> Since {formatNaira(whtAmount)} has been withheld, we promise to
                     remit this amount to the relevant tax authority. Kindly accept this Withholding Tax Credit Note
                     from us as evidence of tax paid on your behalf.
                 </div>
-            )}
+            </div>
 
             <div className="mt-4 pt-3 border-t border-slate-200">
                 <p className="text-[11px] text-slate-500 leading-relaxed">

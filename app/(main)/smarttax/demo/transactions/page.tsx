@@ -388,30 +388,36 @@ export default function TransactionsPage() {
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                                         <div>
                                             <p className="text-xs text-slate-500">Subtotal</p>
-                                            <p className="font-semibold text-slate-900">{formatNaira(amountNumber)}</p>
+                                            <p className="font-semibold text-slate-900 whitespace-nowrap">{formatNaira(amountNumber)}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500">VAT (7.5%)</p>
-                                            <p className={effectiveVatable ? 'font-semibold text-orange-700' : 'font-semibold text-slate-400'}>
+                                            <p className={`${effectiveVatable ? 'font-semibold text-orange-700' : 'font-semibold text-slate-400'} whitespace-nowrap`}>
                                                 {effectiveVatable ? `+ ${formatNaira(preview.vatAmount)}` : 'Not applied'}
                                             </p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500">WHT</p>
-                                            <p className={effectiveWht ? 'font-semibold text-rose-700' : 'font-semibold text-slate-400'}>
+                                            <p className={`${effectiveWht ? 'font-semibold text-rose-700' : 'font-semibold text-slate-400'} whitespace-nowrap`}>
                                                 {effectiveWht ? `- ${formatNaira(preview.whtAmount)}` : 'Not deducted'}
                                             </p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500">{isRevenue ? 'Net to Credit' : 'Net Amount Going Out'}</p>
-                                            <p className="font-bold text-emerald-700">{formatNaira(preview.netAmount)}</p>
+                                            <p className="font-bold text-emerald-700 whitespace-nowrap">{formatNaira(preview.netAmount)}</p>
                                         </div>
                                     </div>
-                                    {!isRevenue && effectiveWht && (
-                                        <p className="mt-3 text-xs text-slate-600">
-                                            WHT is posted as a tax credit asset. Only the payer can remove it and issue the credit note.
-                                        </p>
-                                    )}
+                                    <div className="mt-3 min-h-[4rem]">
+                                        {!isRevenue && effectiveWht ? (
+                                            <p className="text-xs text-slate-600">
+                                                WHT is posted as a tax credit asset. Only the payer can remove it and issue the credit note.
+                                            </p>
+                                        ) : (
+                                            <p className="invisible text-xs">
+                                                WHT is posted as a tax credit asset. Only the payer can remove it and issue the credit note.
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             )}
 

@@ -14,7 +14,7 @@ function ReceiptsInner() {
     const params = useSearchParams();
     const focusId = params.get('id');
     const [selectedId, setSelectedId] = useState<string | null>(focusId);
-    const [sendStatus, setSendStatus] = useState<string | null>(null);
+    const [actionStatus, setActionStatus] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     const selected = useMemo(() => {
         const id = selectedId ?? state.receipts[0]?.id ?? null;
@@ -30,32 +30,69 @@ function ReceiptsInner() {
         return document.getElementById('receipt-print-area');
     }
 
+    function showActionStatus(message: string, type: 'success' | 'error') {
+        setActionStatus({ message, type });
+        window.setTimeout(() => setActionStatus(null), 6000);
+    }
+
+    function handleDocumentPopup(receiptNode: HTMLElement, title: string, autoPrint = false) {
+        const popup = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
+        if (!popup) {
+            showActionStatus('Popup blocked. Please allow popups and try again.', 'error');
+            return false;
+        }
+
+        openReceiptDocument(receiptNode, title, autoPrint, popup);
+        return true;
+    }
+
     function handlePrint() {
         const receiptNode = getReceiptNode();
-        if (!receiptNode || !selected) return;
-        openReceiptDocument(receiptNode, `${selected.receipt.receiptNumber} Receipt`, true);
+        if (!receiptNode || !selected) {
+            showActionStatus('Unable to print receipt because the receipt content is unavailable.', 'error');
+            return;
+        }
+        const opened = handleDocumentPopup(receiptNode, `${selected.receipt.receiptNumber} Receipt`, true);
+        if (opened) {
+            showActionStatus('Receipt window opened successfully. Use the browser print dialog to save or print.', 'success');
+        }
     }
 
     function handleOpenReceiptOnly() {
         const receiptNode = getReceiptNode();
-        if (!receiptNode || !selected) return;
-        openReceiptDocument(receiptNode, `${selected.receipt.receiptNumber} Receipt`);
+        if (!receiptNode || !selected) {
+            showActionStatus('Unable to open receipt because the receipt content is unavailable.', 'error');
+            return;
+        }
+        const opened = handleDocumentPopup(receiptNode, `${selected.receipt.receiptNumber} Receipt`);
+        if (opened) {
+            showActionStatus('Receipt opened successfully in a new tab.', 'success');
+        }
     }
 
     function handleSend(channel: 'email' | 'whatsapp') {
         if (!selected) return;
         const shareText = buildReceiptShareText(state.profile, selected.txn, selected.receipt);
+
         if (channel === 'email') {
             const subject = encodeURIComponent(`Receipt ${selected.receipt.receiptNumber}`);
             const body = encodeURIComponent(shareText);
-            window.open(`mailto:${selected.txn.customerEmail || ''}?subject=${subject}&body=${body}`, '_self');
-        } else {
-            const text = encodeURIComponent(shareText);
-            window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
+            window.location.href = `mailto:${selected.txn.customerEmail || ''}?subject=${subject}&body=${body}`;
+            markReceiptSent(selected.receipt.id, channel);
+            showActionStatus(`Prepared email share for ${selected.txn.customerName}.`, 'success');
+            return;
         }
+
+        const text = encodeURIComponent(shareText);
+        const popup = window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
+        if (!popup) {
+            console.warn('WhatsApp share popup was blocked by the browser.');
+            showActionStatus('WhatsApp share popup was blocked. Please allow popups and try again.', 'error');
+            return;
+        }
+
         markReceiptSent(selected.receipt.id, channel);
-        setSendStatus(`Prepared ${channel === 'email' ? 'email' : 'WhatsApp'} share for ${selected.txn.customerName}.`);
-        setTimeout(() => setSendStatus(null), 6000);
+        showActionStatus(`Prepared WhatsApp share for ${selected.txn.customerName}.`, 'success');
     }
 
     if (!hydrated) {
@@ -189,11 +226,16 @@ function ReceiptsInner() {
                                 <p className="text-xs text-slate-500 mt-3">
                                     Print and PDF actions are restricted to the receipt element only. SMS has been removed from this demo.
                                 </p>
-                                {sendStatus && (
-                                    <div className="mt-3 flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-md px-3 py-2 text-xs text-blue-900">
-                                        <Check className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                                        <span>{sendStatus}</span>
-                                        <button onClick={() => setSendStatus(null)} className="ml-auto">
+                                {actionStatus && (
+                                    <div
+                                        className={`mt-3 flex items-start gap-2 rounded-md px-3 py-2 text-xs ${
+                                            actionStatus.type === 'success'
+                                                ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                                                : 'bg-rose-50 border border-rose-200 text-rose-800'
+                                        }`}
+                                    >
+                                        <span className="flex-1">{actionStatus.message}</span>
+                                        <button onClick={() => setActionStatus(null)} className="ml-auto">
                                             <X className="h-3 w-3" />
                                         </button>
                                     </div>

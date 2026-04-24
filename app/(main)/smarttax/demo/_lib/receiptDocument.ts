@@ -12,15 +12,19 @@ function cloneDocumentHead(): string {
     return `${stylesHtml}\n${tailwindCDN}`;
 }
 
-export function openReceiptDocument(receiptNode: HTMLElement, title: string, autoPrint = false) {
-    const popup = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
+export function openReceiptDocument(
+    receiptNode: HTMLElement,
+    title: string,
+    autoPrint = false,
+    popupWindow?: Window | null,
+) {
+    const popup = popupWindow ?? window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
     if (!popup) {
         return false;
     }
 
     const styles = cloneDocumentHead();
-    popup.document.open();
-    popup.document.write(`
+    const documentHtml = `
         <!doctype html>
         <html>
             <head>
@@ -41,15 +45,22 @@ export function openReceiptDocument(receiptNode: HTMLElement, title: string, aut
                 ${receiptNode.outerHTML}
             </body>
         </html>
-    `);
-    popup.document.close();
+    `;
 
-    if (autoPrint) {
-        popup.onload = () => {
-            popup.focus();
-            popup.print();
-        };
-    }
+    const writeDocument = () => {
+        popup.document.open();
+        popup.document.write(documentHtml);
+        popup.document.close();
+
+        if (autoPrint) {
+            popup.onload = () => {
+                popup.focus();
+                popup.print();
+            };
+        }
+    };
+
+    writeDocument();
 
     return true;
 }

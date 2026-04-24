@@ -71,6 +71,7 @@ export function SmartTaxDashboard() {
   const { state, updateSettings } = useSmartTaxStore();
   const [transactions] = useState<Transaction[]>(initialTransactions);
   const [selectedReceipt, setSelectedReceipt] = useState<Transaction | null>(null);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const taxRate = state.settings.profitTaxRatePercent;
 
@@ -111,29 +112,55 @@ export function SmartTaxDashboard() {
     return lines.filter(Boolean).join("\n");
   };
 
+  function showNotification(message: string, type: 'success' | 'error') {
+    setNotification({ message, type });
+    window.setTimeout(() => setNotification(null), 6000);
+  }
+
   const handlePrint = () => {
     const node = document.getElementById("receipt-print-area");
-    if (!node || !selectedReceipt) return;
-    exportReceiptAsPDF(node, `receipt-${selectedReceipt.reference}.pdf`);
+    if (!node || !selectedReceipt) {
+      showNotification('Receipt content unavailable for print.', 'error');
+      return;
+    }
+    const opened = exportReceiptAsPDF(node, `receipt-${selectedReceipt.reference}.pdf`);
+    if (!opened) {
+      showNotification('Popup blocked. Please allow popups and try again.', 'error');
+      return;
+    }
+    showNotification('Receipt opened for print successfully.', 'success');
   };
 
   const handleWhatsApp = () => {
     if (!selectedReceipt) return;
     const text = encodeURIComponent(buildReceiptShareText(selectedReceipt));
-    window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
+    const popup = window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
+    if (!popup) {
+      showNotification('WhatsApp share popup was blocked. Please allow popups and try again.', 'error');
+      return;
+    }
+    showNotification('WhatsApp share ready in a new tab.', 'success');
   };
 
   const handleEmail = () => {
     if (!selectedReceipt) return;
     const subject = encodeURIComponent(`Receipt - ${selectedReceipt.reference}`);
     const body = encodeURIComponent(buildReceiptShareText(selectedReceipt));
-    window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 
   const handlePDF = () => {
     const node = document.getElementById("receipt-print-area");
-    if (!node) return;
-    exportReceiptAsPDF(node);
+    if (!node) {
+      showNotification('Receipt content unavailable for PDF export.', 'error');
+      return;
+    }
+    const opened = exportReceiptAsPDF(node);
+    if (!opened) {
+      showNotification('Popup blocked. Please allow popups and try again.', 'error');
+      return;
+    }
+    showNotification('PDF export window opened successfully.', 'success');
   };
 
   return (
@@ -265,6 +292,18 @@ export function SmartTaxDashboard() {
                 <Mail className="h-4 w-4" /> Email
               </button>
             </div>
+
+            {notification && (
+              <div
+                className={`border-b px-4 py-3 text-sm ${
+                  notification.type === 'success'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    : 'bg-rose-50 border-rose-200 text-rose-800'
+                }`}
+              >
+                {notification.message}
+              </div>
+            )}
 
             <div className="bg-white p-8 print:p-0" id="receipt-print-area">
               <div className="mb-6 text-center">

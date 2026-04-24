@@ -6,11 +6,14 @@ function cloneDocumentHead(): string {
   return nodes.map((node) => node.outerHTML).join('\n');
 }
 
-export async function exportReceiptAsPDF(receiptNode: HTMLElement, fileName = 'receipt.pdf') {
-  if (!receiptNode || typeof window === 'undefined') return;
+export function exportReceiptAsPDF(receiptNode: HTMLElement, fileName = 'receipt.pdf') {
+  if (!receiptNode || typeof window === 'undefined') return false;
 
   const popup = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
-  if (!popup) return;
+  if (!popup) {
+    console.warn('PDF export popup was blocked by the browser.');
+    return false;
+  }
 
   const styles = cloneDocumentHead();
   popup.document.open();
@@ -37,4 +40,6 @@ export async function exportReceiptAsPDF(receiptNode: HTMLElement, fileName = 'r
     popup.focus();
     popup.print();
   };
+
+  return true;
 }
