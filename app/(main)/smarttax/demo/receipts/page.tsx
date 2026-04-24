@@ -42,7 +42,11 @@ function ReceiptsInner() {
             return false;
         }
 
-        openReceiptDocument(receiptNode, title, autoPrint, popup);
+        // Defer heavy DOM serialization and cross-window writes to unblock the main thread
+        // and allow the browser to paint the button's clicked state immediately.
+        setTimeout(() => {
+            openReceiptDocument(receiptNode, title, autoPrint, popup);
+        }, 10);
         return true;
     }
 

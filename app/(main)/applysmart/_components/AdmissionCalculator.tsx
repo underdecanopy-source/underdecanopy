@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { federalUniversities, stateUniversities, polytechnics, firstTierCourses, secondTierCourses, thirdTierCourses, states } from "@/lib/data/applysmart";
+import { federalUniversities, stateUniversities, privateUniversities, polytechnics, statePolytechnics, collegesOfEducation, monotechnics, nursingColleges, ieis, firstTierCourses, secondTierCourses, thirdTierCourses, states } from "@/lib/data/applysmart";
 import { calculateAdmissionChance } from "@/lib/utils/admissionCalculator";
 
 // Mapping from form course values to utility course keys
@@ -86,8 +86,24 @@ export function AdmissionCalculator() {
                         <optgroup label="State Universities">
                             {stateUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
                         </optgroup>
-                        <optgroup label="Polytechnics">
+                        <optgroup label="Private Universities">
+                            {privateUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
+                        </optgroup>
+                        <optgroup label="Federal & State Polytechnics">
                             {polytechnics.map(poly => <option key={poly.value} value={poly.value}>{poly.label}</option>)}
+                            {statePolytechnics.map(poly => <option key={poly.value} value={poly.value}>{poly.label}</option>)}
+                        </optgroup>
+                        <optgroup label="Colleges of Education">
+                            {collegesOfEducation.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
+                        </optgroup>
+                        <optgroup label="Monotechnics">
+                            {monotechnics.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
+                        </optgroup>
+                        <optgroup label="College of Nursing">
+                            {nursingColleges.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
+                        </optgroup>
+                        <optgroup label="Institutes of Education/IEIs">
+                            {ieis.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
                         </optgroup>
                     </select>
                 </div>

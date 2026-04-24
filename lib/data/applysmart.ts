@@ -1,37 +1,26 @@
-export const federalUniversities = [
-  { value: 'UNILAG', label: 'University of Lagos (UNILAG)' },
-  { value: 'UI', label: 'University of Ibadan (UI)' },
-  { value: 'OAU', label: 'Obafemi Awolowo University (OAU)' },
-  { value: 'UNIBEN', label: 'University of Benin (UNIBEN)' },
-  { value: 'UNN', label: 'University of Nigeria, Nsukka (UNN)' },
-  { value: 'ABU', label: 'Ahmadu Bello University (ABU)' },
-  { value: 'BUK', label: 'Bayero University Kano (BUK)' },
-  { value: 'FUTA', label: 'Federal University of Technology, Akure (FUTA)' },
-  { value: 'FUTO', label: 'Federal University of Technology, Owerri (FUTO)' },
-  { value: 'UNIPORT', label: 'University of Port Harcourt (UNIPORT)' },
-  { value: 'UNILORIN', label: 'University of Ilorin (UNILORIN)' },
-  { value: 'UNICAL', label: 'University of Calabar (UNICAL)' },
-  { value: 'FUNAAB', label: 'Federal University of Agriculture, Abeokuta (FUNAAB)' },
-  { value: 'UNIJOS', label: 'University of Jos (UNIJOS)' },
-  { value: 'UNIMAID', label: 'University of Maiduguri (UNIMAID)' },
-];
+import {
+  federalInstitutions,
+  stateUniversities as stateUniInstitutions,
+  polytechnics as polytechnicInstitutions,
+  privateInstitutions,
+  statePolytechnics as statePolytechnicInstitutions,
+  collegesOfEducation as collegeOfEducationInstitutions,
+  monotechnics as monotechnicInstitutions,
+  nursingColleges as nursingCollegeInstitutions,
+  ieis as ieiInstitutions,
+} from '@/lib/data/admissionDataset';
 
-export const stateUniversities = [
-  { value: 'LASU', label: 'Lagos State University (LASU)' },
-  { value: 'EKSU', label: 'Ekiti State University (EKSU)' },
-  { value: 'AAU', label: 'Ambrose Alli University (AAU)' },
-  { value: 'OOU', label: 'Olabisi Onabanjo University (OOU)' },
-  { value: 'RSU', label: 'Rivers State University (RSU)' },
-  { value: 'PLASU', label: 'Plateau State University (PLASU)' },
-  { value: 'KSU', label: 'Prince Abubakar Audu University (KSU)' },
-];
+const toOption = (id: string, name: string) => ({ value: id, label: `${name} (${id})` });
 
-export const polytechnics = [
-  { value: 'YABATECH', label: 'Yaba College of Technology (YABATECH)' },
-  { value: 'FEDPOLYNEKEDE', label: 'Federal Polytechnic, Nekede' },
-  { value: 'FEDPOLYILARO', label: 'Federal Polytechnic, Ilaro' },
-  { value: 'MAPOLY', label: 'Moshood Abiola Polytechnic (MAPOLY)' },
-];
+export const federalUniversities = federalInstitutions.map(({ id, name }) => toOption(id, name));
+export const stateUniversities = stateUniInstitutions.map(({ id, name }) => toOption(id, name));
+export const privateUniversities = privateInstitutions.map(({ id, name }) => toOption(id, name));
+export const polytechnics = polytechnicInstitutions.map(({ id, name }) => toOption(id, name));
+export const statePolytechnics = statePolytechnicInstitutions.map(({ id, name }) => toOption(id, name));
+export const collegesOfEducation = collegeOfEducationInstitutions.map(({ id, name }) => toOption(id, name));
+export const monotechnics = monotechnicInstitutions.map(({ id, name }) => toOption(id, name));
+export const nursingColleges = nursingCollegeInstitutions.map(({ id, name }) => toOption(id, name));
+export const ieis = ieiInstitutions.map(({ id, name }) => toOption(id, name));
 
 export const firstTierCourses = [
   { value: 'Medicine and Surgery (MBBS)', label: 'Medicine and Surgery' },
