@@ -6,19 +6,12 @@ import html2canvas from 'html2canvas';
  * Prevents 'about:blank' issues by ensuring content is written before printing.
  */
 export const printContent = (htmlContent: string) => {
-  // Opening about:blank explicitly before writing
-  const printWindow = window.open('about:blank', '_blank', 'width=800,height=600');
+  const printWindow = window.open('', '_blank', 'width=800,height=600');
   
   if (!printWindow) {
-    alert('Please allow pop-ups to print your document.');
+    alert('Please allow pop-ups to print.');
     return;
   }
-
-  // Setup event listeners BEFORE writing content to avoid race conditions
-  printWindow.onload = () => {
-    printWindow.focus();
-    printWindow.print();
-  };
 
   printWindow.document.write(`
     <!DOCTYPE html>
@@ -41,15 +34,19 @@ export const printContent = (htmlContent: string) => {
   `);
   printWindow.document.close();
   
-  // Fallback for browsers that don't trigger onload for document.write
-  setTimeout(() => {
-    if (printWindow && printWindow.document.readyState === 'complete') {
-      printWindow.focus();
-      printWindow.print();
-    }
-  }, 500);
+  const triggerPrint = () => {
+    if (!printWindow) return;
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
 
-  printWindow.onafterprint = () => printWindow.close();
+  // Handle browser timing differences for document.write completion
+  if (printWindow.document.readyState === 'complete') {
+    triggerPrint();
+  } else {
+    printWindow.onload = triggerPrint;
+  }
 };
 
 /**
