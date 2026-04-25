@@ -37,6 +37,9 @@ export async function submitContactForm(prevState: State, formData: FormData): P
   }
 
   try {
+    console.log('New contact form submission:');
+    console.log(validatedFields.data);
+
     // send email via Resend
     await resend.emails.send({
       from: "contact@underdecanopy.com",

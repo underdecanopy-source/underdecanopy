@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import type { Profile, Reminder, Receipt, SmartTaxState, TaxReturn, TaxSettings, Transaction } from './types';
+import type { AuditEntry, Profile, Reminder, Receipt, SmartTaxState, TaxReturn, TaxSettings, Transaction } from './types';
 import { getDebitCreditLabel } from './financials';
 import { calculateTransactionTax } from './taxCalculator';
 
@@ -64,6 +64,7 @@ function seedDefaults(): SmartTaxState {
         receipts: [],
         taxReturns: [],
         reminders,
+        auditTrail: [],
         initialized: true,
     };
 }
@@ -138,7 +139,19 @@ export function loadState(): SmartTaxState {
                     ? taxReturn.totalWhtCredit
                     : ((taxReturn as TaxReturn & { totalWhtDeducted?: number }).totalWhtDeducted ?? 0),
         }));
-        return { ...parsed, settings: migratedSettings, transactions: migratedTxns, receipts: migratedReceipts, taxReturns: migratedTaxReturns };
+        const migratedAuditTrail = (parsed.auditTrail || []).map((entry: AuditEntry) => ({
+            ...entry,
+            timestamp: entry.timestamp || new Date().toISOString(),
+            recordHash: entry.recordHash ?? '',
+        }));
+        return {
+            ...parsed,
+            settings: migratedSettings,
+            transactions: migratedTxns,
+            receipts: migratedReceipts,
+            taxReturns: migratedTaxReturns,
+            auditTrail: migratedAuditTrail,
+        };
     } catch {
         return seedDefaults();
     }
@@ -236,6 +249,16 @@ export function useSmartTaxStore() {
         const taxReturn: TaxReturn = { ...input, id, createdAt: new Date().toISOString() };
         setState((current) => ({ ...current, taxReturns: [taxReturn, ...current.taxReturns] }));
         return taxReturn;
+    }, []);
+
+    const addAuditEntry = useCallback((entry: Omit<AuditEntry, 'id' | 'timestamp'>) => {
+        const auditEntry: AuditEntry = {
+            ...entry,
+            id: `audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            timestamp: new Date().toISOString(),
+        };
+        setState((current) => ({ ...current, auditTrail: [auditEntry, ...current.auditTrail] }));
+        return auditEntry;
     }, []);
 
     const addReminder = useCallback((input: Omit<Reminder, 'id' | 'createdAt' | 'isCompleted'>) => {
@@ -456,6 +479,7 @@ export function useSmartTaxStore() {
         deleteTransaction,
         markReceiptSent,
         addTaxReturn,
+        addAuditEntry,
         addReminder,
         toggleReminder,
         deleteReminder,

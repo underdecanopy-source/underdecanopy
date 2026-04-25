@@ -38,8 +38,11 @@ export async function subscribeToNewsletter(
     });
 
     if (existingSubscription && existingSubscription.isActive) {
+      console.log('Existing newsletter subscription:', email);
       return { message: 'You are already subscribed to our newsletter!' };
     }
+
+    console.log('New newsletter subscription:', email);
 
     // Create or reactivate subscription
     await db.newsletterSubscription.upsert({

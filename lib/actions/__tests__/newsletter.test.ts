@@ -1,3 +1,18 @@
+jest.mock('@/lib/prisma', () => {
+  return {
+    __esModule: true,
+    default: {
+      newsletterSubscription: {
+        findUnique: jest.fn(async () => null),
+        upsert: jest.fn(async ({ create }: any) => ({
+          email: create?.email || '',
+          isActive: true,
+        })),
+      },
+    },
+  };
+});
+
 import { subscribeToNewsletter, NewsletterState } from '../newsletter';
 
 describe('Newsletter Subscription Action', () => {

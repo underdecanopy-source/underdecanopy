@@ -1,3 +1,14 @@
+jest.mock('resend', () => {
+  return {
+    __esModule: true,
+    Resend: jest.fn().mockImplementation(() => ({
+      emails: {
+        send: jest.fn(async () => ({ id: 'test-email' })),
+      },
+    })),
+  };
+});
+
 import { submitContactForm, State } from '../contact';
 
 describe('Contact Form Action', () => {

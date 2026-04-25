@@ -12,6 +12,7 @@ function withEnv(vars: Record<string, string | undefined>, fn: () => void) {
   const g: any = (globalThis as any)
   const env = g.process ? g.process.env : (g.process = { env: {} }).env
   const prev = { ...env }
+  Object.keys(env).forEach(k => delete env[k])
   Object.assign(env, vars)
   try { fn() } finally {
     Object.keys(env).forEach(k => delete env[k])

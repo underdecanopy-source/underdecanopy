@@ -61,6 +61,22 @@ export interface TaxReturn {
     status: 'draft' | 'filed' | 'approved';
     filingDate?: string;
     createdAt: string;
+    documentTitle?: string;
+    documentGeneratedAt?: string;
+    pdfHash?: string;
+}
+
+export interface AuditEntry {
+    id: string;
+    timestamp: string;
+    userId: string;
+    resourceType: 'taxReturn' | 'transaction' | 'receipt' | 'settings';
+    resourceId: string;
+    action: 'create' | 'update' | 'delete' | 'filed';
+    note?: string;
+    oldValue?: unknown;
+    newValue?: unknown;
+    recordHash: string;
 }
 
 export interface Reminder {
@@ -79,5 +95,6 @@ export interface SmartTaxState {
     receipts: Receipt[];
     taxReturns: TaxReturn[];
     reminders: Reminder[];
+    auditTrail: AuditEntry[];
     initialized: boolean;
 }

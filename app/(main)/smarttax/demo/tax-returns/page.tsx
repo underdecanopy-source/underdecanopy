@@ -4,21 +4,53 @@ import { useMemo, useState } from 'react';
 import { CheckCircle2, FileText, Plus } from 'lucide-react';
 import { EmptyState, PageHeader } from '../_components/ui';
 import { filterTransactionsByPeriod, summarizeTransactions } from '../_lib/financials';
+import { openPrintableDocument } from '../_lib/openDocument';
 import { useSmartTaxStore } from '../_lib/store';
 import { calculatePersonalIncomeTax, formatNaira } from '../_lib/taxCalculator';
 
 type ReturnType = 'VAT' | 'PIT' | 'WHT' | 'CIT';
 
+type TaxSummary =
+    | {
+          kind: 'period';
+          period: string;
+          transactionCount: number;
+          totalIncome: number;
+          totalVat: number;
+          totalWht: number;
+          taxPayable: number;
+          dueDate: Date;
+      }
+    | {
+          kind: 'pit';
+          period: string;
+          annualIncome: number;
+          tax: number;
+          effectiveRate: number;
+          bracketBreakdown: Array<{ label: string; taxedAmount: number; tax: number }>;
+          dueDate: Date;
+      }
+    | {
+          kind: 'cit';
+          period: string;
+          revenue: number;
+          expenses: number;
+          profitBeforeTax: number;
+          cit: number;
+          dueDate: Date;
+      };
+
 export default function TaxReturnsPage() {
-    const { state, hydrated, addTaxReturn } = useSmartTaxStore();
+    const { state, hydrated, addTaxReturn, addAuditEntry } = useSmartTaxStore();
     const [returnType, setReturnType] = useState<ReturnType>('VAT');
+    const [selectedAuditReturnId, setSelectedAuditReturnId] = useState<string | null>(null);
     const now = new Date();
     const [year, setYear] = useState<string>(String(now.getFullYear()));
     const [month, setMonth] = useState<string>(String(now.getMonth() + 1).padStart(2, '0'));
     const [annualIncome, setAnnualIncome] = useState<string>('');
     const [filedMsg, setFiledMsg] = useState<string | null>(null);
 
-    const summary = useMemo(() => {
+    const summary = useMemo<TaxSummary>(() => {
         if (returnType === 'VAT' || returnType === 'WHT') {
             const txns = filterTransactionsByPeriod(state.transactions, 'monthly', Number(year), Number(month) - 1).filter(
                 (transaction) => (returnType === 'VAT' ? transaction.type === 'revenue' : transaction.type === 'expense')
@@ -64,43 +96,146 @@ export default function TaxReturnsPage() {
         };
     }, [annualIncome, month, returnType, state.settings.profitTaxRatePercent, state.transactions, year]);
 
-    function handleFile() {
-        if (summary.kind === 'period') {
-            addTaxReturn({
-                returnType,
-                filingPeriod: summary.period,
-                totalIncome: summary.totalIncome,
-                totalVatCredit: summary.totalVat,
-                totalWhtCredit: summary.totalWht,
-                taxPayable: summary.taxPayable,
-                status: 'filed',
-                filingDate: new Date().toISOString(),
-            });
-        } else if (summary.kind === 'pit') {
-            addTaxReturn({
-                returnType,
-                filingPeriod: summary.period,
-                totalIncome: summary.annualIncome,
-                totalVatCredit: 0,
-                totalWhtCredit: 0,
-                taxPayable: summary.tax,
-                status: 'filed',
-                filingDate: new Date().toISOString(),
-            });
-        } else {
-            addTaxReturn({
-                returnType,
-                filingPeriod: summary.period,
-                totalIncome: summary.revenue,
-                totalVatCredit: 0,
-                totalWhtCredit: 0,
-                taxPayable: summary.cit,
-                status: 'filed',
-                filingDate: new Date().toISOString(),
-            });
+    async function createDocumentHash(content: string): Promise<string> {
+        const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
+        return Array.from(new Uint8Array(hashBuffer))
+            .map((byte) => byte.toString(16).padStart(2, '0'))
+            .join('');
+    }
+
+    function buildTaxReturnDocumentHtml(
+        taxReturn: {
+            returnType: ReturnType;
+            filingPeriod: string;
+            totalIncome: number;
+            totalVatCredit: number;
+            totalWhtCredit: number;
+            taxPayable: number;
+            filingDate: string;
+            documentTitle: string;
+            documentGeneratedAt: string;
+            pdfHash: string;
+        },
+        summary?: TaxSummary
+    ) {
+        const header = `<div class="document-header"><h1>${taxReturn.documentTitle}</h1><p class="small-text">Filed on ${new Date(taxReturn.filingDate).toLocaleDateString('en-NG', { dateStyle: 'long' })}</p></div>`;
+        const summaryRows: string[] = [];
+
+        if (summary) {
+            if (summary.kind === 'period') {
+                summaryRows.push(`
+                    <div class="card">
+                        <div class="field-row"><span><strong>Transaction Count</strong><span>${summary.transactionCount}</span></span><span><strong>Total Income</strong><span>${formatNaira(summary.totalIncome)}</span></span></div>
+                        <div class="field-row"><span><strong>VAT Credits</strong><span>${formatNaira(summary.totalVat)}</span></span><span><strong>WHT Credits</strong><span>${formatNaira(summary.totalWht)}</span></span></div>
+                        <div class="field-row"><span><strong>Tax Payable</strong><span>${formatNaira(summary.taxPayable)}</span></span><span><strong>Due Date</strong><span>${summary.dueDate.toLocaleDateString('en-NG')}</span></span></div>
+                    </div>
+                `);
+            } else if (summary.kind === 'pit') {
+                summaryRows.push(`
+                    <div class="card">
+                        <div class="field-row"><span><strong>Annual Income</strong><span>${formatNaira(summary.annualIncome)}</span></span><span><strong>Tax Payable</strong><span>${formatNaira(summary.tax)}</span></span></div>
+                        <div class="field-row"><span><strong>Effective Rate</strong><span>${summary.effectiveRate.toFixed(2)}%</span></span><span><strong>Due Date</strong><span>${summary.dueDate.toLocaleDateString('en-NG')}</span></span></div>
+                    </div>
+                    <div class="card"><strong>Bracket Breakdown</strong>${summary.bracketBreakdown
+                        .map((item: { label: string; taxedAmount: number; tax: number }) =>
+                            `<div class="field-row"><span>${item.label}</span><span>${formatNaira(item.tax)}</span></span></div>`
+                        )
+                        .join('')}</div>
+                `);
+            } else {
+                summaryRows.push(`
+                    <div class="card">
+                        <div class="field-row"><span><strong>Revenue</strong><span>${formatNaira(summary.revenue)}</span></span><span><strong>Expenses</strong><span>${formatNaira(summary.expenses)}</span></span></div>
+                        <div class="field-row"><span><strong>Profit Before Tax</strong><span>${formatNaira(summary.profitBeforeTax)}</span></span><span><strong>CIT</strong><span>${formatNaira(summary.cit)}</span></span></div>
+                        <div class="field-row"><span><strong>Due Date</strong><span>${summary.dueDate.toLocaleDateString('en-NG')}</span></span><span></span></div>
+                    </div>
+                `);
+            }
         }
+
+        const footer = `<div class="footer-note">This document is a generated tax return record for the selected period. The SHA-256 digest below is stored with the record to help verify document integrity and demonstrate a tamper-evident filing proof.</div>
+                        <div class="card"><strong>Document Hash</strong><div class="small-text">${taxReturn.pdfHash}</div></div>`;
+
+        return `${header}${summaryRows.join('')}<div class="card"><div class="field-row"><span><strong>Filing Period</strong><span>${taxReturn.filingPeriod}</span></span><span><strong>Return Type</strong><span>${taxReturn.returnType}</span></span></div><div class="field-row"><span><strong>Total Income</strong><span>${formatNaira(taxReturn.totalIncome)}</span></span><span><strong>Tax Payable</strong><span>${formatNaira(taxReturn.taxPayable)}</span></span></div></div>${footer}`;
+    }
+
+    async function handleFile() {
+        const filingDate = new Date().toISOString();
+        const documentTitle = `${returnType} Return ${summary.period}`;
+        const baseReturn = {
+            returnType,
+            filingPeriod: summary.period,
+            totalIncome: summary.kind === 'period' ? summary.totalIncome : summary.kind === 'pit' ? summary.annualIncome : summary.revenue,
+            totalVatCredit: summary.kind === 'period' ? summary.totalVat : 0,
+            totalWhtCredit: summary.kind === 'period' ? summary.totalWht : 0,
+            taxPayable: summary.kind === 'pit' ? summary.tax : summary.kind === 'cit' ? summary.cit : summary.taxPayable,
+            status: 'filed' as const,
+            filingDate,
+            documentTitle,
+            documentGeneratedAt: filingDate,
+            pdfHash: '',
+        };
+
+        const previewHtml = buildTaxReturnDocumentHtml({ ...baseReturn, pdfHash: 'pending' }, summary);
+        const pdfHash = await createDocumentHash(previewHtml);
+        const taxReturn = addTaxReturn({ ...baseReturn, pdfHash });
+
+        addAuditEntry({
+            userId: state.profile.email || 'demo@smarttax.ng',
+            resourceType: 'taxReturn',
+            resourceId: taxReturn.id,
+            action: 'filed',
+            note: `Filed ${returnType} return for ${summary.period}`,
+            newValue: taxReturn,
+            recordHash: pdfHash,
+        });
+
+        const documentHtml = buildTaxReturnDocumentHtml(taxReturn, summary);
+        openPrintableDocument(documentHtml, documentTitle, true);
+
         setFiledMsg(`${returnType} return prepared using the updated revenue and expense split.`);
         setTimeout(() => setFiledMsg(null), 6000);
+    }
+
+    function handlePreviewReturnDocument(taxReturn: typeof state.taxReturns[number]) {
+        const documentHtml = buildTaxReturnDocumentHtml(
+            {
+                ...taxReturn,
+                filingDate: taxReturn.filingDate ?? new Date().toISOString(),
+                documentTitle: `${taxReturn.returnType} Return ${taxReturn.filingPeriod}`,
+                documentGeneratedAt: taxReturn.documentGeneratedAt ?? taxReturn.filingDate ?? new Date().toISOString(),
+                pdfHash: taxReturn.pdfHash ?? 'n/a',
+            },
+            summary
+        );
+        openPrintableDocument(documentHtml, `${taxReturn.returnType}-${taxReturn.filingPeriod}-return`, true);
+    }
+
+    function renderAuditTrail() {
+        if (!selectedAuditReturnId) return null;
+        const entries = state.auditTrail.filter((entry) => entry.resourceId === selectedAuditReturnId);
+        if (entries.length === 0) {
+            return (
+                <div className="mt-4 bg-slate-50 border border-slate-200 rounded-lg p-4 text-slate-600">
+                    No audit entries found for this return.
+                </div>
+            );
+        }
+
+        return (
+            <div className="mt-4 bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <h3 className="font-semibold text-slate-800 mb-3">Audit Trail</h3>
+                <div className="space-y-3">
+                    {entries.map((entry) => (
+                        <div key={entry.id} className="rounded-lg border border-slate-200 bg-white p-3">
+                            <p className="text-sm font-semibold text-slate-800">{entry.action.toUpperCase()} • {new Date(entry.timestamp).toLocaleString('en-NG')}</p>
+                            <p className="text-sm text-slate-600">{entry.note}</p>
+                            <p className="text-xs text-slate-500 mt-2">Record Hash: {entry.recordHash}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -190,38 +325,57 @@ export default function TaxReturnsPage() {
                 {state.taxReturns.length === 0 ? (
                     <EmptyState title="No returns filed yet" description="Prepare and file a return above to see it here." />
                 ) : (
-                    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                        <table className="w-full text-sm">
-                            <thead className="bg-slate-50 text-slate-600 text-xs uppercase">
-                                <tr>
-                                    <th className="text-left px-5 py-3">Type</th>
-                                    <th className="text-left px-5 py-3">Period</th>
-                                    <th className="text-right px-5 py-3">Income</th>
-                                    <th className="text-right px-5 py-3">Tax Payable</th>
-                                    <th className="text-left px-5 py-3">Status</th>
-                                    <th className="text-left px-5 py-3">Filed</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {state.taxReturns.map((taxReturn) => (
-                                    <tr key={taxReturn.id} className="border-t border-slate-100">
-                                        <td className="px-5 py-3 font-semibold text-slate-800">{taxReturn.returnType}</td>
-                                        <td className="px-5 py-3 text-slate-600">{taxReturn.filingPeriod}</td>
-                                        <td className="px-5 py-3 text-right text-slate-700">{formatNaira(taxReturn.totalIncome)}</td>
-                                        <td className="px-5 py-3 text-right font-semibold text-slate-900">{formatNaira(taxReturn.taxPayable)}</td>
-                                        <td className="px-5 py-3">
-                                            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                                                <CheckCircle2 className="h-3 w-3" /> {taxReturn.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-5 py-3 text-xs text-slate-500">
-                                            {taxReturn.filingDate ? new Date(taxReturn.filingDate).toLocaleDateString('en-NG') : '-'}
-                                        </td>
+                    <>
+                        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                            <table className="w-full text-sm">
+                                <thead className="bg-slate-50 text-slate-600 text-xs uppercase">
+                                    <tr>
+                                        <th className="text-left px-5 py-3">Type</th>
+                                        <th className="text-left px-5 py-3">Period</th>
+                                        <th className="text-right px-5 py-3">Income</th>
+                                        <th className="text-right px-5 py-3">Tax Payable</th>
+                                        <th className="text-left px-5 py-3">Status</th>
+                                        <th className="text-left px-5 py-3">Document</th>
+                                        <th className="text-left px-5 py-3">Filed</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {state.taxReturns.map((taxReturn) => (
+                                        <tr key={taxReturn.id} className="border-t border-slate-100">
+                                            <td className="px-5 py-3 font-semibold text-slate-800">{taxReturn.returnType}</td>
+                                            <td className="px-5 py-3 text-slate-600">{taxReturn.filingPeriod}</td>
+                                            <td className="px-5 py-3 text-right text-slate-700">{formatNaira(taxReturn.totalIncome)}</td>
+                                            <td className="px-5 py-3 text-right font-semibold text-slate-900">{formatNaira(taxReturn.taxPayable)}</td>
+                                            <td className="px-5 py-3">
+                                                <span className="inline-flex items-center gap-1 text-xs font-semibold bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
+                                                    <CheckCircle2 className="h-3 w-3" /> {taxReturn.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-5 py-3 text-slate-700 space-y-1">
+                                                <button
+                                                    onClick={() => handlePreviewReturnDocument(taxReturn)}
+                                                    className="text-blue-600 hover:text-blue-800 text-sm"
+                                                >
+                                                    Print / Save PDF
+                                                </button>
+                                                <button
+                                                    onClick={() => setSelectedAuditReturnId((current) => (current === taxReturn.id ? null : taxReturn.id))}
+                                                    className="text-slate-600 hover:text-slate-900 text-sm"
+                                                >
+                                                    {selectedAuditReturnId === taxReturn.id ? 'Hide audit trail' : 'View audit trail'}
+                                                </button>
+                                                <div className="text-xs text-slate-500">Hash: {taxReturn.pdfHash?.slice(0, 10) ?? 'n/a'}</div>
+                                            </td>
+                                            <td className="px-5 py-3 text-xs text-slate-500">
+                                                {taxReturn.filingDate ? new Date(taxReturn.filingDate).toLocaleDateString('en-NG') : '-'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {renderAuditTrail()}
+                    </>
                 )}
             </div>
         </>

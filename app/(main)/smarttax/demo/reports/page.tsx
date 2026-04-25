@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { EmptyState, PageHeader, StatCard } from '../_components/ui';
 import { filterTransactionsByPeriod, getTransactionLabel, summarizeTransactions, type ReportPeriod } from '../_lib/financials';
+import { openPrintableDocument } from '../_lib/openDocument';
 import { useSmartTaxStore } from '../_lib/store';
 import { formatNaira } from '../_lib/taxCalculator';
 
@@ -12,6 +13,8 @@ export default function ReportsPage() {
     const [period, setPeriod] = useState<ReportPeriod>('yearly');
     const [year, setYear] = useState(String(now.getFullYear()));
     const [month, setMonth] = useState(String(now.getMonth() + 1).padStart(2, '0'));
+    const [validationMessage, setValidationMessage] = useState<string | null>(null);
+    const [validationStatus, setValidationStatus] = useState<'pass' | 'warning' | 'fail' | null>(null);
 
     const report = useMemo(() => {
         if (state.transactions.length === 0) return null;
@@ -58,6 +61,51 @@ export default function ReportsPage() {
         return { summary, monthly, byCategory, scopedTransactions };
     }, [month, period, state.settings.profitTaxRatePercent, state.transactions, year]);
 
+    function validateReport(reportData: NonNullable<typeof report>) {
+        const errors: string[] = [];
+        const expectedProfitBeforeTax = reportData.summary.revenue - reportData.summary.expenses;
+        if (Math.abs(reportData.summary.profitBeforeTax - expectedProfitBeforeTax) > 0.01) {
+            errors.push('Profit before tax should equal revenue minus expenses.');
+        }
+
+        const expectedTaxation = (reportData.summary.profitBeforeTax * state.settings.profitTaxRatePercent) / 100;
+        if (Math.abs(reportData.summary.taxation - expectedTaxation) > 0.01) {
+            errors.push('Taxation appears inconsistent with the configured profit-tax rate.');
+        }
+
+        const reportingEnd = period === 'monthly'
+            ? new Date(Number(year), Number(month) - 1, new Date(Number(year), Number(month), 0).getDate())
+            : new Date(Number(year), 11, 31);
+        const invalidTransactions = reportData.scopedTransactions.filter((transaction) => new Date(transaction.date) > reportingEnd);
+        if (invalidTransactions.length > 0) {
+            errors.push(`${invalidTransactions.length} transaction(s) are dated after the selected reporting period end.`);
+        }
+
+        if (errors.length > 0) {
+            return { status: 'fail' as const, message: `Report review found issues: ${errors.join(' ')}` };
+        }
+
+        return { status: 'pass' as const, message: 'Report metrics are consistent with the selected period, transaction totals, and tax settings.' };
+    }
+
+    function buildReportDocumentHtml(reportData: NonNullable<typeof report>) {
+        const title = `${period === 'monthly' ? 'Monthly' : 'Yearly'} Tax Report ${year}${period === 'monthly' ? `-${month}` : ''}`;
+        const header = `<div class="document-header"><h1>${title}</h1><p class="small-text">Generated on ${new Date().toLocaleDateString('en-NG', { dateStyle: 'long' })}</p></div>`;
+        const metrics = `<div class="card"><div class="field-row"><span><strong>Revenue</strong><span>${formatNaira(reportData.summary.revenue)}</span></span><span><strong>Expenses</strong><span>${formatNaira(reportData.summary.expenses)}</span></span></div><div class="field-row"><span><strong>Profit Before Tax</strong><span>${formatNaira(reportData.summary.profitBeforeTax)}</span></span><span><strong>Taxation</strong><span>${formatNaira(reportData.summary.taxation)}</span></span></div><div class="field-row"><span><strong>Profit After Tax</strong><span>${formatNaira(reportData.summary.profitAfterTax)}</span></span><span><strong>Profit Tax Rate</strong><span>${state.settings.profitTaxRatePercent}%</span></span></div></div>`;
+        const breakdown = Array.from(reportData.byCategory.entries())
+            .sort((a, b) => b[1].total - a[1].total)
+            .map(
+                ([label, bucket]) => `<div class="field-row"><span>${label}</span><span>${formatNaira(bucket.total)}</span></div>`
+            )
+            .join('');
+        return `${header}${metrics}<div class="card"><strong>Transaction Category Breakdown</strong>${breakdown}</div>`;
+    }
+
+    function handlePrintReport(reportData: NonNullable<typeof report>) {
+        const documentHtml = buildReportDocumentHtml(reportData);
+        openPrintableDocument(documentHtml, `${period === 'monthly' ? 'Monthly' : 'Yearly'}-Tax-Report-${year}${period === 'monthly' ? `-${month}` : ''}`);
+    }
+
     return (
         <>
             <PageHeader
@@ -98,6 +146,24 @@ export default function ReportsPage() {
                                 ))}
                             </select>
                         )}
+                        <button
+                            onClick={() => {
+                                if (report) {
+                                    const result = validateReport(report);
+                                    setValidationMessage(result.message);
+                                    setValidationStatus(result.status);
+                                }
+                            }}
+                            className="px-3 py-1.5 text-sm font-semibold rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        >
+                            Validate
+                        </button>
+                        <button
+                            onClick={() => report && handlePrintReport(report)}
+                            className="px-3 py-1.5 text-sm font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                        >
+                            Download PDF
+                        </button>
                     </>
                 }
             />
@@ -111,6 +177,11 @@ export default function ReportsPage() {
                 />
             ) : (
                 <>
+                    {validationMessage && (
+                        <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${validationStatus === 'pass' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : validationStatus === 'fail' ? 'border-rose-200 bg-rose-50 text-rose-800' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
+                            {validationMessage}
+                        </div>
+                    )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                         <StatCard label="Revenue" value={formatNaira(report.summary.revenue)} tone="blue" />
                         <StatCard label="Expenses" value={formatNaira(report.summary.expenses)} tone="orange" />

@@ -3,22 +3,7 @@ import '@testing-library/jest-dom';
 // Mock environment variables
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-key';
-
-// Suppress console errors in tests (optional)
-const originalError = console.error;
-beforeAll(() => {
-  console.error = (...args: unknown[]) => {
-    if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render')
-    ) {
-      return;
-    }
-    originalError.call(console, ...args);
-  };
-});
-
-afterAll(() => {
-  console.error = originalError;
-});
+process.env.RESEND_API_KEY = process.env.RESEND_API_KEY || 'test-resend-key';
+process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/testdb';
+process.env.DIRECT_URL = process.env.DIRECT_URL || 'postgresql://test:test@localhost:5432/testdb';
 
