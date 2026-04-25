@@ -77,148 +77,93 @@ export function calculateAdmissionChance(
   if (!courseInfo || !institution) return null;
 
   const factors: string[] = [];
-  let chance = 0;
-  let effectiveCutoff = institution.minimum_score;
+  let chance = 0; // Base chance starts at 0
+  const normalizedState = state?.trim();
+  const isELDS = educationallyLessDevelopedStates.includes(normalizedState);
 
-  const courseRange = getHistoricalRange(institution, course);
-  if (courseRange) {
-    const [low, high] = parseRange(courseRange);
-    if (score >= high) {
-      chance += 50;
-      factors.push('✓ Your score is at or above the strong historical range for this course');
-    } else if (score >= low) {
-      chance += 40;
-      factors.push('✓ Your score falls within the historical admission range for this course');
-    } else if (score >= effectiveCutoff) {
-      chance += 30;
-      factors.push('✓ Your score meets the institution minimum score');
-    } else if (score >= effectiveCutoff - 15) {
+  // 1. Base score vs institution minimum
+  if (score >= institution.minimum_score) {
+    chance += 30;
+    factors.push(`✓ You meet the minimum institution score (${institution.minimum_score})`);
+  } else {
+    chance += 5;
+    factors.push(`✗ Your score is below the institution minimum of ${institution.minimum_score}`);
+  }
+
+  // 2. Course competitiveness (historical range vs JAMB score)
+  const rangeString = getHistoricalRange(institution, course);
+  let scoreVsCourseStatus: 'high' | 'med' | 'low' = 'low';
+
+  if (rangeString) {
+    const [minRange, maxRange] = parseRange(rangeString);
+    if (score >= maxRange) {
+      chance += 35;
+      scoreVsCourseStatus = 'high';
+      factors.push(`✓ Your score is within or above the competitive range (${minRange}-${maxRange}) for this course`);
+    } else if (score >= minRange) {
       chance += 20;
-      factors.push('⚠ Your score is a little below the institution minimum score');
+      scoreVsCourseStatus = 'med';
+      factors.push(`⚠ Your score is at the lower bound of the competitive range (${minRange}-${maxRange})`);
     } else {
-      chance += 5;
-      factors.push('✗ Your score is below the institution minimum score');
+      chance += 10;
+      const eldsNote = isELDS ? '. However, as an ELDS applicant, you may still be considered via quota.' : '';
+      factors.push(`✗ Your score is significantly below the typical cut-off (${minRange}-${maxRange}) for this course${eldsNote}`);
     }
   } else {
-    const scoreDiff = score - effectiveCutoff;
-    if (scoreDiff >= 30) {
-      chance += 50;
-      factors.push('✓ Your score is well above the institution minimum score');
-    } else if (scoreDiff >= 10) {
-      chance += 40;
-      factors.push('✓ Your score is above the institution minimum score');
-    } else if (scoreDiff >= 0) {
-      chance += 30;
-      factors.push('✓ Your score meets the institution minimum score');
-    } else if (scoreDiff >= -10) {
-      chance += 20;
-      factors.push('⚠ Your score is slightly below the institution minimum score');
+    // Fallback: Use course cutoff if historical range is missing
+    if (score >= courseInfo.cutoff) {
+      chance += 25;
+      factors.push(`✓ Your score meets the estimated competitive cutoff for ${course}`);
     } else {
-      chance += 5;
-      factors.push('✗ Your score is significantly below the institution minimum score');
+      chance += 10;
+      factors.push(`⚠ Your score is below the estimated competitive cutoff for ${course}`);
     }
   }
 
-  chance += getInstitutionFactor(institution, score);
-  chance += getCourseCompetitionFactor(courseInfo);
-  chance += getCatchmentAndQuotaFactor(institution, state);
+  // 3. State of origin advantage (Catchment/ELDS/Priority)
+  const catchmentStates = institution.catchment_states ?? [];
+  
+  if (institution.type === 'Federal University') {
+    if (catchmentStates.includes(normalizedState)) {
+      chance += 20;
+      factors.push(`✓ Your state (${normalizedState}) is in the catchment area, giving you an advantage`);
+    } else if (isELDS) {
+      chance += 15;
+      factors.push(`✓ ELDS concession applies – you may be considered with a slightly lower score`);
+    } else {
+      factors.push(`✗ You are not from a catchment state for this institution`);
+    }
+    
+    // Special UNIABUJA FCT quota
+    if (institutionId.toLowerCase().includes('uniabuja') && normalizedState === 'FCT') {
+      chance += 5;
+      factors.push(`✓ FCT quota (2%) gives you a small advantage at this institution`);
+    }
+  } else if (institution.type === 'State University') {
+    if (institution.state_priority?.includes(normalizedState)) {
+      chance += 25;
+      factors.push(`✓ Indigene quota greatly improves your chance at this state university`);
+    } else {
+      factors.push(`✗ Non-indigene status; only 50% of seats are available to non-indigenes`);
+    }
+  }
+
+  // 4. Institution and Course competitiveness modifiers
+  const highCompUnis = ['unilag', 'ui', 'unilorin', 'abu', 'unn', 'oau'];
+  if (institution.type === 'Federal University' && highCompUnis.some(id => institutionId.toLowerCase().includes(id))) {
+    chance -= 10;
+    factors.push('⚠ This institution is highly competitive');
+  }
+
+  if (courseInfo.competition === 'Very High' || courseInfo.competition === 'High') {
+    chance -= 5;
+    factors.push('⚠ This course is highly competitive');
+  }
 
   chance = Math.round(Math.max(0, Math.min(100, chance)));
   const recommendation = getRecommendation(chance);
 
   return { chance, factors, recommendation };
-}
-
-function getHistoricalRange(institution: AdmissionInstitution, course: string) {
-  if (!institution.historical_score_ranges) return null;
-  return institution.historical_score_ranges[course] ?? null;
-}
-
-function parseRange(rangeString: string): [number, number] {
-  const [low, high] = rangeString.split('-').map(value => Number(value.trim()));
-  return [low, high];
-}
-
-function getInstitutionFactor(institution: AdmissionInstitution, score: number): number {
-  const institutionType = institution.type;
-  if (institutionType === 'Private University') {
-    return 25;
-  }
-
-  if (institutionType === 'Federal University') {
-    if (educationallyLessDevelopedStates.includes(institution.host_state)) {
-      return 15;
-    }
-    return 10;
-  }
-
-  if (institutionType === 'State University') {
-    return 12;
-  }
-
-  if (institutionType === 'Polytechnic' || institutionType === 'State Polytechnic') {
-    return 10;
-  }
-
-  if (institutionType === 'College of Education') {
-    return 8;
-  }
-
-  if (institutionType === 'Monotechnic' || institutionType === 'College of Nursing' || institutionType === 'IEI') {
-    return 12;
-  }
-
-  return 10;
-}
-
-function getCourseCompetitionFactor(courseInfo: CourseData): number {
-  switch (courseInfo.competition) {
-    case 'Very High':
-      return 5;
-    case 'High':
-      return 10;
-    case 'Medium':
-      return 15;
-    case 'Low':
-      return 18;
-    default:
-      return 10;
-  }
-}
-
-function getCatchmentAndQuotaFactor(institution: AdmissionInstitution, state: string): number {
-  let factor = 0;
-  const normalizedState = state?.trim();
-  const catchmentStates = institution.catchment_states ?? [];
-
-  if (!normalizedState) {
-    factor += 5;
-    return factor;
-  }
-
-  if (catchmentStates.includes(normalizedState)) {
-    factor += 10;
-  } else {
-    factor += 5;
-  }
-
-  if (institution.type === 'Federal University' && institution.fct_quota_enabled && normalizedState === 'FCT') {
-    factor += 5;
-  }
-
-  if (institution.type === 'Federal University' && educationallyLessDevelopedStates.includes(normalizedState)) {
-    factor += 10;
-  }
-
-  if (institution.type === 'State University' && institution.state_priority?.includes(normalizedState)) {
-    factor += 10;
-  }
-
-  if (institution.type === 'Private University') {
-    factor += 5;
-  }
-
-  return factor;
 }
 
 function getRecommendation(chance: number): string {
@@ -245,3 +190,14 @@ export function getChanceColor(chance: number): string {
   return '#F44336';
 }
 
+/**
+ * Helper to retrieve historical score ranges for a specific course at an institution.
+ */
+function getHistoricalRange(institution: AdmissionInstitution, course: string): string | null {
+  return institution.historical_score_ranges ? institution.historical_score_ranges[course] || null : null;
+}
+
+function parseRange(rangeString: string): [number, number] {
+  const [low, high] = rangeString.split('-').map(value => Number(value.trim()));
+  return [low, high];
+}
