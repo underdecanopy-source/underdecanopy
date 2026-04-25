@@ -190,7 +190,16 @@ export default function TaxReturnsPage() {
             recordHash: pdfHash,
         });
 
-        const documentHtml = buildTaxReturnDocumentHtml(taxReturn, summary);
+        const documentHtml = buildTaxReturnDocumentHtml(
+            {
+                ...taxReturn,
+                filingDate: taxReturn.filingDate ?? filingDate,
+                documentTitle: taxReturn.documentTitle ?? documentTitle,
+                documentGeneratedAt: taxReturn.documentGeneratedAt ?? filingDate,
+                pdfHash: taxReturn.pdfHash ?? pdfHash,
+            },
+            summary
+        );
         openPrintableDocument(documentHtml, documentTitle, true);
 
         setFiledMsg(`${returnType} return prepared using the updated revenue and expense split.`);

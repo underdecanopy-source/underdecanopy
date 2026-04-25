@@ -1,1 +1,14 @@
 node_modules
+
+# Next.js build artifacts
+.next/
+
+test output
+build-output.log
+build-output.txt
+build-output-utf8.txt
+tsc-output.txt
+tsc-local-output.txt
+git-status.txt
+git-status-utf8.txt
+tsconfig.tsbuildinfo
