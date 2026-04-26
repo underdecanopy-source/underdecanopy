@@ -48,7 +48,7 @@ export default function SettingsPage() {
         <>
             <PageHeader
                 title="Settings"
-                description="Configure your business profile and the tax rule used for profit-before-tax reporting."
+                description="Configure your business identity, Tax ID and TIN, and the tax rule used for profit-before-tax reporting."
             />
 
             <form
@@ -92,7 +92,17 @@ export default function SettingsPage() {
                     />
                 </label>
                 <label className="block">
-                    <span className="text-sm font-medium text-slate-700">Tax Identification Number (TIN)</span>
+                    <span className="text-sm font-medium text-slate-700">Tax ID</span>
+                    <input
+                        type="text"
+                        value={form.taxId}
+                        onChange={(e) => setForm({ ...form, taxId: e.target.value })}
+                        placeholder="e.g. NRS-24001"
+                        className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </label>
+                <label className="block">
+                    <span className="text-sm font-medium text-slate-700">TIN (Legacy / Secondary)</span>
                     <input
                         type="text"
                         value={form.tin}

@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { schedulePopupPrint, writePopupDocument } from '@/lib/print/popup';
 
 /**
  * Utility for printing HTML content in a new window.
@@ -13,7 +14,7 @@ export const printContent = (htmlContent: string) => {
     return;
   }
 
-  printWindow.document.write(`
+  writePopupDocument(printWindow, `
     <!DOCTYPE html>
     <html>
       <head>
@@ -32,21 +33,8 @@ export const printContent = (htmlContent: string) => {
       <body>${htmlContent}</body>
     </html>
   `);
-  printWindow.document.close();
-  
-  const triggerPrint = () => {
-    if (!printWindow) return;
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-  };
 
-  // Handle browser timing differences for document.write completion
-  if (printWindow.document.readyState === 'complete') {
-    triggerPrint();
-  } else {
-    printWindow.onload = triggerPrint;
-  }
+  schedulePopupPrint(printWindow, { closeAfterPrint: true });
 };
 
 /**

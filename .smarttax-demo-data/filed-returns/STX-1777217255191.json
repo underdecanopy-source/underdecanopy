@@ -1,0 +1,15 @@
+{
+  "ref": "STX-1777217255191",
+  "fileName": "PIT-Return-2026.pdf",
+  "mimeType": "application/pdf",
+  "taxType": "PIT",
+  "taxId": "STX-DEMO-TAX-1001",
+  "tin": "12345678-0001",
+  "taxpayerName": "SmartTax Demo Business",
+  "filingPeriod": "2026",
+  "createdAt": "2026-04-26T15:27:25.758Z",
+  "verificationHash": "635877afa528139b8015fcde43e0b3915a935182ad644bff00cd5d40fadeb81d",
+  "email": "demo@smarttax.ng",
+  "phone": "+234 800 000 0000",
+  "size": 6459
+}

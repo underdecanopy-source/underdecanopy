@@ -1,3 +1,5 @@
+import { schedulePopupPrint, writePopupDocument } from '@/lib/print/popup';
+
 export function openPrintableDocument(contentHtml: string, title: string, autoPrint = false): void {
     const popup = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
     if (!popup) {
@@ -22,11 +24,12 @@ export function openPrintableDocument(contentHtml: string, title: string, autoPr
         th { background: #f9fafb; }
     `;
 
-    popup.document.write(`<!DOCTYPE html><html><head><title>${title}</title><meta charset="utf-8"><style>${style}</style></head><body><div class="document-shell">${contentHtml}</div></body></html>`);
-    popup.document.close();
+    writePopupDocument(
+        popup,
+        `<!DOCTYPE html><html><head><title>${title}</title><meta charset="utf-8"><style>${style}</style></head><body><div class="document-shell">${contentHtml}</div></body></html>`
+    );
 
     if (autoPrint) {
-        popup.focus();
-        popup.print();
+        schedulePopupPrint(popup);
     }
 }

@@ -2,6 +2,7 @@
 
 import { Receipt as ReceiptIcon } from 'lucide-react';
 import type { Profile, Transaction } from '../_lib/types';
+import { resolveTaxIdentity } from '../_lib/identity';
 import { formatNaira } from '../_lib/taxCalculator';
 import { getTransactionLabel } from '../_lib/financials';
 
@@ -49,6 +50,7 @@ export function ReceiptPreview({
         category: data.category,
     });
     const whtAmount = data.whtAmount ?? data.amount * ((data.whtPercentage ?? 0) / 100);
+    const identity = resolveTaxIdentity(profile);
 
     return (
         <div id={id} className="bg-white border border-slate-200 rounded-lg p-5 md:p-6 print:border-0 print:shadow-none">
@@ -66,14 +68,21 @@ export function ReceiptPreview({
                     {profile.email && <p className="text-xs text-slate-600 truncate">{profile.email}</p>}
                     {profile.phone && <p className="text-xs text-slate-600">{profile.phone}</p>}
                     {profile.address && <p className="text-xs text-slate-600">{profile.address}</p>}
-                    <p className="text-[11px] text-slate-500 mt-1">
-                        TIN: <span className="font-mono">{profile.tin || 'Not set'}</span>
-                        {profile.vatNumber && data.vatable && (
-                            <span className="ml-2">
-                                | VAT Reg: <span className="font-mono">{profile.vatNumber}</span>
-                            </span>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-500">
+                        <p>
+                            {identity.primaryLabel}: <span className="font-mono text-slate-700">{identity.primaryValue || 'Missing'}</span>
+                        </p>
+                        {identity.secondaryValue && (
+                            <p>
+                                {identity.secondaryLabel}: <span className="font-mono text-slate-700">{identity.secondaryValue}</span>
+                            </p>
                         )}
-                    </p>
+                        {profile.vatNumber && data.vatable && (
+                            <p>
+                                VAT Reg: <span className="font-mono text-slate-700">{profile.vatNumber}</span>
+                            </p>
+                        )}
+                    </div>
                 </div>
                 <div className="text-right flex-shrink-0">
                     <p className="text-[11px] font-semibold uppercase text-slate-500">Receipt</p>
@@ -140,38 +149,38 @@ export function ReceiptPreview({
                     <span>Subtotal</span>
                     <span>{formatNaira(data.amount)}</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                    <span className={data.vatable ? '' : 'line-through opacity-60'}>VAT Credit (7.5%)</span>
-                    <span className={data.vatable ? 'text-orange-700' : 'text-slate-400'}>
-                        {data.vatable ? `+ ${formatNaira(data.vatAmount)}` : 'Not applied'}
-                    </span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                    <span className={data.whtApplicable ? '' : 'line-through opacity-60'}>WHT Tax Credit</span>
-                    <span className={data.whtApplicable ? 'text-rose-700' : 'text-slate-400'}>
-                        {data.whtApplicable ? `- ${formatNaira(whtAmount)}` : 'Not deducted'}
-                    </span>
-                </div>
+                {data.vatable && (
+                    <div className="flex justify-between text-slate-600">
+                        <span>VAT (7.5%)</span>
+                        <span className="text-orange-700">+ {formatNaira(data.vatAmount)}</span>
+                    </div>
+                )}
+                {data.whtApplicable && (
+                    <div className="flex justify-between text-slate-600">
+                        <span>WHT Credit</span>
+                        <span className="text-rose-700">- {formatNaira(whtAmount)}</span>
+                    </div>
+                )}
                 <div className="flex justify-between text-base md:text-lg font-bold text-slate-900 pt-2 border-t border-slate-200 mt-2">
                     <span>{isRevenue ? 'Net Amount to Credit' : 'Net Amount Going Out'}</span>
                     <span>{formatNaira(data.netAmount)}</span>
                 </div>
             </div>
 
-            <div className="mt-3 min-h-[4.75rem]">
-                <div
-                    className={`p-3 rounded-md text-xs ${!isRevenue && data.whtApplicable ? 'bg-rose-50 border border-rose-200 text-rose-800' : 'invisible'}`}
-                >
-                    <strong>WHT Credit Note:</strong> Since {formatNaira(whtAmount)} has been withheld, we promise to
-                    remit this amount to the relevant tax authority. Kindly accept this Withholding Tax Credit Note
-                    from us as evidence of tax paid on your behalf.
+            {!isRevenue && data.whtApplicable && (
+                <div className="mt-3">
+                    <div className="p-3 rounded-md text-xs bg-rose-50 border border-rose-200 text-rose-800">
+                        <strong>WHT Credit Note:</strong> Since {formatNaira(whtAmount)} has been withheld, we promise to
+                        remit this amount to the relevant tax authority. Kindly accept this Withholding Tax Credit Note
+                        from us as evidence of tax paid on your behalf.
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="mt-4 pt-3 border-t border-slate-200">
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                    This receipt reflects the recorded financial event, its debit or credit classification, and the
-                    applied tax treatment for audit and filing support.
+                    This receipt reflects the recorded financial event, its debit or credit classification, the
+                    taxpayer identity used for NRS compliance, and the applied tax treatment for audit and filing support.
                 </p>
             </div>
         </div>

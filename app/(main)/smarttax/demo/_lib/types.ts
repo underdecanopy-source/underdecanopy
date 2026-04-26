@@ -3,6 +3,7 @@ export interface Profile {
     email: string;
     phone: string;
     businessName: string;
+    taxId: string;
     tin: string;
     vatNumber?: string;
     address: string;
@@ -50,6 +51,57 @@ export interface Receipt {
     sentViaWhatsApp: boolean;
 }
 
+export interface PeriodTaxComputation {
+    kind: 'period';
+    returnType: 'VAT' | 'WHT';
+    transactionCount: number;
+    totalIncome: number;
+    totalVatCredit: number;
+    totalWhtCredit: number;
+    taxPayable: number;
+    dueDate: string;
+}
+
+export interface TaxBandBreakdown {
+    label: string;
+    taxableAmount: number;
+    rate: number;
+    tax: number;
+}
+
+export interface PitTaxComputation {
+    kind: 'pit';
+    grossAnnualIncome: number;
+    pension: number;
+    nhf: number;
+    nhis: number;
+    totalDeductions: number;
+    useRelief: boolean;
+    cra: number;
+    taxableIncome: number;
+    totalTax: number;
+    effectiveRate: number;
+    breakdown: TaxBandBreakdown[];
+    dueDate: string;
+}
+
+export interface CitTaxComputation {
+    kind: 'cit';
+    turnover: number;
+    accountingProfit: number;
+    disallowableExpenses: number;
+    capitalAllowances: number;
+    whtCredits: number;
+    taxableProfit: number;
+    tax: number;
+    finalTax: number;
+    effectiveRate: number;
+    companyCategory: 'small' | 'medium-large';
+    dueDate: string;
+}
+
+export type TaxReturnComputation = PeriodTaxComputation | PitTaxComputation | CitTaxComputation;
+
 export interface TaxReturn {
     id: string;
     returnType: 'VAT' | 'PIT' | 'WHT' | 'CIT';
@@ -64,6 +116,16 @@ export interface TaxReturn {
     documentTitle?: string;
     documentGeneratedAt?: string;
     pdfHash?: string;
+    verificationHash?: string;
+    taxId?: string;
+    tin?: string;
+    taxpayerName?: string;
+    downloadRef?: string;
+    downloadFileName?: string;
+    secureLink?: string;
+    sentViaEmail?: boolean;
+    sentViaWhatsApp?: boolean;
+    computation?: TaxReturnComputation;
 }
 
 export interface AuditEntry {

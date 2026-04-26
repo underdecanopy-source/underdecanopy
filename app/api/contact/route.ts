@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { createSmtpTransport, hasSmtpConfig } from '@/lib/mail/smtp';
 
 function escapeHtml(str: string): string {
   return str
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Validate env vars are configured
-  if (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  if (!hasSmtpConfig()) {
     console.error('SMTP environment variables not configured');
     return NextResponse.json({ error: 'Mail service not configured' }, { status: 503 });
   }
@@ -37,15 +37,7 @@ export async function POST(req: NextRequest) {
 
   const recipient = emailMapping[origin as string] || 'underdecanopy@gmail.com';
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: Number(process.env.SMTP_PORT) === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  const transporter = createSmtpTransport();
 
   // Sanitize user input for HTML email
   const safeName = escapeHtml(String(name));

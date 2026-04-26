@@ -1,15 +1,10 @@
-import { formatNaira } from './taxCalculator';
 import type { Profile, Receipt, Transaction } from './types';
-import { getTransactionLabel } from './financials';
+import { buildReceiptShareText as buildReceiptShareTextContent } from './receiptContent';
+import { schedulePopupPrint, writePopupDocument } from '@/lib/print/popup';
 
 function cloneDocumentHead(): string {
     const nodes = Array.from(document.head.querySelectorAll('style, link[rel="stylesheet"]'));
-    const stylesHtml = nodes.map((node) => node.outerHTML).join('\n');
-    
-    // Include Tailwind CSS from CDN as fallback for styling
-    const tailwindCDN = '<link href="https://cdn.tailwindcss.com" rel="stylesheet">';
-    
-    return `${stylesHtml}\n${tailwindCDN}`;
+    return nodes.map((node) => node.outerHTML).join('\n');
 }
 
 export function openReceiptDocument(
@@ -24,6 +19,7 @@ export function openReceiptDocument(
     }
 
     const styles = cloneDocumentHead();
+    const receiptMarkup = receiptNode.cloneNode(true) as HTMLElement;
     const documentHtml = `
         <!doctype html>
         <html>
@@ -42,43 +38,20 @@ export function openReceiptDocument(
                 </style>
             </head>
             <body>
-                ${receiptNode.outerHTML}
+                ${receiptMarkup.outerHTML}
             </body>
         </html>
     `;
 
-    const writeDocument = () => {
-        popup.document.open();
-        popup.document.write(documentHtml);
-        popup.document.close();
+    writePopupDocument(popup, documentHtml);
 
-        if (autoPrint) {
-            popup.onload = () => {
-                popup.focus();
-                popup.print();
-            };
-        }
-    };
-
-    writeDocument();
+    if (autoPrint) {
+        schedulePopupPrint(popup);
+    }
 
     return true;
 }
 
 export function buildReceiptShareText(profile: Profile, transaction: Transaction, receipt: Receipt): string {
-    const lines = [
-        `${profile.businessName || profile.name} Receipt`,
-        `Receipt No: ${receipt.receiptNumber}`,
-        `Date: ${new Date(receipt.createdAt).toLocaleString('en-NG')}`,
-        `Counterparty: ${transaction.customerName}`,
-        `Transaction Type: ${transaction.type === 'revenue' ? 'Revenue (Credit)' : 'Expense (Debit)'}`,
-        `Category: ${getTransactionLabel(transaction)}`,
-        `Description: ${transaction.description}`,
-        `Subtotal: ${formatNaira(transaction.amount)}`,
-        `VAT Credit: ${transaction.vatable ? formatNaira(transaction.vatAmount) : 'Not applied'}`,
-        `WHT Credit: ${transaction.whtApplicable ? formatNaira(transaction.whtAmount) : 'Not deducted'}`,
-        `${transaction.type === 'revenue' ? 'Net Amount to Credit' : 'Net Amount Going Out'}: ${formatNaira(transaction.netAmount)}`,
-    ];
-
-    return lines.join('\n');
+    return buildReceiptShareTextContent(profile, transaction, receipt);
 }

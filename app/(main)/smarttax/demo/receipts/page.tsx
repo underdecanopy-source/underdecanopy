@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Check, Mail, MessageCircle, Printer, X } from 'lucide-react';
 import { EmptyState, PageHeader } from '../_components/ui';
 import { ReceiptPreview } from '../_components/ReceiptPreview';
+import { resolveTaxIdentity } from '../_lib/identity';
 import { buildReceiptShareText, openReceiptDocument } from '../_lib/receiptDocument';
 import { useSmartTaxStore } from '../_lib/store';
 import { formatNaira } from '../_lib/taxCalculator';
@@ -15,6 +16,7 @@ function ReceiptsInner() {
     const focusId = params.get('id');
     const [selectedId, setSelectedId] = useState<string | null>(focusId);
     const [actionStatus, setActionStatus] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [busyChannel, setBusyChannel] = useState<'email' | 'whatsapp' | null>(null);
 
     const selected = useMemo(() => {
         const id = selectedId ?? state.receipts[0]?.id ?? null;
@@ -41,13 +43,7 @@ function ReceiptsInner() {
             showActionStatus('Popup blocked. Please allow popups and try again.', 'error');
             return false;
         }
-
-        // Defer heavy DOM serialization and cross-window writes to unblock the main thread
-        // and allow the browser to paint the button's clicked state immediately.
-        setTimeout(() => {
-            openReceiptDocument(receiptNode, title, autoPrint, popup);
-        }, 10);
-        return true;
+        return openReceiptDocument(receiptNode, title, autoPrint, popup);
     }
 
     function handlePrint() {
@@ -74,29 +70,63 @@ function ReceiptsInner() {
         }
     }
 
-    function handleSend(channel: 'email' | 'whatsapp') {
+    async function handleSend(channel: 'email' | 'whatsapp') {
         if (!selected) return;
         const shareText = buildReceiptShareText(state.profile, selected.txn, selected.receipt);
+        const identity = resolveTaxIdentity(state.profile);
 
         if (channel === 'email') {
-            const subject = encodeURIComponent(`Receipt ${selected.receipt.receiptNumber}`);
-            const body = encodeURIComponent(shareText);
-            window.location.href = `mailto:${selected.txn.customerEmail || ''}?subject=${subject}&body=${body}`;
-            markReceiptSent(selected.receipt.id, channel);
-            showActionStatus(`Prepared email share for ${selected.txn.customerName}.`, 'success');
+            const recipient = selected.txn.customerEmail?.trim();
+            if (!recipient) {
+                showActionStatus('This transaction has no customer email address. Update the transaction and try again.', 'error');
+                return;
+            }
+
+            setBusyChannel('email');
+            try {
+                const response = await fetch('/api/smarttax/share/receipt-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: recipient,
+                        profile: state.profile,
+                        transaction: selected.txn,
+                        receipt: selected.receipt,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const error = (await response.json().catch(() => null)) as { error?: string } | null;
+                    throw new Error(error?.error || 'Unable to send the receipt email.');
+                }
+
+                markReceiptSent(selected.receipt.id, channel);
+                showActionStatus(`Receipt emailed successfully to ${recipient}.`, 'success');
+            } catch (error) {
+                const subject = encodeURIComponent(`Receipt ${selected.receipt.receiptNumber} (Tax ID: ${identity.primaryValue || 'Missing'})`);
+                const body = encodeURIComponent(shareText);
+                window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+                const message = error instanceof Error ? error.message : 'Unable to send the receipt email.';
+                showActionStatus(`${message} A local draft has been opened instead.`, 'error');
+            } finally {
+                setBusyChannel(null);
+            }
             return;
         }
 
+        setBusyChannel('whatsapp');
         const text = encodeURIComponent(shareText);
         const popup = window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
         if (!popup) {
             console.warn('WhatsApp share popup was blocked by the browser.');
             showActionStatus('WhatsApp share popup was blocked. Please allow popups and try again.', 'error');
+            setBusyChannel(null);
             return;
         }
 
         markReceiptSent(selected.receipt.id, channel);
         showActionStatus(`Prepared WhatsApp share for ${selected.txn.customerName}.`, 'success');
+        setBusyChannel(null);
     }
 
     if (!hydrated) {
@@ -160,7 +190,7 @@ function ReceiptsInner() {
                     {selected && (
                         <>
                             <ReceiptPreview
-                                id="receipt-print-area"
+                                id="receipt-display"
                                 profile={state.profile}
                                 variant="final"
                                 data={{
@@ -186,10 +216,39 @@ function ReceiptsInner() {
                                 }}
                             />
 
+                            <div className="hidden" aria-hidden="true">
+                                <ReceiptPreview
+                                    id="receipt-print-area"
+                                    profile={state.profile}
+                                    variant="final"
+                                    data={{
+                                        customerName: selected.txn.customerName,
+                                        customerEmail: selected.txn.customerEmail,
+                                        customerPhone: selected.txn.customerPhone,
+                                        customerType: selected.txn.customerType,
+                                        description: selected.txn.description,
+                                        category: selected.txn.category,
+                                        amount: selected.txn.amount,
+                                        vatable: selected.txn.vatable,
+                                        whtApplicable: selected.txn.whtApplicable,
+                                        vatAmount: selected.txn.vatAmount,
+                                        whtAmount: selected.txn.whtAmount,
+                                        whtPercentage: selected.txn.whtPercentage,
+                                        netAmount: selected.txn.netAmount,
+                                        receiptNumber: selected.receipt.receiptNumber,
+                                        createdAt: selected.receipt.createdAt,
+                                        transactionType: selected.txn.type,
+                                        subCategory: selected.txn.subCategory,
+                                        debitCreditFlag: selected.txn.debitCreditFlag,
+                                        creditNoteGenerated: selected.txn.creditNoteGenerated,
+                                    }}
+                                />
+                            </div>
+
                             <div className="mt-4 flex flex-wrap gap-2 text-xs">
                                 {selected.receipt.sentViaEmail && (
                                     <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                                        <Check className="h-3 w-3" /> Email prepared
+                                        <Check className="h-3 w-3" /> Email sent
                                     </span>
                                 )}
                                 {selected.receipt.sentViaWhatsApp && (
@@ -204,12 +263,14 @@ function ReceiptsInner() {
                                 <div className="flex flex-wrap gap-2">
                                     <button
                                         onClick={() => handleSend('email')}
+                                        disabled={busyChannel === 'email'}
                                         className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-semibold hover:bg-blue-700"
                                     >
-                                        <Mail className="h-4 w-4" /> Share by Email
+                                        <Mail className="h-4 w-4" /> {busyChannel === 'email' ? 'Sending...' : 'Share by Email'}
                                     </button>
                                     <button
                                         onClick={() => handleSend('whatsapp')}
+                                        disabled={busyChannel === 'whatsapp'}
                                         className="inline-flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md text-sm font-semibold hover:bg-emerald-700"
                                     >
                                         <MessageCircle className="h-4 w-4" /> Share on WhatsApp
@@ -228,7 +289,7 @@ function ReceiptsInner() {
                                     </button>
                                 </div>
                                 <p className="text-xs text-slate-500 mt-3">
-                                    Print and PDF actions are restricted to the receipt element only. SMS has been removed from this demo.
+                                    Print and PDF actions are restricted to the hidden receipt-only print area, with Tax ID resolved before output. SMS has been removed from this demo.
                                 </p>
                                 {actionStatus && (
                                     <div

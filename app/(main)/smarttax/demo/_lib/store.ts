@@ -12,7 +12,8 @@ export const defaultProfile: Profile = {
     email: 'demo@smarttax.ng',
     phone: '+234 800 000 0000',
     businessName: 'SmartTax Demo Business',
-    tin: '',
+    taxId: 'STX-DEMO-TAX-1001',
+    tin: '12345678-0001',
     address: '',
     state: 'Lagos',
     businessType: 'sole-proprietor',
@@ -81,6 +82,17 @@ export function loadState(): SmartTaxState {
             return fresh;
         }
         const parsed = JSON.parse(raw) as SmartTaxState;
+        const migratedProfile: Profile = {
+            ...defaultProfile,
+            ...(parsed.profile || {}),
+            taxId:
+                typeof parsed.profile?.taxId === 'string' && parsed.profile.taxId.trim()
+                    ? parsed.profile.taxId.trim()
+                    : typeof parsed.profile?.tin === 'string' && parsed.profile.tin.trim()
+                      ? parsed.profile.tin.trim()
+                      : defaultProfile.taxId,
+            tin: typeof parsed.profile?.tin === 'string' ? parsed.profile.tin.trim() : defaultProfile.tin,
+        };
         const migratedSettings: TaxSettings = {
             ...defaultTaxSettings,
             ...(parsed.settings || {}),
@@ -138,6 +150,21 @@ export function loadState(): SmartTaxState {
                 typeof taxReturn.totalWhtCredit === 'number'
                     ? taxReturn.totalWhtCredit
                     : ((taxReturn as TaxReturn & { totalWhtDeducted?: number }).totalWhtDeducted ?? 0),
+            verificationHash: taxReturn.verificationHash ?? taxReturn.pdfHash ?? '',
+            taxId:
+                typeof taxReturn.taxId === 'string' && taxReturn.taxId.trim()
+                    ? taxReturn.taxId.trim()
+                    : migratedProfile.taxId,
+            tin:
+                typeof taxReturn.tin === 'string'
+                    ? taxReturn.tin.trim()
+                    : migratedProfile.tin,
+            taxpayerName:
+                typeof taxReturn.taxpayerName === 'string' && taxReturn.taxpayerName.trim()
+                    ? taxReturn.taxpayerName.trim()
+                    : migratedProfile.businessName || migratedProfile.name,
+            sentViaEmail: !!taxReturn.sentViaEmail,
+            sentViaWhatsApp: !!taxReturn.sentViaWhatsApp,
         }));
         const migratedAuditTrail = (parsed.auditTrail || []).map((entry: AuditEntry) => ({
             ...entry,
@@ -146,6 +173,7 @@ export function loadState(): SmartTaxState {
         }));
         return {
             ...parsed,
+            profile: migratedProfile,
             settings: migratedSettings,
             transactions: migratedTxns,
             receipts: migratedReceipts,
@@ -249,6 +277,21 @@ export function useSmartTaxStore() {
         const taxReturn: TaxReturn = { ...input, id, createdAt: new Date().toISOString() };
         setState((current) => ({ ...current, taxReturns: [taxReturn, ...current.taxReturns] }));
         return taxReturn;
+    }, []);
+
+    const markTaxReturnShared = useCallback((taxReturnId: string, channel: 'email' | 'whatsapp') => {
+        setState((current) => ({
+            ...current,
+            taxReturns: current.taxReturns.map((taxReturn) =>
+                taxReturn.id === taxReturnId
+                    ? {
+                          ...taxReturn,
+                          sentViaEmail: channel === 'email' ? true : taxReturn.sentViaEmail,
+                          sentViaWhatsApp: channel === 'whatsapp' ? true : taxReturn.sentViaWhatsApp,
+                      }
+                    : taxReturn
+            ),
+        }));
     }, []);
 
     const addAuditEntry = useCallback((entry: Omit<AuditEntry, 'id' | 'timestamp'>) => {
@@ -478,6 +521,7 @@ export function useSmartTaxStore() {
         addTransaction,
         deleteTransaction,
         markReceiptSent,
+        markTaxReturnShared,
         addTaxReturn,
         addAuditEntry,
         addReminder,

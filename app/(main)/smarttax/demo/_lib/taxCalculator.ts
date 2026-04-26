@@ -4,24 +4,24 @@ export const VAT_RATE = 0.075;
 export const VAT_THRESHOLD = 25_000_000;
 
 export const WHT_RATES = {
-    'Rent': { individual: 0.10, corporate: 0.10 },
-    'Royalties': { individual: 0.05, corporate: 0.10 },
-    'Consulting': { individual: 0.05, corporate: 0.10 },
-    'Sales': { individual: 0.05, corporate: 0.05 }, // Contract of Supplies
-    'Construction': { individual: 0.05, corporate: 0.05 },
-    'Dividends': { individual: 0.10, corporate: 0.10 },
-    'Directors Fees': { individual: 0.10, corporate: 0.10 },
-    'Services': { individual: 0.05, corporate: 0.10 }, // Default for Services
-    'Other': { individual: 0.05, corporate: 0.10 },
+    Rent: { individual: 0.1, corporate: 0.1 },
+    Royalties: { individual: 0.05, corporate: 0.1 },
+    Consulting: { individual: 0.05, corporate: 0.1 },
+    Sales: { individual: 0.05, corporate: 0.05 },
+    Construction: { individual: 0.05, corporate: 0.05 },
+    Dividends: { individual: 0.1, corporate: 0.1 },
+    'Directors Fees': { individual: 0.1, corporate: 0.1 },
+    Services: { individual: 0.05, corporate: 0.1 },
+    Other: { individual: 0.05, corporate: 0.1 },
 } as const;
 
-export const PIT_BRACKETS = [
-    { min: 0, max: 300_000, rate: 0.07, label: '7% on first ₦300,000' },
-    { min: 300_001, max: 600_000, rate: 0.11, label: '11% on next ₦300,000' },
-    { min: 600_001, max: 1_100_000, rate: 0.15, label: '15% on next ₦500,000' },
-    { min: 1_100_001, max: 1_600_000, rate: 0.19, label: '19% on next ₦500,000' },
-    { min: 1_600_001, max: 3_200_000, rate: 0.21, label: '21% on next ₦1,600,000' },
-    { min: 3_200_001, max: Infinity, rate: 0.24, label: '24% above ₦3,200,000' },
+export const PIT_BANDS = [
+    { limit: 800_000, rate: 0, label: '0% on first NGN 800,000' },
+    { limit: 2_200_000, rate: 0.15, label: '15% on next NGN 2,200,000' },
+    { limit: 9_000_000, rate: 0.18, label: '18% on next NGN 9,000,000' },
+    { limit: 13_000_000, rate: 0.21, label: '21% on next NGN 13,000,000' },
+    { limit: 25_000_000, rate: 0.23, label: '23% on next NGN 25,000,000' },
+    { limit: Number.POSITIVE_INFINITY, rate: 0.25, label: '25% above NGN 50,000,000' },
 ] as const;
 
 export interface TaxCalculationResult {
@@ -41,10 +41,66 @@ export interface TaxCalculationInput {
     transactionType?: 'expense' | 'revenue';
 }
 
-export function calculateTransactionTax(input: TaxCalculationInput | number, legacyCustomerType?: CustomerType): TaxCalculationResult {
-    const opts: TaxCalculationInput = typeof input === 'number' ? { amount: input, customerType: legacyCustomerType } : input;
+export interface PitCalculationInput {
+    grossAnnualIncome: number;
+    pension?: number;
+    nhf?: number;
+    nhis?: number;
+    useRelief?: boolean;
+}
+
+export interface PitCalculationResult {
+    grossAnnualIncome: number;
+    pension: number;
+    nhf: number;
+    nhis: number;
+    totalDeductions: number;
+    useRelief: boolean;
+    cra: number;
+    taxableIncome: number;
+    totalTax: number;
+    effectiveRate: number;
+    breakdown: Array<{ label: string; taxableAmount: number; rate: number; tax: number }>;
+}
+
+export interface CitCalculationInput {
+    turnover: number;
+    accountingProfit: number;
+    disallowableExpenses?: number;
+    capitalAllowances?: number;
+    whtCredits?: number;
+}
+
+export interface CitCalculationResult {
+    turnover: number;
+    accountingProfit: number;
+    disallowableExpenses: number;
+    capitalAllowances: number;
+    whtCredits: number;
+    taxableProfit: number;
+    tax: number;
+    finalTax: number;
+    effectiveRate: number;
+    companyCategory: 'small' | 'medium-large';
+}
+
+function normalizeAmount(value?: number): number {
+    return Number.isFinite(value) ? Math.max(0, Number(value)) : 0;
+}
+
+function roundCurrency(value: number): number {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+export function calculateTransactionTax(
+    input: TaxCalculationInput | number,
+    legacyCustomerType?: CustomerType
+): TaxCalculationResult {
+    const opts: TaxCalculationInput =
+        typeof input === 'number' ? { amount: input, customerType: legacyCustomerType } : input;
     const amount = opts.amount;
     const customerType: CustomerType = opts.customerType ?? 'individual';
+    void customerType;
     const transactionType = opts.transactionType ?? 'revenue';
     const vatable = transactionType === 'revenue' ? opts.vatable ?? true : false;
     const whtApplicable = transactionType === 'expense' ? opts.whtApplicable ?? false : false;
@@ -62,31 +118,116 @@ export function calculateTransactionTax(input: TaxCalculationInput | number, leg
     };
 }
 
-export function calculatePersonalIncomeTax(annualIncome: number): {
-    tax: number;
-    effectiveRate: number;
-    bracketBreakdown: Array<{ label: string; taxedAmount: number; tax: number }>;
-} {
-    let remaining = annualIncome;
+export function calculatePIT(input: PitCalculationInput): PitCalculationResult {
+    const grossAnnualIncome = normalizeAmount(input.grossAnnualIncome);
+    const pension = normalizeAmount(input.pension);
+    const nhf = normalizeAmount(input.nhf);
+    const nhis = normalizeAmount(input.nhis);
+    const useRelief = input.useRelief ?? true;
+    const totalDeductions = pension + nhf + nhis;
+    const taxableBase = Math.max(0, grossAnnualIncome - totalDeductions);
+    const cra = useRelief ? Math.max(200_000, 0.2 * grossAnnualIncome) : 0;
+    let remaining = Math.max(0, taxableBase - cra);
     let totalTax = 0;
-    const bracketBreakdown: Array<{ label: string; taxedAmount: number; tax: number }> = [];
+    const breakdown: PitCalculationResult['breakdown'] = [];
 
-    for (const bracket of PIT_BRACKETS) {
+    for (const band of PIT_BANDS) {
         if (remaining <= 0) break;
-        const span = bracket.max - bracket.min + 1;
-        const taxedAmount = Math.min(remaining, span);
-        const tax = taxedAmount * bracket.rate;
+        const taxableAmount = Math.min(remaining, band.limit);
+        const tax = taxableAmount * band.rate;
         totalTax += tax;
-        remaining -= taxedAmount;
-        if (taxedAmount > 0) {
-            bracketBreakdown.push({ label: bracket.label, taxedAmount, tax });
+        remaining -= taxableAmount;
+        if (taxableAmount > 0) {
+            breakdown.push({
+                label: band.label,
+                taxableAmount: roundCurrency(taxableAmount),
+                rate: band.rate,
+                tax: roundCurrency(tax),
+            });
         }
     }
 
+    const taxableIncome = Math.max(0, taxableBase - cra);
+
     return {
-        tax: totalTax,
-        effectiveRate: annualIncome > 0 ? (totalTax / annualIncome) * 100 : 0,
-        bracketBreakdown,
+        grossAnnualIncome: roundCurrency(grossAnnualIncome),
+        pension: roundCurrency(pension),
+        nhf: roundCurrency(nhf),
+        nhis: roundCurrency(nhis),
+        totalDeductions: roundCurrency(totalDeductions),
+        useRelief,
+        cra: roundCurrency(cra),
+        taxableIncome: roundCurrency(taxableIncome),
+        totalTax: roundCurrency(totalTax),
+        effectiveRate: grossAnnualIncome > 0 ? roundCurrency((totalTax / grossAnnualIncome) * 100) : 0,
+        breakdown,
+    };
+}
+
+export function calculateCIT(input: CitCalculationInput): CitCalculationResult {
+    const turnover = normalizeAmount(input.turnover);
+    const accountingProfit = normalizeAmount(input.accountingProfit);
+    const disallowableExpenses = normalizeAmount(input.disallowableExpenses);
+    const capitalAllowances = normalizeAmount(input.capitalAllowances);
+    const whtCredits = normalizeAmount(input.whtCredits);
+    const taxableProfit = Math.max(0, accountingProfit + disallowableExpenses - capitalAllowances);
+
+    if (turnover <= 100_000_000) {
+        return {
+            turnover: roundCurrency(turnover),
+            accountingProfit: roundCurrency(accountingProfit),
+            disallowableExpenses: roundCurrency(disallowableExpenses),
+            capitalAllowances: roundCurrency(capitalAllowances),
+            whtCredits: roundCurrency(whtCredits),
+            taxableProfit: roundCurrency(taxableProfit),
+            tax: 0,
+            finalTax: 0,
+            effectiveRate: 0,
+            companyCategory: 'small',
+        };
+    }
+
+    const tax = taxableProfit * 0.3;
+    const finalTax = Math.max(0, tax - whtCredits);
+
+    return {
+        turnover: roundCurrency(turnover),
+        accountingProfit: roundCurrency(accountingProfit),
+        disallowableExpenses: roundCurrency(disallowableExpenses),
+        capitalAllowances: roundCurrency(capitalAllowances),
+        whtCredits: roundCurrency(whtCredits),
+        taxableProfit: roundCurrency(taxableProfit),
+        tax: roundCurrency(tax),
+        finalTax: roundCurrency(finalTax),
+        effectiveRate: taxableProfit > 0 ? roundCurrency((finalTax / taxableProfit) * 100) : 0,
+        companyCategory: 'medium-large',
+    };
+}
+
+export function calculatePersonalIncomeTax(
+    annualIncome: number,
+    options: Omit<PitCalculationInput, 'grossAnnualIncome'> = {}
+): {
+    tax: number;
+    taxableIncome: number;
+    cra: number;
+    totalDeductions: number;
+    effectiveRate: number;
+    bracketBreakdown: Array<{ label: string; taxedAmount: number; tax: number; rate: number }>;
+} {
+    const pit = calculatePIT({ grossAnnualIncome: annualIncome, ...options });
+    return {
+        tax: pit.totalTax,
+        taxableIncome: pit.taxableIncome,
+        cra: pit.cra,
+        totalDeductions: pit.totalDeductions,
+        effectiveRate: pit.effectiveRate,
+        bracketBreakdown: pit.breakdown.map((item) => ({
+            label: item.label,
+            taxedAmount: item.taxableAmount,
+            tax: item.tax,
+            rate: item.rate,
+        })),
     };
 }
 

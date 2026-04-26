@@ -1,0 +1,44 @@
+
+> underdecanopy-digital-hub@0.1.0 dev
+> next dev --port 3000
+
+  ▲ Next.js 14.2.33
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 35.3s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 5.7s (72 modules)
+ ○ Compiling /sites/main ...
+ ✓ Compiled /sites/main in 45.7s (812 modules)
+ GET / 200 in 48080ms
+ ○ Compiling /smarttax ...
+ ✓ Compiled /smarttax in 3.2s (848 modules)
+ ○ Compiling /smarttax/demo ...
+ ✓ Compiled /smarttax/demo in 3.2s (882 modules)
+ GET /smarttax/demo 200 in 3947ms
+ ○ Compiling /smarttax/demo/reports ...
+ ✓ Compiled /smarttax/demo/reports in 4s (890 modules)
+ ○ Compiling /smarttax/demo/tax-returns ...
+ ✓ Compiled /smarttax/demo/tax-returns in 19.5s (1375 modules)
+ ○ Compiling /api/smarttax/filed-returns ...
+ ✓ Compiled /api/smarttax/filed-returns in 4.9s (900 modules)
+ POST /api/smarttax/filed-returns 201 in 5497ms
+ ○ Compiling /api/smarttax/share/email ...
+ ✓ Compiled /api/smarttax/share/email in 2.1s (946 modules)
+ POST /api/smarttax/share/email 503 in 2447ms
+ ○ Compiling /smarttax/demo/receipts ...
+ ✓ Compiled /smarttax/demo/receipts in 4.1s (1391 modules)
+ ○ Compiling /smarttax/demo/transactions ...
+ ✓ Compiled /smarttax/demo/transactions in 2.1s (1256 modules)
+ ✓ Compiled in 125.4s (1275 modules)
+ ✓ Compiled in 794ms (606 modules)
+ ✓ Compiled in 6.3s (606 modules)
+ ✓ Compiled in 1065ms (606 modules)
+ ✓ Compiled in 1132ms (606 modules)
+ GET /smarttax/demo/receipts?id=sample_rcpt_0_1777216755297 200 in 2206ms
+ GET /smarttax/demo/receipts?id=sample_rcpt_0_1777216755297 200 in 286ms
+ ✓ Compiled in 420.9s (1205 modules)
+ ✓ Compiled in 2.9s (607 modules)
+ ✓ Compiled in 1196ms (607 modules)
+ ✓ Compiled in 695ms (607 modules)

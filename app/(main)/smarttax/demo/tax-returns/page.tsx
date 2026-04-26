@@ -1,100 +1,149 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { CheckCircle2, FileText, Plus } from 'lucide-react';
+import { CheckCircle2, Download, FileText, Mail, MessageCircle, Plus } from 'lucide-react';
 import { EmptyState, PageHeader } from '../_components/ui';
 import { filterTransactionsByPeriod, summarizeTransactions } from '../_lib/financials';
+import { requireTaxIdentity } from '../_lib/identity';
 import { openPrintableDocument } from '../_lib/openDocument';
 import { useSmartTaxStore } from '../_lib/store';
-import { calculatePersonalIncomeTax, formatNaira } from '../_lib/taxCalculator';
+import { buildTaxReturnDocumentData, buildTaxReturnDocumentHtml, buildTaxReturnShareMessage } from '../_lib/taxReturnDocument';
+import { blobToBase64, generateTaxReturnPdfBlob } from '../_lib/taxReturnPdf';
+import { calculateCIT, calculatePIT, formatNaira } from '../_lib/taxCalculator';
+import type { TaxReturn, TaxReturnComputation } from '../_lib/types';
 
 type ReturnType = 'VAT' | 'PIT' | 'WHT' | 'CIT';
+type StatusMessage = { text: string; tone: 'success' | 'error' } | null;
 
-type TaxSummary =
-    | {
-          kind: 'period';
-          period: string;
-          transactionCount: number;
-          totalIncome: number;
-          totalVat: number;
-          totalWht: number;
-          taxPayable: number;
-          dueDate: Date;
-      }
-    | {
-          kind: 'pit';
-          period: string;
-          annualIncome: number;
-          tax: number;
-          effectiveRate: number;
-          bracketBreakdown: Array<{ label: string; taxedAmount: number; tax: number }>;
-          dueDate: Date;
-      }
-    | {
-          kind: 'cit';
-          period: string;
-          revenue: number;
-          expenses: number;
-          profitBeforeTax: number;
-          cit: number;
-          dueDate: Date;
-      };
+function parseNumericInput(value: string): number {
+    const parsed = Number.parseFloat(value.replace(/,/g, '').trim());
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getDueDateLabel(isoDate: string): string {
+    return new Date(isoDate).toLocaleDateString('en-NG', { dateStyle: 'medium' });
+}
 
 export default function TaxReturnsPage() {
-    const { state, hydrated, addTaxReturn, addAuditEntry } = useSmartTaxStore();
+    const { state, hydrated, addTaxReturn, addAuditEntry, markTaxReturnShared } = useSmartTaxStore();
     const [returnType, setReturnType] = useState<ReturnType>('VAT');
     const [selectedAuditReturnId, setSelectedAuditReturnId] = useState<string | null>(null);
+    const [statusMessage, setStatusMessage] = useState<StatusMessage>(null);
+    const [busyReturnId, setBusyReturnId] = useState<string | null>(null);
     const now = new Date();
     const [year, setYear] = useState<string>(String(now.getFullYear()));
     const [month, setMonth] = useState<string>(String(now.getMonth() + 1).padStart(2, '0'));
-    const [annualIncome, setAnnualIncome] = useState<string>('');
-    const [filedMsg, setFiledMsg] = useState<string | null>(null);
+    const [pitForm, setPitForm] = useState({
+        annualIncome: '',
+        pension: '',
+        nhf: '',
+        nhis: '',
+        useRelief: true,
+    });
+    const [citForm, setCitForm] = useState({
+        turnover: '',
+        accountingProfit: '',
+        disallowableExpenses: '',
+        capitalAllowances: '',
+        whtCredits: '',
+    });
 
-    const summary = useMemo<TaxSummary>(() => {
+    const summary = useMemo<TaxReturnComputation>(() => {
+        const selectedYear = Number(year) || now.getFullYear();
+        const selectedMonthIndex = Math.max(0, Math.min(11, (Number(month) || now.getMonth() + 1) - 1));
+
         if (returnType === 'VAT' || returnType === 'WHT') {
-            const txns = filterTransactionsByPeriod(state.transactions, 'monthly', Number(year), Number(month) - 1).filter(
+            const transactions = filterTransactionsByPeriod(state.transactions, 'monthly', selectedYear, selectedMonthIndex).filter(
                 (transaction) => (returnType === 'VAT' ? transaction.type === 'revenue' : transaction.type === 'expense')
             );
-            const totals = summarizeTransactions(txns, state.settings.profitTaxRatePercent);
+            const totals = summarizeTransactions(transactions, state.settings.profitTaxRatePercent);
+
             return {
-                kind: 'period' as const,
-                period: `${year}-${month}`,
-                transactionCount: txns.length,
+                kind: 'period',
+                returnType,
+                transactionCount: transactions.length,
                 totalIncome: returnType === 'VAT' ? totals.revenue : totals.expenses,
-                totalVat: totals.vatCredits,
-                totalWht: totals.whtCredits,
+                totalVatCredit: totals.vatCredits,
+                totalWhtCredit: totals.whtCredits,
                 taxPayable: returnType === 'VAT' ? totals.vatCredits : totals.whtCredits,
-                dueDate: new Date(Number(year), Number(month), 21),
+                dueDate: new Date(selectedYear, selectedMonthIndex + 1, 21).toISOString(),
             };
         }
 
-        const yearTxns = filterTransactionsByPeriod(state.transactions, 'yearly', Number(year));
-        const yearlySummary = summarizeTransactions(yearTxns, state.settings.profitTaxRatePercent);
+        const yearlyTransactions = filterTransactionsByPeriod(state.transactions, 'yearly', selectedYear);
+        const yearlySummary = summarizeTransactions(yearlyTransactions, state.settings.profitTaxRatePercent);
 
         if (returnType === 'PIT') {
-            const income = annualIncome ? parseFloat(annualIncome) : yearlySummary.revenue;
-            const pit = calculatePersonalIncomeTax(income);
+            const income = pitForm.annualIncome ? parseNumericInput(pitForm.annualIncome) : yearlySummary.revenue;
+            const pit = calculatePIT({
+                grossAnnualIncome: income,
+                pension: parseNumericInput(pitForm.pension),
+                nhf: parseNumericInput(pitForm.nhf),
+                nhis: parseNumericInput(pitForm.nhis),
+                useRelief: pitForm.useRelief,
+            });
+
             return {
-                kind: 'pit' as const,
-                period: year,
-                annualIncome: income,
-                tax: pit.tax,
+                kind: 'pit',
+                grossAnnualIncome: pit.grossAnnualIncome,
+                pension: pit.pension,
+                nhf: pit.nhf,
+                nhis: pit.nhis,
+                totalDeductions: pit.totalDeductions,
+                useRelief: pit.useRelief,
+                cra: pit.cra,
+                taxableIncome: pit.taxableIncome,
+                totalTax: pit.totalTax,
                 effectiveRate: pit.effectiveRate,
-                bracketBreakdown: pit.bracketBreakdown,
-                dueDate: new Date(Number(year) + 1, 2, 31),
+                breakdown: pit.breakdown,
+                dueDate: new Date(selectedYear + 1, 2, 31).toISOString(),
             };
         }
 
+        const turnover = citForm.turnover ? parseNumericInput(citForm.turnover) : yearlySummary.revenue;
+        const accountingProfit = citForm.accountingProfit
+            ? parseNumericInput(citForm.accountingProfit)
+            : Math.max(0, yearlySummary.profitBeforeTax);
+        const cit = calculateCIT({
+            turnover,
+            accountingProfit,
+            disallowableExpenses: parseNumericInput(citForm.disallowableExpenses),
+            capitalAllowances: parseNumericInput(citForm.capitalAllowances),
+            whtCredits: parseNumericInput(citForm.whtCredits),
+        });
+
         return {
-            kind: 'cit' as const,
-            period: year,
-            revenue: yearlySummary.revenue,
-            expenses: yearlySummary.expenses,
-            profitBeforeTax: yearlySummary.profitBeforeTax,
-            cit: yearlySummary.taxation,
-            dueDate: new Date(Number(year) + 1, 5, 30),
+            kind: 'cit',
+            turnover: cit.turnover,
+            accountingProfit: cit.accountingProfit,
+            disallowableExpenses: cit.disallowableExpenses,
+            capitalAllowances: cit.capitalAllowances,
+            whtCredits: cit.whtCredits,
+            taxableProfit: cit.taxableProfit,
+            tax: cit.tax,
+            finalTax: cit.finalTax,
+            effectiveRate: cit.effectiveRate,
+            companyCategory: cit.companyCategory,
+            dueDate: new Date(selectedYear + 1, 5, 30).toISOString(),
         };
-    }, [annualIncome, month, returnType, state.settings.profitTaxRatePercent, state.transactions, year]);
+    }, [
+        citForm.accountingProfit,
+        citForm.capitalAllowances,
+        citForm.disallowableExpenses,
+        citForm.turnover,
+        citForm.whtCredits,
+        month,
+        now,
+        pitForm.annualIncome,
+        pitForm.nhf,
+        pitForm.nhis,
+        pitForm.pension,
+        pitForm.useRelief,
+        returnType,
+        state.settings.profitTaxRatePercent,
+        state.transactions,
+        year,
+    ]);
 
     async function createDocumentHash(content: string): Promise<string> {
         const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
@@ -103,121 +152,267 @@ export default function TaxReturnsPage() {
             .join('');
     }
 
-    function buildTaxReturnDocumentHtml(
-        taxReturn: {
-            returnType: ReturnType;
-            filingPeriod: string;
-            totalIncome: number;
-            totalVatCredit: number;
-            totalWhtCredit: number;
-            taxPayable: number;
-            filingDate: string;
-            documentTitle: string;
-            documentGeneratedAt: string;
-            pdfHash: string;
-        },
-        summary?: TaxSummary
-    ) {
-        const header = `<div class="document-header"><h1>${taxReturn.documentTitle}</h1><p class="small-text">Filed on ${new Date(taxReturn.filingDate).toLocaleDateString('en-NG', { dateStyle: 'long' })}</p></div>`;
-        const summaryRows: string[] = [];
+    function showStatus(text: string, tone: 'success' | 'error') {
+        setStatusMessage({ text, tone });
+        window.setTimeout(() => setStatusMessage(null), 6000);
+    }
 
-        if (summary) {
-            if (summary.kind === 'period') {
-                summaryRows.push(`
-                    <div class="card">
-                        <div class="field-row"><span><strong>Transaction Count</strong><span>${summary.transactionCount}</span></span><span><strong>Total Income</strong><span>${formatNaira(summary.totalIncome)}</span></span></div>
-                        <div class="field-row"><span><strong>VAT Credits</strong><span>${formatNaira(summary.totalVat)}</span></span><span><strong>WHT Credits</strong><span>${formatNaira(summary.totalWht)}</span></span></div>
-                        <div class="field-row"><span><strong>Tax Payable</strong><span>${formatNaira(summary.taxPayable)}</span></span><span><strong>Due Date</strong><span>${summary.dueDate.toLocaleDateString('en-NG')}</span></span></div>
-                    </div>
-                `);
-            } else if (summary.kind === 'pit') {
-                summaryRows.push(`
-                    <div class="card">
-                        <div class="field-row"><span><strong>Annual Income</strong><span>${formatNaira(summary.annualIncome)}</span></span><span><strong>Tax Payable</strong><span>${formatNaira(summary.tax)}</span></span></div>
-                        <div class="field-row"><span><strong>Effective Rate</strong><span>${summary.effectiveRate.toFixed(2)}%</span></span><span><strong>Due Date</strong><span>${summary.dueDate.toLocaleDateString('en-NG')}</span></span></div>
-                    </div>
-                    <div class="card"><strong>Bracket Breakdown</strong>${summary.bracketBreakdown
-                        .map((item: { label: string; taxedAmount: number; tax: number }) =>
-                            `<div class="field-row"><span>${item.label}</span><span>${formatNaira(item.tax)}</span></span></div>`
-                        )
-                        .join('')}</div>
-                `);
-            } else {
-                summaryRows.push(`
-                    <div class="card">
-                        <div class="field-row"><span><strong>Revenue</strong><span>${formatNaira(summary.revenue)}</span></span><span><strong>Expenses</strong><span>${formatNaira(summary.expenses)}</span></span></div>
-                        <div class="field-row"><span><strong>Profit Before Tax</strong><span>${formatNaira(summary.profitBeforeTax)}</span></span><span><strong>CIT</strong><span>${formatNaira(summary.cit)}</span></span></div>
-                        <div class="field-row"><span><strong>Due Date</strong><span>${summary.dueDate.toLocaleDateString('en-NG')}</span></span><span></span></div>
-                    </div>
-                `);
-            }
+    function getFilingPeriod(): string {
+        return returnType === 'VAT' || returnType === 'WHT' ? `${year}-${month}` : year;
+    }
+
+    function buildDocumentForComputation(computation: TaxReturnComputation, generatedAt: string, verificationHash: string) {
+        const period = getFilingPeriod();
+        const totalIncome =
+            computation.kind === 'period'
+                ? computation.totalIncome
+                : computation.kind === 'pit'
+                  ? computation.grossAnnualIncome
+                  : computation.turnover;
+        const taxPayable =
+            computation.kind === 'period'
+                ? computation.taxPayable
+                : computation.kind === 'pit'
+                  ? computation.totalTax
+                  : computation.finalTax;
+        const totalVatCredit = computation.kind === 'period' ? computation.totalVatCredit : 0;
+        const totalWhtCredit = computation.kind === 'period' ? computation.totalWhtCredit : computation.kind === 'cit' ? computation.whtCredits : 0;
+
+        return buildTaxReturnDocumentData({
+            profile: state.profile,
+            title: `${returnType} Return ${period}`,
+            taxType: returnType,
+            filingPeriod: period,
+            filingYear: year,
+            generatedAt,
+            verificationHash,
+            totalIncome,
+            totalVatCredit,
+            totalWhtCredit,
+            taxPayable,
+            computation,
+        });
+    }
+
+    function buildDocumentForFiledReturn(taxReturn: TaxReturn) {
+        if (!taxReturn.computation) {
+            return null;
         }
 
-        const footer = `<div class="footer-note">This document is a generated tax return record for the selected period. The SHA-256 digest below is stored with the record to help verify document integrity and demonstrate a tamper-evident filing proof.</div>
-                        <div class="card"><strong>Document Hash</strong><div class="small-text">${taxReturn.pdfHash}</div></div>`;
+        const profileSnapshot = {
+            ...state.profile,
+            businessName: taxReturn.taxpayerName || state.profile.businessName,
+            name: taxReturn.taxpayerName || state.profile.name,
+            taxId: taxReturn.taxId || state.profile.taxId,
+            tin: taxReturn.tin || state.profile.tin,
+        };
 
-        return `${header}${summaryRows.join('')}<div class="card"><div class="field-row"><span><strong>Filing Period</strong><span>${taxReturn.filingPeriod}</span></span><span><strong>Return Type</strong><span>${taxReturn.returnType}</span></span></div><div class="field-row"><span><strong>Total Income</strong><span>${formatNaira(taxReturn.totalIncome)}</span></span><span><strong>Tax Payable</strong><span>${formatNaira(taxReturn.taxPayable)}</span></span></div></div>${footer}`;
+        return buildTaxReturnDocumentData({
+            profile: profileSnapshot,
+            title: taxReturn.documentTitle || `${taxReturn.returnType} Return ${taxReturn.filingPeriod}`,
+            taxType: taxReturn.returnType,
+            filingPeriod: taxReturn.filingPeriod,
+            filingYear: taxReturn.filingPeriod.slice(0, 4),
+            generatedAt: taxReturn.documentGeneratedAt || taxReturn.filingDate || taxReturn.createdAt,
+            verificationHash: taxReturn.verificationHash || taxReturn.pdfHash || 'n/a',
+            totalIncome: taxReturn.totalIncome,
+            totalVatCredit: taxReturn.totalVatCredit,
+            totalWhtCredit: taxReturn.totalWhtCredit,
+            taxPayable: taxReturn.taxPayable,
+            computation: taxReturn.computation,
+        });
     }
 
     async function handleFile() {
-        const filingDate = new Date().toISOString();
-        const documentTitle = `${returnType} Return ${summary.period}`;
-        const baseReturn = {
-            returnType,
-            filingPeriod: summary.period,
-            totalIncome: summary.kind === 'period' ? summary.totalIncome : summary.kind === 'pit' ? summary.annualIncome : summary.revenue,
-            totalVatCredit: summary.kind === 'period' ? summary.totalVat : 0,
-            totalWhtCredit: summary.kind === 'period' ? summary.totalWht : 0,
-            taxPayable: summary.kind === 'pit' ? summary.tax : summary.kind === 'cit' ? summary.cit : summary.taxPayable,
-            status: 'filed' as const,
-            filingDate,
-            documentTitle,
-            documentGeneratedAt: filingDate,
-            pdfHash: '',
-        };
+        try {
+            const identity = requireTaxIdentity(state.profile);
+            const filingDate = new Date().toISOString();
+            const verificationHash = await createDocumentHash(
+                JSON.stringify({
+                    returnType,
+                    period: getFilingPeriod(),
+                    computation: summary,
+                    taxId: identity.primaryValue,
+                    filingDate,
+                })
+            );
+            const document = buildDocumentForComputation(summary, filingDate, verificationHash);
+            const pdfBlob = await generateTaxReturnPdfBlob(document);
+            const pdfBase64 = await blobToBase64(pdfBlob);
+            const downloadFileName = `${document.title.replace(/\s+/g, '-')}.pdf`;
 
-        const previewHtml = buildTaxReturnDocumentHtml({ ...baseReturn, pdfHash: 'pending' }, summary);
-        const pdfHash = await createDocumentHash(previewHtml);
-        const taxReturn = addTaxReturn({ ...baseReturn, pdfHash });
+            const response = await fetch('/api/smarttax/filed-returns', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fileName: downloadFileName,
+                    mimeType: 'application/pdf',
+                    pdfBase64,
+                    metadata: {
+                        taxType: returnType,
+                        taxId: identity.primaryValue,
+                        tin: state.profile.tin,
+                        taxpayerName: document.taxpayerName,
+                        filingPeriod: document.filingPeriod,
+                        createdAt: filingDate,
+                        verificationHash,
+                        email: state.profile.email,
+                        phone: state.profile.phone,
+                    },
+                }),
+            });
 
-        addAuditEntry({
-            userId: state.profile.email || 'demo@smarttax.ng',
-            resourceType: 'taxReturn',
-            resourceId: taxReturn.id,
-            action: 'filed',
-            note: `Filed ${returnType} return for ${summary.period}`,
-            newValue: taxReturn,
-            recordHash: pdfHash,
-        });
+            if (!response.ok) {
+                const error = (await response.json().catch(() => null)) as { error?: string } | null;
+                throw new Error(error?.error || 'Unable to save the filed return PDF.');
+            }
 
-        const documentHtml = buildTaxReturnDocumentHtml(
-            {
-                ...taxReturn,
-                filingDate: taxReturn.filingDate ?? filingDate,
-                documentTitle: taxReturn.documentTitle ?? documentTitle,
-                documentGeneratedAt: taxReturn.documentGeneratedAt ?? filingDate,
-                pdfHash: taxReturn.pdfHash ?? pdfHash,
-            },
-            summary
-        );
-        openPrintableDocument(documentHtml, documentTitle, true);
+            const payload = (await response.json()) as {
+                secureLink: string;
+                downloadRef: string;
+            };
 
-        setFiledMsg(`${returnType} return prepared using the updated revenue and expense split.`);
-        setTimeout(() => setFiledMsg(null), 6000);
+            const taxReturn = addTaxReturn({
+                returnType,
+                filingPeriod: document.filingPeriod,
+                totalIncome: document.totalIncome,
+                totalVatCredit: document.totalVatCredit,
+                totalWhtCredit: document.totalWhtCredit,
+                taxPayable: document.taxPayable,
+                status: 'filed',
+                filingDate,
+                documentTitle: document.title,
+                documentGeneratedAt: filingDate,
+                pdfHash: verificationHash,
+                verificationHash,
+                taxId: identity.primaryValue,
+                tin: state.profile.tin,
+                taxpayerName: document.taxpayerName,
+                downloadRef: payload.downloadRef,
+                downloadFileName,
+                secureLink: payload.secureLink,
+                sentViaEmail: false,
+                sentViaWhatsApp: false,
+                computation: summary,
+            });
+
+            addAuditEntry({
+                userId: state.profile.email || 'demo@smarttax.ng',
+                resourceType: 'taxReturn',
+                resourceId: taxReturn.id,
+                action: 'filed',
+                note: `Filed ${returnType} return for ${document.filingPeriod} with Tax ID ${identity.primaryValue}`,
+                newValue: taxReturn,
+                recordHash: verificationHash,
+            });
+
+            openPrintableDocument(buildTaxReturnDocumentHtml(document), document.title);
+            showStatus(`${returnType} return prepared, stored, and linked to Tax ID ${identity.primaryValue}.`, 'success');
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to prepare the return.';
+            showStatus(message, 'error');
+        }
     }
 
-    function handlePreviewReturnDocument(taxReturn: typeof state.taxReturns[number]) {
-        const documentHtml = buildTaxReturnDocumentHtml(
-            {
-                ...taxReturn,
-                filingDate: taxReturn.filingDate ?? new Date().toISOString(),
-                documentTitle: `${taxReturn.returnType} Return ${taxReturn.filingPeriod}`,
-                documentGeneratedAt: taxReturn.documentGeneratedAt ?? taxReturn.filingDate ?? new Date().toISOString(),
-                pdfHash: taxReturn.pdfHash ?? 'n/a',
-            },
-            summary
-        );
-        openPrintableDocument(documentHtml, `${taxReturn.returnType}-${taxReturn.filingPeriod}-return`, true);
+    function handlePreviewReturnDocument(taxReturn: TaxReturn) {
+        const document = buildDocumentForFiledReturn(taxReturn);
+        if (!document) {
+            showStatus('Unable to rebuild this return document because its computation snapshot is missing.', 'error');
+            return;
+        }
+
+        openPrintableDocument(buildTaxReturnDocumentHtml(document), document.title, true);
+    }
+
+    async function handleShareEmail(taxReturn: TaxReturn) {
+        const document = buildDocumentForFiledReturn(taxReturn);
+        if (!document || !taxReturn.secureLink) {
+            showStatus('This return does not yet have a secure file link.', 'error');
+            return;
+        }
+
+        const recipient = state.profile.email?.trim();
+        const subject = `Your ${taxReturn.returnType} Return (Tax ID: ${document.identity.primaryValue})`;
+        const body = buildTaxReturnShareMessage(document, taxReturn.secureLink);
+
+        if (!recipient) {
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            markTaxReturnShared(taxReturn.id, 'email');
+            showStatus('Prepared an email draft because no SmartTax email address is configured.', 'success');
+            return;
+        }
+
+        if (!taxReturn.downloadRef) {
+            window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            markTaxReturnShared(taxReturn.id, 'email');
+            showStatus('Prepared an email draft because this return has no stored PDF reference.', 'success');
+            return;
+        }
+
+        setBusyReturnId(taxReturn.id);
+        try {
+            const response = await fetch('/api/smarttax/share/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ref: taxReturn.downloadRef,
+                    to: recipient,
+                    taxId: document.identity.primaryValue,
+                    secureLink: taxReturn.secureLink,
+                    subject,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = (await response.json().catch(() => null)) as { error?: string } | null;
+                throw new Error(error?.error || 'Unable to send email from the server.');
+            }
+
+            markTaxReturnShared(taxReturn.id, 'email');
+            showStatus(`Sent the ${taxReturn.returnType} return to ${recipient}.`, 'success');
+        } catch {
+            window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            markTaxReturnShared(taxReturn.id, 'email');
+            showStatus('Mail service is unavailable, so an email draft has been prepared locally.', 'success');
+        } finally {
+            setBusyReturnId(null);
+        }
+    }
+
+    function handleShareWhatsApp(taxReturn: TaxReturn) {
+        const document = buildDocumentForFiledReturn(taxReturn);
+        if (!document || !taxReturn.secureLink) {
+            showStatus('This return does not yet have a secure file link.', 'error');
+            return;
+        }
+
+        const phone = state.profile.phone.replace(/\D/g, '');
+        const message = encodeURIComponent(buildTaxReturnShareMessage(document, taxReturn.secureLink));
+        const target = phone ? `https://wa.me/${phone}?text=${message}` : `https://wa.me/?text=${message}`;
+        const popup = window.open(target, '_blank', 'noopener,noreferrer');
+
+        if (!popup) {
+            showStatus('WhatsApp share popup was blocked. Please allow popups and try again.', 'error');
+            return;
+        }
+
+        markTaxReturnShared(taxReturn.id, 'whatsapp');
+        showStatus(`Prepared WhatsApp share for ${taxReturn.returnType} return.`, 'success');
+    }
+
+    function handleDownloadReturn(taxReturn: TaxReturn) {
+        if (!taxReturn.secureLink) {
+            showStatus('This return does not yet have a secure file link.', 'error');
+            return;
+        }
+
+        const anchor = document.createElement('a');
+        anchor.href = taxReturn.secureLink;
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
     }
 
     function renderAuditTrail() {
@@ -237,7 +432,9 @@ export default function TaxReturnsPage() {
                 <div className="space-y-3">
                     {entries.map((entry) => (
                         <div key={entry.id} className="rounded-lg border border-slate-200 bg-white p-3">
-                            <p className="text-sm font-semibold text-slate-800">{entry.action.toUpperCase()} • {new Date(entry.timestamp).toLocaleString('en-NG')}</p>
+                            <p className="text-sm font-semibold text-slate-800">
+                                {entry.action.toUpperCase()} | {new Date(entry.timestamp).toLocaleString('en-NG')}
+                            </p>
                             <p className="text-sm text-slate-600">{entry.note}</p>
                             <p className="text-xs text-slate-500 mt-2">Record Hash: {entry.recordHash}</p>
                         </div>
@@ -251,7 +448,7 @@ export default function TaxReturnsPage() {
         <>
             <PageHeader
                 title="Tax Returns"
-                description="Prepare returns from credit-side VAT, debit-side WHT deductions, and configured annual profit-tax calculations."
+                description="Prepare VAT, WHT, PIT, and CIT returns with Tax ID resolution, stored PDF output, and secure share links."
             />
 
             <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6">
@@ -301,31 +498,135 @@ export default function TaxReturnsPage() {
                             <input
                                 type="number"
                                 step="0.01"
-                                value={annualIncome}
-                                onChange={(event) => setAnnualIncome(event.target.value)}
+                                value={pitForm.annualIncome}
+                                onChange={(event) => setPitForm((current) => ({ ...current, annualIncome: event.target.value }))}
                                 placeholder="Leave blank to use revenue transactions"
                                 className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
                             />
                         </label>
                     )}
                 </div>
+
+                {returnType === 'PIT' && (
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-slate-200 pt-4">
+                        <label className="flex items-center gap-3 rounded-md border border-slate-200 px-3 py-2 md:col-span-4 bg-slate-50">
+                            <input
+                                type="checkbox"
+                                checked={pitForm.useRelief}
+                                onChange={(event) => setPitForm((current) => ({ ...current, useRelief: event.target.checked }))}
+                                className="h-4 w-4 accent-blue-600"
+                            />
+                            <span className="text-sm text-slate-700">
+                                Apply CRA relief and statutory deductions. Disable this for the demo shortcut that taxes gross income directly.
+                            </span>
+                        </label>
+                        <label className="block">
+                            <span className="text-sm font-medium text-slate-700">Pension</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={pitForm.pension}
+                                onChange={(event) => setPitForm((current) => ({ ...current, pension: event.target.value }))}
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
+                            />
+                        </label>
+                        <label className="block">
+                            <span className="text-sm font-medium text-slate-700">NHF</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={pitForm.nhf}
+                                onChange={(event) => setPitForm((current) => ({ ...current, nhf: event.target.value }))}
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
+                            />
+                        </label>
+                        <label className="block">
+                            <span className="text-sm font-medium text-slate-700">NHIS</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={pitForm.nhis}
+                                onChange={(event) => setPitForm((current) => ({ ...current, nhis: event.target.value }))}
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
+                            />
+                        </label>
+                    </div>
+                )}
+
+                {returnType === 'CIT' && (
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-5 gap-4 border-t border-slate-200 pt-4">
+                        <label className="block">
+                            <span className="text-sm font-medium text-slate-700">Turnover</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={citForm.turnover}
+                                onChange={(event) => setCitForm((current) => ({ ...current, turnover: event.target.value }))}
+                                placeholder="Defaults to annual revenue"
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
+                            />
+                        </label>
+                        <label className="block">
+                            <span className="text-sm font-medium text-slate-700">Accounting Profit</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={citForm.accountingProfit}
+                                onChange={(event) => setCitForm((current) => ({ ...current, accountingProfit: event.target.value }))}
+                                placeholder="Defaults to annual PBT"
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
+                            />
+                        </label>
+                        <label className="block">
+                            <span className="text-sm font-medium text-slate-700">Disallowable Expenses</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={citForm.disallowableExpenses}
+                                onChange={(event) => setCitForm((current) => ({ ...current, disallowableExpenses: event.target.value }))}
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
+                            />
+                        </label>
+                        <label className="block">
+                            <span className="text-sm font-medium text-slate-700">Capital Allowances</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={citForm.capitalAllowances}
+                                onChange={(event) => setCitForm((current) => ({ ...current, capitalAllowances: event.target.value }))}
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
+                            />
+                        </label>
+                        <label className="block">
+                            <span className="text-sm font-medium text-slate-700">WHT Credits</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={citForm.whtCredits}
+                                onChange={(event) => setCitForm((current) => ({ ...current, whtCredits: event.target.value }))}
+                                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2"
+                            />
+                        </label>
+                    </div>
+                )}
             </div>
 
             {!hydrated ? (
                 <div className="bg-white rounded-lg border border-slate-200 p-8 text-slate-500">Loading...</div>
             ) : (
-                <ReturnSummary
-                    returnType={returnType}
-                    summary={summary}
-                    profitTaxRatePercent={state.settings.profitTaxRatePercent}
-                    onFile={handleFile}
-                />
+                <ReturnSummary returnType={returnType} summary={summary} onFile={handleFile} />
             )}
 
-            {filedMsg && (
-                <div className="mt-4 flex items-start gap-2 bg-emerald-50 border border-emerald-200 rounded-md px-4 py-3 text-sm text-emerald-900">
+            {statusMessage && (
+                <div
+                    className={`mt-4 flex items-start gap-2 rounded-md px-4 py-3 text-sm ${
+                        statusMessage.tone === 'success'
+                            ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
+                            : 'bg-rose-50 border border-rose-200 text-rose-900'
+                    }`}
+                >
                     <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                    <span>{filedMsg}</span>
+                    <span>{statusMessage.text}</span>
                 </div>
             )}
 
@@ -341,42 +642,60 @@ export default function TaxReturnsPage() {
                                     <tr>
                                         <th className="text-left px-5 py-3">Type</th>
                                         <th className="text-left px-5 py-3">Period</th>
+                                        <th className="text-left px-5 py-3">Tax ID</th>
                                         <th className="text-right px-5 py-3">Income</th>
                                         <th className="text-right px-5 py-3">Tax Payable</th>
-                                        <th className="text-left px-5 py-3">Status</th>
-                                        <th className="text-left px-5 py-3">Document</th>
-                                        <th className="text-left px-5 py-3">Filed</th>
+                                        <th className="text-left px-5 py-3">Delivery</th>
+                                        <th className="text-left px-5 py-3">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {state.taxReturns.map((taxReturn) => (
-                                        <tr key={taxReturn.id} className="border-t border-slate-100">
+                                        <tr key={taxReturn.id} className="border-t border-slate-100 align-top">
                                             <td className="px-5 py-3 font-semibold text-slate-800">{taxReturn.returnType}</td>
                                             <td className="px-5 py-3 text-slate-600">{taxReturn.filingPeriod}</td>
+                                            <td className="px-5 py-3 text-slate-700 font-mono">{taxReturn.taxId || '-'}</td>
                                             <td className="px-5 py-3 text-right text-slate-700">{formatNaira(taxReturn.totalIncome)}</td>
                                             <td className="px-5 py-3 text-right font-semibold text-slate-900">{formatNaira(taxReturn.taxPayable)}</td>
+                                            <td className="px-5 py-3 text-xs text-slate-600 space-y-1">
+                                                <div>{taxReturn.sentViaEmail ? 'Email sent/prepared' : 'Email pending'}</div>
+                                                <div>{taxReturn.sentViaWhatsApp ? 'WhatsApp prepared' : 'WhatsApp pending'}</div>
+                                                <div>Hash: {(taxReturn.verificationHash || taxReturn.pdfHash || 'n/a').slice(0, 12)}</div>
+                                            </td>
                                             <td className="px-5 py-3">
-                                                <span className="inline-flex items-center gap-1 text-xs font-semibold bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                                                    <CheckCircle2 className="h-3 w-3" /> {taxReturn.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-5 py-3 text-slate-700 space-y-1">
-                                                <button
-                                                    onClick={() => handlePreviewReturnDocument(taxReturn)}
-                                                    className="text-blue-600 hover:text-blue-800 text-sm"
-                                                >
-                                                    Print / Save PDF
-                                                </button>
-                                                <button
-                                                    onClick={() => setSelectedAuditReturnId((current) => (current === taxReturn.id ? null : taxReturn.id))}
-                                                    className="text-slate-600 hover:text-slate-900 text-sm"
-                                                >
-                                                    {selectedAuditReturnId === taxReturn.id ? 'Hide audit trail' : 'View audit trail'}
-                                                </button>
-                                                <div className="text-xs text-slate-500">Hash: {taxReturn.pdfHash?.slice(0, 10) ?? 'n/a'}</div>
-                                            </td>
-                                            <td className="px-5 py-3 text-xs text-slate-500">
-                                                {taxReturn.filingDate ? new Date(taxReturn.filingDate).toLocaleDateString('en-NG') : '-'}
+                                                <div className="flex flex-wrap gap-2">
+                                                    <button
+                                                        onClick={() => handleShareEmail(taxReturn)}
+                                                        disabled={busyReturnId === taxReturn.id}
+                                                        className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                                                    >
+                                                        <Mail className="h-3.5 w-3.5" /> Email
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleShareWhatsApp(taxReturn)}
+                                                        className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+                                                    >
+                                                        <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDownloadReturn(taxReturn)}
+                                                        className="inline-flex items-center gap-1 rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+                                                    >
+                                                        <Download className="h-3.5 w-3.5" /> Download PDF
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handlePreviewReturnDocument(taxReturn)}
+                                                        className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                                                    >
+                                                        <FileText className="h-3.5 w-3.5" /> Print / Save PDF
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setSelectedAuditReturnId((current) => (current === taxReturn.id ? null : taxReturn.id))}
+                                                        className="inline-flex items-center gap-1 rounded-md bg-white px-3 py-2 text-xs font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50"
+                                                    >
+                                                        {selectedAuditReturnId === taxReturn.id ? 'Hide Audit Trail' : 'View Audit Trail'}
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -394,47 +713,19 @@ export default function TaxReturnsPage() {
 function ReturnSummary({
     returnType,
     summary,
-    profitTaxRatePercent,
     onFile,
 }: {
     returnType: ReturnType;
-    summary:
-        | {
-              kind: 'period';
-              period: string;
-              transactionCount: number;
-              totalIncome: number;
-              totalVat: number;
-              totalWht: number;
-              taxPayable: number;
-              dueDate: Date;
-          }
-        | {
-              kind: 'pit';
-              period: string;
-              annualIncome: number;
-              tax: number;
-              effectiveRate: number;
-              bracketBreakdown: Array<{ label: string; taxedAmount: number; tax: number }>;
-              dueDate: Date;
-          }
-        | {
-              kind: 'cit';
-              period: string;
-              revenue: number;
-              expenses: number;
-              profitBeforeTax: number;
-              cit: number;
-              dueDate: Date;
-          };
-    profitTaxRatePercent: number;
+    summary: TaxReturnComputation;
     onFile: () => void;
 }) {
     return (
         <div className="bg-white border border-slate-200 rounded-lg p-6">
             <div className="flex items-center gap-2 mb-4">
                 <FileText className="h-5 w-5 text-blue-600" />
-                <h2 className="font-semibold text-slate-800">{returnType} Return - {summary.period}</h2>
+                <h2 className="font-semibold text-slate-800">
+                    {returnType} Return - {summary.kind === 'period' ? 'Monthly' : 'Annual'} Preview
+                </h2>
             </div>
 
             {summary.kind === 'period' && (
@@ -447,26 +738,33 @@ function ReturnSummary({
                         label={returnType === 'VAT' ? 'Total Revenue' : 'Total Gross Expenses'}
                         value={formatNaira(summary.totalIncome)}
                     />
-                    <Stat label="VAT Credits" value={formatNaira(summary.totalVat)} tone="orange" />
-                    <Stat label="WHT Credits" value={formatNaira(summary.totalWht)} tone="rose" />
+                    <Stat label="VAT Credit" value={formatNaira(summary.totalVatCredit)} tone="orange" />
+                    <Stat label="WHT Credit" value={formatNaira(summary.totalWhtCredit)} tone="rose" />
+                    <Stat label="Tax Payable" value={formatNaira(summary.taxPayable)} tone="orange" />
+                    <Stat label="Due Date" value={getDueDateLabel(summary.dueDate)} />
                 </div>
             )}
 
             {summary.kind === 'pit' && (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <Stat label="Annual Income" value={formatNaira(summary.annualIncome)} />
-                        <Stat label="Tax Payable" value={formatNaira(summary.tax)} tone="orange" />
+                        <Stat label="Gross Annual Income" value={formatNaira(summary.grossAnnualIncome)} />
+                        <Stat label="Statutory Deductions" value={formatNaira(summary.totalDeductions)} />
+                        <Stat label="CRA" value={summary.useRelief ? formatNaira(summary.cra) : 'Not applied'} />
+                        <Stat label="Taxable Income" value={formatNaira(summary.taxableIncome)} />
+                        <Stat label="Tax Payable" value={formatNaira(summary.totalTax)} tone="orange" />
                         <Stat label="Effective Rate" value={`${summary.effectiveRate.toFixed(2)}%`} />
                     </div>
-                    {summary.bracketBreakdown.length > 0 && (
+                    {summary.breakdown.length > 0 && (
                         <div className="border border-slate-200 rounded-md p-4 bg-slate-50">
-                            <p className="text-xs font-semibold uppercase text-slate-500 mb-2">Bracket Breakdown</p>
+                            <p className="text-xs font-semibold uppercase text-slate-500 mb-2">Progressive PIT Breakdown</p>
                             <ul className="space-y-1 text-sm">
-                                {summary.bracketBreakdown.map((item, index) => (
-                                    <li key={index} className="flex justify-between">
-                                        <span className="text-slate-700">{item.label} - taxed {formatNaira(item.taxedAmount)}</span>
-                                        <span className="font-semibold text-slate-900">{formatNaira(item.tax)}</span>
+                                {summary.breakdown.map((item, index) => (
+                                    <li key={index} className="flex justify-between gap-3">
+                                        <span className="text-slate-700">{item.label}</span>
+                                        <span className="font-semibold text-slate-900">
+                                            {formatNaira(item.tax)} on {formatNaira(item.taxableAmount)}
+                                        </span>
                                     </li>
                                 ))}
                             </ul>
@@ -477,19 +775,29 @@ function ReturnSummary({
 
             {summary.kind === 'cit' && (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <Stat label="Revenue" value={formatNaira(summary.revenue)} />
-                    <Stat label="Expenses" value={formatNaira(summary.expenses)} />
-                    <Stat label="Profit Before Tax" value={formatNaira(summary.profitBeforeTax)} />
-                    <Stat label={`Estimated CIT (${profitTaxRatePercent}%)`} value={formatNaira(summary.cit)} tone="orange" />
+                    <Stat label="Turnover" value={formatNaira(summary.turnover)} />
+                    <Stat label="Accounting Profit" value={formatNaira(summary.accountingProfit)} />
+                    <Stat label="Taxable Profit" value={formatNaira(summary.taxableProfit)} />
+                    <Stat label="Base CIT" value={formatNaira(summary.tax)} tone="orange" />
+                    <Stat label="WHT Credits" value={formatNaira(summary.whtCredits)} />
+                    <Stat label="Final Tax" value={formatNaira(summary.finalTax)} tone="orange" />
+                    <Stat
+                        label="Company Category"
+                        value={summary.companyCategory === 'small' ? 'Small Company' : 'Medium / Large'}
+                    />
+                    <Stat label="Due Date" value={getDueDateLabel(summary.dueDate)} />
                 </div>
             )}
 
             <div className="flex items-center justify-between pt-4 border-t border-slate-200">
                 <div className="text-sm text-slate-600">
-                    <span className="font-medium">Due: </span>
-                    {summary.dueDate.toLocaleDateString('en-NG', { dateStyle: 'medium' })}
+                    <span className="font-medium">Tax ID Requirement: </span>
+                    Tax ID is inserted into the return PDF, secure download link, and share payloads.
                 </div>
-                <button onClick={onFile} className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700">
+                <button
+                    onClick={onFile}
+                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700"
+                >
                     <Plus className="h-4 w-4" /> Prepare and File Return
                 </button>
             </div>
