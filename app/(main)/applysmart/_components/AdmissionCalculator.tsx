@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { federalUniversities, stateUniversities, privateUniversities, polytechnics, statePolytechnics, collegesOfEducation, monotechnics, nursingColleges, ieis, firstTierCourses, secondTierCourses, thirdTierCourses, states } from "@/lib/data/applysmart";
+import { federalUniversities, stateUniversities, privateUniversities, polytechnics, statePolytechnics, collegesOfEducation, monotechnics, nursingColleges, ieis, firstTierCourses, secondTierCourses, thirdTierCourses, states, courseInstitutionMap } from "@/lib/data/applysmart";
 import { calculateAdmissionChance } from "@/lib/utils/admissionCalculator";
 
 // Mapping from form course values to utility course keys
@@ -55,6 +55,40 @@ export function AdmissionCalculator() {
     const [state, setState] = useState('');
     const [result, setResult] = useState<ReturnType<typeof calculateAdmissionChance> | null>(null);
 
+    const allInstitutionIds = [
+        ...federalUniversities,
+        ...stateUniversities,
+        ...privateUniversities,
+        ...polytechnics,
+        ...statePolytechnics,
+        ...collegesOfEducation,
+        ...monotechnics,
+        ...nursingColleges,
+        ...ieis,
+    ].map(option => option.value);
+
+    const allowedInstitutionIds = course
+        ? new Set(courseInstitutionMap[course] ?? allInstitutionIds)
+        : null;
+
+    const filterOptions = <T extends { value: string }>(options: T[]) =>
+        allowedInstitutionIds
+            ? options.filter(option => allowedInstitutionIds.has(option.value))
+            : options;
+
+    const institutionGroups = [
+        { label: 'Federal Universities', options: filterOptions(federalUniversities) },
+        { label: 'State Universities', options: filterOptions(stateUniversities) },
+        { label: 'Private Universities', options: filterOptions(privateUniversities) },
+        { label: 'Federal & State Polytechnics', options: filterOptions([...polytechnics, ...statePolytechnics]) },
+        { label: 'Colleges of Education', options: filterOptions(collegesOfEducation) },
+        { label: 'Monotechnics', options: filterOptions(monotechnics) },
+        { label: 'College of Nursing', options: filterOptions(nursingColleges) },
+        { label: 'Institutes of Education/IEIs', options: filterOptions(ieis) },
+    ];
+
+    const hasAvailableInstitutions = institutionGroups.some(group => group.options.length > 0);
+
     const calculateChance = (e: React.FormEvent) => {
         e.preventDefault();
         const jambScore = parseInt(score, 10);
@@ -77,39 +111,17 @@ export function AdmissionCalculator() {
         <form onSubmit={calculateChance} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                    <label htmlFor="institution" className="block text-sm font-medium text-gray-700">Preferred Institution</label>
-                    <select id="institution" value={institution} onChange={e => setInstitution(e.target.value)} required className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="">Select Institution</option>
-                        <optgroup label="Federal Universities">
-                            {federalUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
-                        </optgroup>
-                        <optgroup label="State Universities">
-                            {stateUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
-                        </optgroup>
-                        <optgroup label="Private Universities">
-                            {privateUniversities.map(uni => <option key={uni.value} value={uni.value}>{uni.label}</option>)}
-                        </optgroup>
-                        <optgroup label="Federal & State Polytechnics">
-                            {polytechnics.map(poly => <option key={poly.value} value={poly.value}>{poly.label}</option>)}
-                            {statePolytechnics.map(poly => <option key={poly.value} value={poly.value}>{poly.label}</option>)}
-                        </optgroup>
-                        <optgroup label="Colleges of Education">
-                            {collegesOfEducation.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
-                        </optgroup>
-                        <optgroup label="Monotechnics">
-                            {monotechnics.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
-                        </optgroup>
-                        <optgroup label="College of Nursing">
-                            {nursingColleges.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
-                        </optgroup>
-                        <optgroup label="Institutes of Education/IEIs">
-                            {ieis.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
-                        </optgroup>
-                    </select>
-                </div>
-                <div>
                     <label htmlFor="course" className="block text-sm font-medium text-gray-700">Preferred Course</label>
-                    <select id="course" value={course} onChange={e => setCourse(e.target.value)} required className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <select
+                        id="course"
+                        value={course}
+                        onChange={e => {
+                            setCourse(e.target.value);
+                            setInstitution('');
+                        }}
+                        required
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    >
                         <option value="">Select Course</option>
                         <optgroup label="First Tier (Cutoff: 240+)">
                             {firstTierCourses.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -120,6 +132,26 @@ export function AdmissionCalculator() {
                         <optgroup label="Third Tier (Cutoff: 160-199)">
                             {thirdTierCourses.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                         </optgroup>
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="institution" className="block text-sm font-medium text-gray-700">Preferred Institution</label>
+                    <select
+                        id="institution"
+                        value={institution}
+                        onChange={e => setInstitution(e.target.value)}
+                        required
+                        disabled={!course}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-60"
+                    >
+                        <option value="">
+                            {course ? (hasAvailableInstitutions ? 'Select Institution' : 'No institutions available for selected course') : 'Select course first'}
+                        </option>
+                        {institutionGroups.map(group => group.options.length > 0 && (
+                            <optgroup key={group.label} label={group.label}>
+                                {group.options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+                            </optgroup>
+                        ))}
                     </select>
                 </div>
                 <div>

@@ -1,6 +1,5 @@
 import type { Profile, Receipt, Transaction } from './types';
 import { buildReceiptShareText as buildReceiptShareTextContent } from './receiptContent';
-import { schedulePopupPrint, writePopupDocument } from '@/lib/print/popup';
 
 function cloneDocumentHead(): string {
     const nodes = Array.from(document.head.querySelectorAll('style, link[rel="stylesheet"]'));
@@ -11,13 +10,7 @@ export function openReceiptDocument(
     receiptNode: HTMLElement,
     title: string,
     autoPrint = false,
-    popupWindow?: Window | null,
 ) {
-    const popup = popupWindow ?? window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
-    if (!popup) {
-        return false;
-    }
-
     const styles = cloneDocumentHead();
     const receiptMarkup = receiptNode.cloneNode(true) as HTMLElement;
     const documentHtml = `
@@ -43,13 +36,45 @@ export function openReceiptDocument(
         </html>
     `;
 
-    writePopupDocument(popup, documentHtml);
-
     if (autoPrint) {
-        schedulePopupPrint(popup);
-    }
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        document.body.appendChild(iframe);
 
-    return true;
+        const printDocument = iframe.contentWindow?.document;
+        if (printDocument) {
+            printDocument.open();
+            printDocument.write(documentHtml);
+            printDocument.close();
+
+            setTimeout(() => {
+                iframe.contentWindow?.focus();
+                iframe.contentWindow?.print();
+                
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 1000);
+            }, 250);
+            return true;
+        }
+        return false;
+    } else {
+        const blob = new Blob([documentHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const popup = window.open(url, '_blank', 'noopener,noreferrer,width=900,height=1200');
+        if (!popup) {
+            return false;
+        }
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        return true;
+    }
 }
 
 export function buildReceiptShareText(profile: Profile, transaction: Transaction, receipt: Receipt): string {

@@ -38,12 +38,7 @@ function ReceiptsInner() {
     }
 
     function handleDocumentPopup(receiptNode: HTMLElement, title: string, autoPrint = false) {
-        const popup = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1200');
-        if (!popup) {
-            showActionStatus('Popup blocked. Please allow popups and try again.', 'error');
-            return false;
-        }
-        return openReceiptDocument(receiptNode, title, autoPrint, popup);
+        return openReceiptDocument(receiptNode, title, autoPrint);
     }
 
     function handlePrint() {

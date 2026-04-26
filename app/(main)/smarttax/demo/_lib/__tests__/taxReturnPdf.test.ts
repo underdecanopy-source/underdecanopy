@@ -1,3 +1,4 @@
+export {};
 const { TextDecoder, TextEncoder } = require('util');
 
 Object.assign(globalThis, { TextEncoder, TextDecoder });

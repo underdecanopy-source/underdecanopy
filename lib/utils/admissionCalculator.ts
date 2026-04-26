@@ -160,6 +160,21 @@ export function calculateAdmissionChance(
     factors.push('⚠ This course is highly competitive');
   }
 
+  // Extra advantage for scores that are well above both the course cutoff and institution minimum.
+  const benchmark = Math.max(institution.minimum_score, courseInfo.cutoff);
+  const scoreMargin = score - benchmark;
+
+  if (scoreMargin >= 150) {
+    chance += 20;
+    factors.push('✓ Your score is far above the course and institution benchmarks, improving your chances significantly');
+  } else if (scoreMargin >= 80) {
+    chance += 15;
+    factors.push('✓ Your score is comfortably above the course and institution benchmarks');
+  } else if (scoreMargin >= 40) {
+    chance += 10;
+    factors.push('✓ Your score is above the course and institution benchmarks');
+  }
+
   chance = Math.round(Math.max(0, Math.min(100, chance)));
   const recommendation = getRecommendation(chance);
 
