@@ -21,6 +21,104 @@ export interface CalculationResult {
   recommendation: string;
 }
 
+const defaultCourseData: CourseData = {
+  tier: 3,
+  cutoff: 160,
+  competition: 'Low',
+};
+
+const courseAliasMap: Record<string, string> = {
+  'MEDICINE AND SURGERY (MBBS)': 'medicine',
+  'DENTISTRY (BDS)': 'dentistry',
+  'PHARMACY (PHARM.D)': 'pharmacy',
+  'LAW (LL.B)': 'law',
+  'NURSING PROGRAMME': 'nursing',
+  'MEDICAL LABORATORY SCIENCE (B.MLS)': 'medical_lab',
+  'PHYSIOTHERAPY': 'physiotherapy',
+  'RADIOGRAPHY AND RADIATION SCIENCE': 'radiography',
+  'VETERINARY MEDICINE (DVM)': 'vet_med',
+  'OPTOMETRY': 'optometry',
+  'ANATOMY': 'anatomy',
+  'PHYSIOLOGY': 'physiology',
+  'ACCOUNTING': 'accounting',
+  'BANKING AND FINANCE': 'banking_finance',
+  'BUSINESS ADMINISTRATION & MANAGEMENT': 'business_admin',
+  'ECONOMICS': 'economics',
+  'MASS COMMUNICATION': 'mass_comm',
+  'COMPUTER SCIENCE': 'computer_science',
+  'ELECTRICAL/ELECTRONICS ENGINEERING TECHNOLOGY': 'electrical_eng',
+  'MECHANICAL ENGINEERING TECHNOLOGY': 'mechanical_eng',
+  'CIVIL ENGINEERING TECHNOLOGY': 'civil_eng',
+  'ARCHITECTURAL TECHNOLOGY': 'architecture',
+  'ESTATE MANAGEMENT AND VALUATION': 'estate_management',
+  'URBAN AND REGIONAL PLANNING': 'urban_regional',
+  'BIOCHEMISTRY': 'biochemistry',
+  'MICROBIOLOGY': 'microbiology',
+  'PUBLIC ADMINISTRATION': 'public_admin',
+  'LOCAL GOVERNMENT STUDIES': 'local_govt',
+  'SOCIOLOGY': 'sociology',
+  'POLITICAL SCIENCE': 'political_science',
+  'HISTORY AND INTERNATIONAL STUDIES': 'history',
+  'THEATRE ARTS': 'theatre_arts',
+  'LINGUISTICS': 'linguistics',
+  'ENGLISH LANGUAGE AND LITERATURE': 'english',
+  'MODERN LANGUAGES': 'french',
+  'EDUCATION PROGRAMS WITH SUBJECT MAJORS': 'education',
+  'AGRICULTURAL ECONOMICS': 'agric_econ',
+  'ANIMAL SCIENCE': 'animal_science',
+  'CROP SCIENCE': 'crop_science',
+  'SOIL SCIENCE': 'soil_science',
+};
+
+function normalizeCourseKey(course: string): string {
+  return course
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .replace(/_+/g, '_');
+}
+
+function inferCourseDataFromName(course: string): CourseData {
+  if (/\bLAW\b/.test(course)) {
+    return { tier: 1, cutoff: 270, competition: 'Very High' };
+  }
+
+  if (/\b(MEDICINE|PHARMACY|DENTISTRY|VETERINARY|OPTOMETRY|RADIOGRAPHY|PHYSIOTHERAPY|NURSING|DENTAL|ANATOMY|PHYSIOLOGY|MEDICAL)\b/.test(course)) {
+    return { tier: 1, cutoff: 250, competition: 'High' };
+  }
+
+  if (/\b(ENGINEERING|COMPUTER|CYBER|INFORMATION TECHNOLOGY|PETROLEUM|MARITIME|GAS|AUTOMOBILE|AERONAUTICAL|AVIATION|HYDROLOGY|RAILWAY|TRANSPORT|LOGISTICS|SURVEYING)\b/.test(course)) {
+    return { tier: 2, cutoff: 220, competition: 'High' };
+  }
+
+  if (/\b(ACCOUNTING|FINANCE|BUSINESS|ECONOMICS|MARKETING|MANAGEMENT|COMMUNICATION|ARCHITECTURE|HOSPITALITY|TOURISM|HOTEL|PUBLIC ADMINISTRATION|TAXATION|ESTATE MANAGEMENT|URBAN|REGIONAL|ENVIRONMENTAL|GEOLOGY|GEOGRAPHY|FASHION|GRAPHICS|PHARMACEUTICAL|HEALTH|EDUCATION)\b/.test(course)) {
+    return { tier: 2, cutoff: 200, competition: 'Medium' };
+  }
+
+  if (/\b(SOCIOLOGY|POLITICAL SCIENCE|HISTORY|THEATRE|LINGUISTICS|ENGLISH|LANGUAGE|MODERN LANGUAGES|CULTURAL|SOCIAL|SPORTS|PHYSICAL|LEATHER|LAUNDRY|COLLEGE|INSTITUTE|ENVIRONMENTAL|GEOSCIENCE|RESOURCE|SCIENCE)\b/.test(course)) {
+    return { tier: 3, cutoff: 170, competition: 'Low' };
+  }
+
+  return defaultCourseData;
+}
+
+function getCourseData(course: string): CourseData {
+  const normalizedCourse = course.trim().toUpperCase();
+  const aliasKey = courseAliasMap[normalizedCourse];
+  if (aliasKey && courseData[aliasKey]) {
+    return courseData[aliasKey];
+  }
+
+  const normalizedKey = normalizeCourseKey(course);
+  if (courseData[normalizedKey]) {
+    return courseData[normalizedKey];
+  }
+
+  return inferCourseDataFromName(normalizedCourse);
+}
+
 export const courseData: Record<string, CourseData> = {
   medicine: { tier: 1, cutoff: 280, competition: 'Very High' },
   dentistry: { tier: 1, cutoff: 270, competition: 'Very High' },
@@ -72,9 +170,9 @@ export function calculateAdmissionChance(
 ): CalculationResult | null {
   if (!institutionId || !course || !score) return null;
 
-  const courseInfo = courseData[course];
+  const courseInfo = getCourseData(course);
   const institution = getInstitutionById(institutionId);
-  if (!courseInfo || !institution) return null;
+  if (!institution) return null;
 
   const factors: string[] = [];
   let chance = 0; // Base chance starts at 0

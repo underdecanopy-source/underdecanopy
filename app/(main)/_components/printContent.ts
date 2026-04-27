@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-/**
+/** 
  * Utility for printing HTML content in a new window.
  * Prevents 'about:blank' issues by ensuring content is written before printing.
  */

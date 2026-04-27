@@ -1,18 +1,51 @@
 ﻿const fs = require('fs');
 const path = require('path');
 const source = fs.readFileSync(path.join(__dirname, 'lib/data/applysmart.ts'), 'utf8');
-const start = source.indexOf('export const courseInstitutionMap: Record<string, string[]> = {');
-if (start === -1) {
-  console.error('courseInstitutionMap not found');
-  process.exit(1);
+
+function parseRawCourses(source) {
+  const rawStart = source.indexOf('const rawCourseInstitutionData = `');
+  const rawEnd = source.indexOf('`\n\nfunction parseCourseInstitutionData', rawStart);
+  if (rawStart === -1 || rawEnd === -1) {
+    throw new Error('rawCourseInstitutionData not found');
+  }
+  const raw = source.slice(rawStart + 'const rawCourseInstitutionData = `'.length, rawEnd);
+  const entryRegex = /{[\s\S]*?"course"\s*:\s*"([^\"]+)"[\s\S]*?"institutions"\s*:\s*\[([\s\S]*?)\][\s\S]*?}/g;
+  const institutionRegex = /"([^\"]+)"/g;
+  const map = {};
+  let match;
+  while ((match = entryRegex.exec(raw)) !== null) {
+    const course = match[1].trim();
+    const instText = match[2];
+    const institutions = [];
+    let instMatch;
+    while ((instMatch = institutionRegex.exec(instText)) !== null) {
+      institutions.push(instMatch[1].trim());
+    }
+    map[course] = institutions;
+  }
+  return map;
 }
-const mapText = source.slice(start);
-const mapKeys = [];
-const keyRegex = /\n\s*"?([^"\n]+?)"?\s*:\s*\[/g;
-let m;
-while ((m = keyRegex.exec(mapText)) !== null) {
-  mapKeys.push(m[1]);
+
+function parseAliasKeys(source) {
+  const aliasStart = source.indexOf('export const courseInstitutionAliasMap: Record<string, string> = {');
+  const aliasEnd = source.indexOf('};', aliasStart);
+  if (aliasStart === -1 || aliasEnd === -1) {
+    throw new Error('courseInstitutionAliasMap not found');
+  }
+  const aliasText = source.slice(aliasStart, aliasEnd);
+  const aliasRegex = /\n\s*['"]([^'\"]+)['"]\s*:\s*['"]([^'\"]+)['"]/g;
+  const keys = [];
+  let match;
+  while ((match = aliasRegex.exec(aliasText)) !== null) {
+    keys.push(match[1]);
+  }
+  return keys;
 }
+
+const rawCourseMap = parseRawCourses(source);
+const aliasKeys = parseAliasKeys(source);
+const mapKeys = Object.keys(rawCourseMap);
+
 const requested = [
   'ACCOUNTANCY',
   'AGRICULTURAL TECHNOLOGY',
@@ -191,6 +224,7 @@ const requested = [
 const missing = requested.filter(course => !mapKeys.includes(course));
 const extra = mapKeys.filter(course => !requested.includes(course));
 console.log('requested', requested.length);
-console.log('mapped', mapKeys.length);
+console.log('raw mapped', mapKeys.length);
 console.log('missing', missing.length, missing);
-console.log('extra', extra.length, extra);
+console.log('extra raw courses', extra.length, extra);
+console.log('alias keys', aliasKeys.length, aliasKeys);

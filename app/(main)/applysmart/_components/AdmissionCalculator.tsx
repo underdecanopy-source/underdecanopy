@@ -1,52 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { federalUniversities, stateUniversities, privateUniversities, polytechnics, statePolytechnics, collegesOfEducation, monotechnics, nursingColleges, ieis, firstTierCourses, secondTierCourses, thirdTierCourses, states, courseInstitutionMap } from "@/lib/data/applysmart";
+import { federalUniversities, stateUniversities, privateUniversities, polytechnics, statePolytechnics, collegesOfEducation, monotechnics, nursingColleges, ieis, allCourses, states, courseInstitutionMap } from "@/lib/data/applysmart";
 import { calculateAdmissionChance } from "@/lib/utils/admissionCalculator";
-
-// Mapping from form course values to utility course keys
-const courseMapping: Record<string, string> = {
-    'Medicine and Surgery (MBBS)': 'medicine',
-    'Dentistry (BDS)': 'dentistry',
-    'Pharmacy (Pharm.D)': 'pharmacy',
-    'Law (LL.B)': 'law',
-    'Nursing Science (B.N.Sc.)': 'nursing',
-    'Medical Laboratory Science (B.MLS)': 'medical_lab',
-    'Physiotherapy': 'physiotherapy',
-    'Radiography and Radiation Science': 'radiography',
-    'Veterinary Medicine (DVM)': 'vet_med',
-    'Optometry': 'optometry',
-    'Anatomy': 'anatomy',
-    'Physiology': 'physiology',
-    'Accounting': 'accounting',
-    'Banking and Finance': 'banking_finance',
-    'Business Administration': 'business_admin',
-    'Economics': 'economics',
-    'Mass Communication': 'mass_comm',
-    'Computer Science': 'computer_science',
-    'Electrical/Electronics Engineering': 'electrical_eng',
-    'Mechanical Engineering': 'mechanical_eng',
-    'Civil Engineering': 'civil_eng',
-    'Architecture': 'architecture',
-    'Estate Management': 'estate_management',
-    'Urban and Regional Planning': 'urban_regional',
-    'Biochemistry': 'biochemistry',
-    'Microbiology': 'microbiology',
-    'Public Administration': 'public_admin',
-    'Local Government Studies': 'local_govt',
-    'Sociology': 'sociology',
-    'Political Science': 'political_science',
-    'History and International Studies': 'history',
-    'Theatre Arts': 'theatre_arts',
-    'Linguistics': 'linguistics',
-    'English Language and Literature': 'english',
-    'Modern Languages': 'french',
-    'Education programs with subject majors': 'education',
-    'Agricultural Economics': 'agric_econ',
-    'Animal Science': 'animal_science',
-    'Crop Science': 'crop_science',
-    'Soil Science': 'soil_science',
-};
 
 export function AdmissionCalculator() {
     const [institution, setInstitution] = useState('');
@@ -97,13 +53,7 @@ export function AdmissionCalculator() {
             return;
         }
 
-        const courseKey = courseMapping[course];
-        if (!courseKey) {
-            alert('Please select a valid course.');
-            return;
-        }
-
-        const calculationResult = calculateAdmissionChance(institution, courseKey, jambScore, state);
+        const calculationResult = calculateAdmissionChance(institution, course, jambScore, state);
         setResult(calculationResult);
     };
 
@@ -123,14 +73,8 @@ export function AdmissionCalculator() {
                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                     >
                         <option value="">Select Course</option>
-                        <optgroup label="First Tier (Cutoff: 240+)">
-                            {firstTierCourses.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                        </optgroup>
-                        <optgroup label="Second Tier (Cutoff: 200-239)">
-                            {secondTierCourses.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                        </optgroup>
-                        <optgroup label="Third Tier (Cutoff: 160-199)">
-                            {thirdTierCourses.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                        <optgroup label="All Available Courses">
+                            {allCourses.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                         </optgroup>
                     </select>
                 </div>
