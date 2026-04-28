@@ -103,7 +103,11 @@ export default function ReportsPage() {
 
     function handlePrintReport(reportData: NonNullable<typeof report>) {
         const documentHtml = buildReportDocumentHtml(reportData);
-        openPrintableDocument(documentHtml, `${period === 'monthly' ? 'Monthly' : 'Yearly'}-Tax-Report-${year}${period === 'monthly' ? `-${month}` : ''}`);
+        openPrintableDocument(
+            documentHtml,
+            `${period === 'monthly' ? 'Monthly' : 'Yearly'}-Tax-Report-${year}${period === 'monthly' ? `-${month}` : ''}`,
+            true
+        );
     }
 
     return (
@@ -162,7 +166,7 @@ export default function ReportsPage() {
                             onClick={() => report && handlePrintReport(report)}
                             className="px-3 py-1.5 text-sm font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-700"
                         >
-                            Download PDF
+                            Print / Save PDF
                         </button>
                     </>
                 }

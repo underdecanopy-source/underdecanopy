@@ -135,11 +135,14 @@ export function downloadBlob(blob: Blob, fileName: string): void {
 }
 
 export async function blobToBase64(blob: Blob): Promise<string> {
-    const arrayBuffer = await blob.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    let binary = '';
-    bytes.forEach((byte) => {
-        binary += String.fromCharCode(byte);
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const dataUrl = reader.result as string;
+            const base64 = dataUrl.split(',')[1] || '';
+            resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
     });
-    return window.btoa(binary);
 }

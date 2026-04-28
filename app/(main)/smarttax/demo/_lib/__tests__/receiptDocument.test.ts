@@ -74,36 +74,70 @@ describe('openReceiptDocument', () => {
         receiptNode.id = 'receipt-print-area';
         receiptNode.innerHTML = '<p>Receipt Only</p>';
 
-        const mockIframe = {
-            style: {},
-            contentWindow: {
-                document: {
-                    open: jest.fn(),
-                    write: jest.fn(),
-                    close: jest.fn(),
-                },
-                focus: jest.fn(),
-                print: jest.fn(),
+        const mockIframe = document.createElement('iframe');
+        const mockWindow = {
+            document: {
+                open: jest.fn(),
+                write: jest.fn(),
+                close: jest.fn(),
             },
+            focus: jest.fn(),
+            print: jest.fn(),
         };
+        Object.defineProperty(mockIframe, 'contentWindow', {
+            value: mockWindow,
+            configurable: true,
+        });
 
         const originalCreateElement = document.createElement.bind(document);
         jest.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-            if (tagName === 'iframe') return mockIframe as any;
-            return originalCreateElement(tagName as any);
+            if (tagName === 'iframe') return mockIframe;
+            return originalCreateElement(tagName as never);
         });
-        jest.spyOn(document.body, 'appendChild').mockImplementation(() => mockIframe as any);
 
         const result = openReceiptDocument(receiptNode, 'Receipt Test', true);
 
         expect(result).toBe(true);
-        expect(mockIframe.contentWindow.document.write).toHaveBeenCalledWith(expect.stringContaining(receiptNode.outerHTML));
+        expect(mockWindow.document.write).toHaveBeenCalledWith(expect.stringContaining(receiptNode.outerHTML));
 
         jest.advanceTimersByTime(251);
 
-        expect(mockIframe.contentWindow.focus).toHaveBeenCalled();
-        expect(mockIframe.contentWindow.print).toHaveBeenCalled();
+        expect(mockWindow.focus).toHaveBeenCalled();
+        expect(mockWindow.print).toHaveBeenCalled();
+    });
 
-        jest.restoreAllMocks();
+    it('opens receipt preview with a blob URL instead of about:blank', () => {
+        const receiptNode = document.createElement('div');
+        receiptNode.id = 'receipt-print-area';
+        receiptNode.innerHTML = '<p>Receipt Preview</p>';
+
+        const objectUrl = 'blob:http://localhost/receipt-preview';
+        const createObjectURL = jest.fn().mockReturnValue(objectUrl);
+        const revokeObjectURL = jest.fn();
+        Object.defineProperty(URL, 'createObjectURL', {
+            value: createObjectURL,
+            configurable: true,
+            writable: true,
+        });
+        Object.defineProperty(URL, 'revokeObjectURL', {
+            value: revokeObjectURL,
+            configurable: true,
+            writable: true,
+        });
+        const openSpy = jest.spyOn(window, 'open').mockReturnValue({} as Window);
+
+        const result = openReceiptDocument(receiptNode, 'Receipt Preview');
+
+        expect(result).toBe(true);
+        expect(createObjectURL).toHaveBeenCalled();
+        expect(openSpy).toHaveBeenCalledWith(
+            objectUrl,
+            '_blank',
+            'noopener,noreferrer,width=900,height=1200'
+        );
+
+        jest.advanceTimersByTime(5001);
+
+        expect(revokeObjectURL).toHaveBeenCalledWith(objectUrl);
     });
 });

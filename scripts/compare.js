@@ -1,6 +1,6 @@
 ﻿const fs = require('fs');
 const path = require('path');
-const source = fs.readFileSync(path.join(__dirname, 'lib/data/applysmart.ts'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '../lib/data/applysmart.ts'), 'utf8');
 
 function parseRawCourses(source) {
   const rawStart = source.indexOf('const rawCourseInstitutionData = `');

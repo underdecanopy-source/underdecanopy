@@ -1,145 +1,11 @@
-import {
-  type AdmissionInstitution,
-  applySmartDirectoryInstitutions,
-  geopoliticalZones,
-  federalInstitutions,
-  institutionsById,
-  stateUniversities as stateUniInstitutions,
-  polytechnics as polytechnicInstitutions,
-  privateInstitutions,
-  statePolytechnics as statePolytechnicInstitutions,
-  collegesOfEducation as collegeOfEducationInstitutions,
-  monotechnics as monotechnicInstitutions,
-  nursingColleges as nursingCollegeInstitutions,
-  ieis as ieiInstitutions,
-} from '@/lib/data/admissionDataset';
-
-const toOption = (id: string, name: string) => ({ value: id, label: `${name} (${id})` });
-
-export const federalUniversities = federalInstitutions.map(({ id, name }) => toOption(id, name));
-export const stateUniversities = stateUniInstitutions.map(({ id, name }) => toOption(id, name));
-export const privateUniversities = privateInstitutions.map(({ id, name }) => toOption(id, name));
-export const polytechnics = polytechnicInstitutions.map(({ id, name }) => toOption(id, name));
-export const statePolytechnics = statePolytechnicInstitutions.map(({ id, name }) => toOption(id, name));
-export const collegesOfEducation = collegeOfEducationInstitutions.map(({ id, name }) => toOption(id, name));
-export const monotechnics = monotechnicInstitutions.map(({ id, name }) => toOption(id, name));
-export const nursingColleges = nursingCollegeInstitutions.map(({ id, name }) => toOption(id, name));
-export const ieis = ieiInstitutions.map(({ id, name }) => toOption(id, name));
-
-export const firstTierCourses = [
-  { value: 'Medicine and Surgery (MBBS)', label: 'Medicine and Surgery' },
-  { value: 'Dentistry (BDS)', label: 'Dentistry (BDS)' },
-  { value: 'Pharmacy (Pharm.D)', label: 'Pharmacy (Pharm.D)' },
-  { value: 'Law (LL.B)', label: 'Law (LL.B)' },
-  { value: 'Nursing Science (B.N.Sc.)', label: 'Nursing Science (B.N.Sc.)' },
-  { value: 'Medical Laboratory Science (B.MLS)', label: 'Medical Laboratory Science (B.MLS)' },
-  { value: 'Physiotherapy', label: 'Physiotherapy' },
-  { value: 'Radiography and Radiation Science', label: 'Radiography' },
-  { value: 'Veterinary Medicine (DVM)', label: 'Veterinary Medicine (DVM)' },
-  { value: 'Optometry', label: 'Optometry' },
-  { value: 'Anatomy', label: 'Anatomy' },
-  { value: 'Physiology', label: 'Physiology' },
-];
-
-export const secondTierCourses = [
-  { value: 'Accounting', label: 'Accounting' },
-  { value: 'Banking and Finance', label: 'Banking and Finance' },
-  { value: 'Business Administration', label: 'Business Administration' },
-  { value: 'Economics', label: 'Economics' },
-  { value: 'Mass Communication', label: 'Mass Communication' },
-  { value: 'Computer Science', label: 'Computer Science' },
-  { value: 'Electrical/Electronics Engineering', label: 'Electrical Engineering' },
-  { value: 'Mechanical Engineering', label: 'Mechanical Engineering' },
-  { value: 'Civil Engineering', label: 'Civil Engineering' },
-  { value: 'Architecture', label: 'Architecture' },
-  { value: 'Estate Management', label: 'Estate Management' },
-  { value: 'Urban and Regional Planning', label: 'Urban and Regional Planning' },
-  { value: 'Biochemistry', label: 'Biochemistry' },
-  { value: 'Microbiology', label: 'Microbiology' },
-];
-
-export const thirdTierCourses = [
-  { value: 'Public Administration', label: 'Public Administration' },
-  { value: 'Local Government Studies', label: 'Local Government Studies' },
-  { value: 'Sociology', label: 'Sociology' },
-  { value: 'Political Science', label: 'Political Science' },
-  { value: 'History and International Studies', label: 'History and International Studies' },
-  { value: 'Theatre Arts', label: 'Theatre Arts' },
-  { value: 'Linguistics', label: 'Linguistics' },
-  { value: 'English Language and Literature', label: 'English Language' },
-  { value: 'Modern Languages', label: 'French' },
-  { value: 'Education programs with subject majors', label: 'Education' },
-  { value: 'Agricultural Economics', label: 'Agricultural Economics' },
-  { value: 'Animal Science', label: 'Animal Science' },
-  { value: 'Crop Science', label: 'Crop Science' },
-  { value: 'Soil Science', label: 'Soil Science' },
-];
-
-export const states = [
-    { value: "Abia", label: "Abia" },
-    { value: "Adamawa", label: "Adamawa" },
-    { value: "Akwa Ibom", label: "Akwa Ibom" },
-    { value: "Anambra", label: "Anambra" },
-    { value: "Bauchi", label: "Bauchi" },
-    { value: "Bayelsa", label: "Bayelsa" },
-    { value: "Benue", label: "Benue" },
-    { value: "Borno", label: "Borno" },
-    { value: "Cross River", label: "Cross River" },
-    { value: "Delta", label: "Delta" },
-    { value: "Ebonyi", label: "Ebonyi" },
-    { value: "Edo", label: "Edo" },
-    { value: "Ekiti", label: "Ekiti" },
-    { value: "Enugu", label: "Enugu" },
-    { value: "FCT", label: "Federal Capital Territory" },
-    { value: "Gombe", label: "Gombe" },
-    { value: "Imo", label: "Imo" },
-    { value: "Jigawa", label: "Jigawa" },
-    { value: "Kaduna", label: "Kaduna" },
-    { value: "Kano", label: "Kano" },
-    { value: "Katsina", label: "Katsina" },
-    { value: "Kebbi", label: "Kebbi" },
-    { value: "Kogi", label: "Kogi" },
-    { value: "Kwara", label: "Kwara" },
-    { value: "Lagos", label: "Lagos" },
-    { value: "Nasarawa", label: "Nasarawa" },
-    { value: "Niger", label: "Niger" },
-    { value: "Ogun", label: "Ogun" },
-    { value: "Ondo", label: "Ondo" },
-    { value: "Osun", label: "Osun" },
-    { value: "Oyo", label: "Oyo" },
-    { value: "Plateau", label: "Plateau" },
-    { value: "Rivers", label: "Rivers" },
-    { value: "Sokoto", label: "Sokoto" },
-    { value: "Taraba", label: "Taraba" },
-    { value: "Yobe", label: "Yobe" },
-    { value: "Zamfara", label: "Zamfara" },
-];
-
-const universityInstitutionIds = Array.from(new Set<string>([
-  ...federalUniversities,
-  ...stateUniversities,
-  ...privateUniversities,
-].map(institution => institution.value)));
-
-const allInstitutionIds = Array.from(new Set<string>([
-  ...universityInstitutionIds,
-  ...polytechnics.map(institution => institution.value),
-  ...statePolytechnics.map(institution => institution.value),
-  ...collegesOfEducation.map(institution => institution.value),
-  ...monotechnics.map(institution => institution.value),
-  ...nursingColleges.map(institution => institution.value),
-  ...ieis.map(institution => institution.value),
-  ...applySmartDirectoryInstitutions.map(institution => institution.id),
-]));
-
-const rawCourseInstitutionData = `
+[
     {
       "course": "ACCOUNTANCY",
       "institutions": ["ABIAPOLY","AG-POLY","AUCHIPOLY","BEN-POLY","CITI-POLY","COASTAL","COVENANT-POLY","CROWN","D.S. ADEGBENRO","DORBEN","EASTERN-POLY","ED-JOHN","EKITI-POLY","ENU-POLY","FEDPO-ADO","FEDPO-AIU","FEDPO-BAL","FEDPO-BAU","FEDPO-BID","FEDPO-DAM","FEDPO-EDE","FEDPO-EKO","FEDPO-OFFA","FEDPO-IDA","FEDPO-ILA","FEDPO-MUB","FEDPO-NAM","FEDPO-NAS","FEDPO-NEK","FEDPO-OKO","FEDPO-OLUJI","FEDPO-UKA","FIDEIPOLY","GBOKO-POLY","GLORYLAND-POLY","GRACE-POLY","GRACELAND","GRUNDTVIG","HERITAGE","IBADAN-CITYPOLY","IBD-POLY","IBOM-POLY","ICON-POLY","IGBAJO-POLY","IGBO-OWU POLY","ILE-IFE","IMA-POLY","IMO-POLY","IMT-ENU","INTERLINK","IWO-POLY","JIG-POLY","JICORAS","KAD-POLY","KALACKAN","KAN-POLY","KAT-POLY","FEDPO-KAZAURE","KINGS-POLY","KOGI-POLY","KONDUGA","KONGO","KWA-POLY","LASPOTECH","LENS-POLY","LIGHTHOUSE","LNDMK-POLY","MAPOLY","MUSTIBRAH","NACABSPOLY","NACEST","NBPZ","NEWLAND","NICT","NNFLC","NOGAK","OGITECH","OAKOGWASHIUKU","OKE-OGUN POLY","OSISATECH","OSUNPOLY","OSUNTECH","OTEFE","OYSCATECH","OZORO","PH-POLY","PLS-POLY","POLY-YOLA","QUEST","RAMAT-POLY","RECTEM","RUGIPO","SAAPADE","SAF-POLY","SARO-WIWA POLY","SHINAKA","SPEEDWAY","STARS-POLY","TAR-POLY","TEMPLE-GATE","TIMKAI","AO-POLY","TOWER-POLY","TRINITY","UAS-POLY","UNIPOLY","UNIQUE","USEN","UYO-CITYPOLY","VALLEY VIEW","VINEYARD-POLY","WOLEX","WUFPOBK","YABATECH","ZUNGERU"]
     },
     {
       "course": "AGRICULTURAL TECHNOLOGY",
-      "institutions": ["ANSPOLY","ATAPOLY","AUCHIPOLY","AUDU-BAKO","BUPOLY-HAD","COLAGRIC-BAK","COLAGRIC-GAR","COLAGRIC-GUJ","COLAGRIC-IGU","COLAGRIC-JAL","COLAGRIC-KAB","COLAGRIC-LAF","COLAGRIC-MOK","COLAGRIC-TAL","COLAGRICYAN","COLAGRIC-ZAR","COLAGRIC-ZUR","D.S. ADEGBENRO","EKITI-POLY","ENU-POLY","FCAPT-KANO","FCLRT-KURU","FCLT-OWER","FECOFM-AFAKA","FECOFOR-JOS","FEDAGRIC-AKR","FEDAGRIC-IBD","FEDAGRIC-ISH","FEDANIM-VOM","FEDCOFOR-IBD","FEDCOFOR-IBD","FEDPO-BAU","FEDPO-MUB","FEDPO-NEK","FIDEIPOLY","IBD-POLY","IMO-POLY","KAD-POLY","KAT-POLY","KWA-POLY","LASPOTECH","MAPOLY","OKE-OGUN POLY","OYSCATECH","OZORO","PH-POLY","RUGIPO","USTEEM"]
+      "institutions": ["ANSPOLY","ATAPOLY","AUCHIPOLY","AUDU-BAKO","BUPOLY-HAD","COLAGRIC-BAK","COLAGRIC-GAR","COLAGRIC-GUJ","COLAGRIC-IGU","COLAGRIC-JAL","COLAGRIC-KAB","COLAGRIC-LAF","COLAGRIC-MOK","COLAGRIC-TAL","COLAGRICYAN","COLAGRIC-ZAR","COLAGRIC-ZUR","D.S. ADEGBENRO","EKITI-POLY","ENU-POLY","FCAPT-KANO","FCLRT-KURU","FCLT-OWER","FECOFM-AFAKA","FECOFOR-JOS","FEDAGRIC-AKR","FEDAGRIC-IBD","FEDAGRIC-ISH","FEDANIM-VOM","FEDCOFOR-IBD","FEDPO-BAU","FEDPO-MUB","FEDPO-NEK","FIDEIPOLY","IBD-POLY","IMO-POLY","KAD-POLY","KAT-POLY","KWA-POLY","LASPOTECH","MAPOLY","OKE-OGUN POLY","OYSCATECH","OZORO","PH-POLY","RUGIPO","USTEEM"]
     },
     {
       "course": "AGRICULTURAL ENGINEERING/TECHNOLOGY",
@@ -175,11 +41,11 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "COMPUTER SCIENCE",
-      "institutions": ["AAP","ABIAPOLY","ACHTECH","ADECOM","AG-POLY","AJAYI-POLY","AKCAS","AKPOLY","AL-HIKMA-P","ALLOVER-POLY","ALOOMA","ANIMTO","ANSPOLY","ASHI-POLY","ATAPOLY","ATLAS-IMT","AUCHIPOLY","AUDU-BAKO","BACAF","BELLARKS","BEN-POLY","BOLMOR-POLY","BESTPOTECH","BUPOLY-HAD","BRAINFILL","BYSPOLY","CABSP","CITI-POLY","COASTAL","COLAGRIC-LAF","COVENANT-POLY","CROWN","D.S. ADEGBENRO","DORBEN","DSS-MARINE","EASTERN-POLY","ECP","ED-JOHN","EKITI-POLY","ENU-POLY","ENVILLETECH","FCAPT-KANO","FCLT-OWER","FECOFOR-JOS","FEDCOFOR-IBD","FEDAGRIC-AKR","FEDAGRIC-IBD","FEDAGRIC-ISH","FEDANIM-IBD","FEDANIM-VOM","FEDCOOP-IBD","FEDCOOP-KD","FEDCOOP-OROGUN","FEDCOOP-ORJI","FEDFISH-LAG","FEDFISH-NBUS","FEDHORT-GOM","FEDPO-ADO","FEDPO-AIU","FEDPO-BAL","FEDPO-BAU","FEDPO-BID","FEDPO-DAM","FCE-DAURA","FEDPO-EDE","FEDPO-EKO","FEDPO-OFFA","FEDPO-IDA","FEDPO-ILA","FEDPO-MUB","FEDPO-NAM","FEDPO-NAS","FEDPO-NEK","FEDPO-OIL","FEDPO-OKO","FEDPO-OLUJI","FEDPO-UGEP","FEDPO-UKA","FEDWILD-NBUS","FIDEIPOLY","FOUNDATION","FEDPO-KAZAURE","FEDPO-KALTUNGO","FLAILAS","FP-OYO","FSS-IBADAN","FSS-MANCHOK","FSS-OYO","FTC-KAD","FTC-LAG","GBOKO-POLY","GLOBALPOLY","GLOBAL-ND","GLORYLAND-POLY","GRACE-POLY","GRACELAND","GRUNDTVIG","GSPB","HARRY-PASS","HARVARD","HARVARD-POLY","HERITAGE","HOPE-POLY","IBADAN-CITYPOLY","IBD-POLY","IBOM-POLY","ICON-POLY","IGBAJO-POLY","IGBO-OWU POLY","ILE-IFE","IMIT","IMO-POLY","IMT-ENU","INSPOTECH","INTERLINK","ISBC-IBADAN","IWO-POLY","JICORAS","JIG-POLY","JOEMARINE","JSIITK","KAD-POLY","KALACKAN","COHTECH","KAN-POLY","KAT-POLY","FEDPO-KAZAURE","KINGS-POLY","KSITM-ND","KOGI-POLY","KWA-POLY","LAG-CITY","LASPOTECH","LENS-POLY","LIGHTHOUSE","LNDMK-POLY","LOAM-POLY","MAPOLY","MARIST","MATER-DEI","MUSTIBRAH","NACABSPOLY","NACEST","NATIONBTECH","NEWLAND","IMA-POLY","NBPZ","NICT","NILEST","NOGAK","NOVELTY","NWRI-MANDO","OAKODAJI-POLY","ODUWA-POLY","OGITECH","OGWASHIUKU","OKE-OGUN POLY","OSISATECH","OSUNPOLY","OSUNTECH","OTEFE","OYSCTECH","OZORO","PARAMOUNT","PH-POLY","PLS-POLY","POLY-ADOKA","POGIL","POLY-OUKU","POLY-ARAN","POLY-IMESI","POLY-IRESI","POLY-OMUO","POLY-YOLA","PRIME-POLY","PTI","QUEST","RAMAT-POLY","RECTEM","RONIK","RUGIPO","RUFAI-ND","SA-POLY","SAAPADE","SAF-POLY","SARO-WIWA POLY","SAVANNAH","SHAKA","SPEEDWAY","ST MARY-POLY","SURE-POLY","TAR-POLY","TEMPLE-GATE","TIMKAI","AO-POLY","TOWER-POLY","TRINITY","UAS-POLY","UEC-TECH","SUNIPOLY","UNIQUE","UMA-UKPAI","USEN","UYO-CITYPOLY","VALLEY VIEW","VINEYARD-POLY","WESTLAND-POLY","WOLEX","WUFPOBK","YABATECH","ZACAS","ZUNGERU"]
+      "institutions": ["AAP","ABIAPOLY","ACHTECH","ADECOM","AG-POLY","AJAYI-POLY","AKCAS","AKPOLY","AL-HIKMA-P","ALLOVER-POLY","ALOOMA","ANIMTO","ANSPOLY","ASHI-POLY","ATAPOLY","ATLAS-IMT","AUCHIPOLY","AUDU-BAKO","BACAF","BELLARKS","BEN-POLY","BOLMOR-POLY","BESTPOTECH","BUPOLY-HAD","BRAINFILL","BYSPOLY","CABSP","CITI-POLY","COASTAL","COLAGRIC-LAF","COVENANT-POLY","CROWN","D.S. ADEGBENRO","DORBEN","DSS-MARINE","EASTERN-POLY","ECP","ED-JOHN","EKITI-POLY","ENU-POLY","ENVILLETECH","FCAPT-KANO","FCLT-OWER","FECOFOR-JOS","FEDCOFOR-IBD","FEDAGRIC-AKR","FEDAGRIC-IBD","FEDAGRIC-ISH","FEDANIM-IBD","FEDANIM-VOM","FEDCOOP-IBD","FEDCOOP-KD","FEDCOOP-OROGUN","FEDCOOP-ORJI","FEDFISH-LAG","FEDFISH-NBUS","FEDHORT-GOM","FEDPO-ADO","FEDPO-AIU","FEDPO-BAL","FEDPO-BAU","FEDPO-BID","FEDPO-DAM","FCE-DAURA","FEDPO-EDE","FEDPO-EKO","FEDPO-OFFA","FEDPO-IDA","FEDPO-ILA","FEDPO-MUB","FEDPO-NAM","FEDPO-NAS","FEDPO-NEK","FEDPO-OIL","FEDPO-OKO","FEDPO-OLUJI","FEDPO-UGEP","FEDPO-UKA","FEDWILD-NBUS","FIDEIPOLY","FOUNDATION","FEDPO-KAZAURE","FEDPO-KALTUNGO","FLAILAS","FP-OYO","FSS-IBADAN","FSS-MANCHOK","FSS-OYO","FTC-KAD","FTC-LAG","GBOKO-POLY","GLOBALPOLY","GLOBAL-ND","GLORYLAND-POLY","GRACE-POLY","GRACELAND","GRUNDTVIG","GSPB","HARRY-PASS","HARVARD","HARVARD-POLY","HERITAGE","HOPE-POLY","IBADAN-CITYPOLY","IBD-POLY","IBOM-POLY","ICON-POLY","IGBAJO-POLY","IGBO-OWU POLY","ILE-IFE","IMIT","IMO-POLY","IMT-ENU","INSPOTECH","INTERLINK","ITM-UGEP","ISBC-IBADAN","IWO-POLY","JICORAS","JIG-POLY","JOEMARINE","JSIITK","KAD-POLY","KALACKAN","COHTECH","KAN-POLY","KAT-POLY","FEDPO-KAZAURE","KINGS-POLY","KSITM-ND","KOGI-POLY","KWA-POLY","LAG-CITY","LASPOTECH","LENS-POLY","LIGHTHOUSE","LNDMK-POLY","LOAM-POLY","MAPOLY","MARIST","MATER-DEI","MUSTIBRAH","NACABSPOLY","NACEST","NATIONBTECH","NEWLAND","IMA-POLY","NBPZ","NICT","NILEST","NOGAK","NOVELTY","NWRI-MANDO","OAKODAJI-POLY","ODUWA-POLY","OGITECH","OGWASHIUKU","OKE-OGUN POLY","OSISATECH","OSUNPOLY","OSUNTECH","OTEFE","OYSCTECH","OZORO","PARAMOUNT","PH-POLY","PLS-POLY","POLY-ADOKA","POGIL","POLY-OUKU","POLY-ARAN","POLY-IMESI","POLY-IRESI","POLY-OMUO","POLY-YOLA","PRIME-POLY","PTI","QUEST","RAMAT-POLY","RECTEM","RONIK","RUGIPO","RUFAI-ND","SA-POLY","SAAPADE","SAF-POLY","SARO-WIWA POLY","SAVANNAH","SHAKA","SPEEDWAY","ST MARY-POLY","SURE-POLY","TAR-POLY","TEMPLE-GATE","TIMKAI","AO-POLY","TOWER-POLY","TRINITY","UAS-POLY","UEC-TECH","SUNIPOLY","UNIQUE","UMA-UKPAI","USEN","UYO-CITYPOLY","VALLEY VIEW","VINEYARD-POLY","WESTLAND-POLY","WOLEX","WUFPOBK","YABATECH","ZACAS","ZUNGERU"]
     },
     {
       "course": "COMPUTER ENGINEERING",
-      "institutions": ["AAP","ABIAPOLY","AG-POLY","AJAYI-POLY","AKPOLY","AL-HIKMA-P","ALOOMA","ALLOVER-POLY","ANSPOLY","ASHI-POLY","ATAPOLY","BELLARKS","BEN-POLY","BOLMOR-POLY","BESTPOTECH","BUPOLY-HAD","BRAINFILL","BYSPOLY","CALVARYPOLY","CITI-POLY","COASTAL","COLAGRIC-LAF","COVENANT-POLY","CROWN","D.S. ADEGBENRO","DORBEN","DSS-MARINE","EASTERN-POLY","ENU-POLY","ECP","ENVILLETECH","FEDPO-AIU","FEDPO-BAL","FEDPO-BAU","FEDPO-BID","FEDPO-DAM","FCE-DAURA","FEDPO-EDE","FEDPO-OFFA","FEDPO-IDA","FEDPO-ILA","FEDPO-MUB","FEDPO-NAS","FEDPO-NEK","FEDPO-OKO","FEDPO-OLUJI","FEDPO-UGEP","FEDPO-UKA","FIDEIPOLY","FOUNDATION","FEDPO-KAZAURE","FEDPO-KAL TUNGO","FP-OYO","GBOKO-POLY","GLOBALPOLY","GLORYLAND-POLY","GRACELAND","GRACE-POLY","GRUNDTVIG","GSPB","HARRY-PASS","HARVARD-POLY","HERITAGE","HOPE-POLY","IBADAN-CITYPOLY","IBD-POLY","IBOM-POLY","ICON-POLY","IGBAJO-POLY","IGBO-OWU POLY","ILE-IFE","IMIT","INSPOTECH","INTERLINK","ITM-UGEP","IWO-POLY","JSIITK","KAD-POLY","KALACKAN-POLY","KOGI-POLY","KSITM-ND","FEDPO-KAZAURE","LAG-CITY","LASPOTECH","LENS-POLY","LIGHTHOUSE","LNDMK-POLY","LOAM-POLY","MARIST","MATER-DEI","NACABSPOLY","NACEST","NATIONBTECH","NBPZ","NEWLAND","NICT","UNIQUENOVELTY","OGITECH","OGWASHIUKU","MAPOLY","ODUWA-POLY","OGWASHIUKU","OSISATECH","OSUNPOLY","OSUNTECH","OTEFE","OYSATECH","OZORO","PARAMOUNT","PH-POLY","PLS-POLY","POLY-ADOKA","POLY-ORAN","POLY-IMESI","PRIME-POLY","PTI","RAMAT-POLY","RECTEM","RUGIPO","SA-POLY","SAAPADE","SAF-POLY","SHAKA","SPEEDWAY","ST MARY-POLY","SURE-POLY","TEMPLE-GATE","TIMKAI","AO-POLY","TOWER-POLY","TRINITY","UAS-POLY","UNIPOLY","UNIQUE","UMA-UKPAI","USEN","VALLEY VIEW","VINEYARD-POLY","WESTLAND-POLY","WOLEX","WUFPOBK","YABATECH","ZUNGERU"]
+      "institutions": ["AAP","ABIAPOLY","AG-POLY","AJAYI-POLY","AKPOLY","AL-HIKMA-P","ALOOMA","ALLOVER-POLY","ANSPOLY","ASHI-POLY","ATAPOLY","BELLARKS","BEN-POLY","BOLMOR-POLY","BESTPOTECH","BUPOLY-HAD","BRAINFILL","BYSPOLY","CALVARYPOLY","CITI-POLY","COASTAL","COLAGRIC-LAF","COVENANT-POLY","CROWN","D.S. ADEGBENRO","DORBEN","DSS-MARINE","EASTERN-POLY","ENU-POLY","ECP","ENVILLETECH","FEDPO-AIU","FEDPO-BAL","FEDPO-BAU","FEDPO-BID","FEDPO-DAM","FCE-DAURA","FEDPO-EDE","FEDPO-OFFA","FEDPO-IDA","FEDPO-ILA","FEDPO-MUB","FEDPO-NAS","FEDPO-NEK","FEDPO-OKO","FEDPO-OLUJI","FEDPO-UGEP","FEDPO-UKA","FIDEIPOLY","FOUNDATION","FEDPO-KAZAURE","FEDPO-KAL TUNGO","FP-OYO","GBOKO-POLY","GLOBALPOLY","GLORYLAND-POLY","GRACELAND","GRACE-POLY","GRUNDTVIG","GSPB","HARRY-PASS","HARVARD-POLY","HERITAGE","HOPE-POLY","IBADAN-CITYPOLY","IBD-POLY","IBOM-POLY","ICON-POLY","IGBAJO-POLY","IGBO-OWU POLY","ILE-IFE","IMIT","INSPOTECH","INTERLINK","ITM-UGEP","IWO-POLY","JSIITK","KAD-POLY","KALACKAN-POLY","KOGI-POLY","KSITM-ND","FEDPO-KAZAURE","LAG-CITY","LASPOTECH","LENS-POLY","LIGHTHOUSE","LNDMK-POLY","LOAM-POLY","MARIST","MATER-DEI","NACABSPOLY","NACEST","NATIONBTECH","NBPZ","NEWLAND","NICT","UNIQUENOVELTY","OGITECH","OGWASHIUKU","MAPOLY","ODUWA-POLY","OGWASHIUKU","OSISATECH","OSUNPOLY","OSUNTECH","OTEFE","OYSATECH","OZORO","PARAMOUNT","PH-POLY","PLS-POLY","POLY-ADOKA","POLY-ORAN","POLY-IMESI","POLY-IRESI","PRIME-POLY","PTI","RAMAT-POLY","RECTEM","RUGIPO","SA-POLY","SAAPADE","SAF-POLY","SHAKA","SPEEDWAY","ST MARY-POLY","SURE-POLY","TEMPLE-GATE","TIMKAI","AO-POLY","TOWER-POLY","TRINITY","UAS-POLY","UNIPOLY","UNIQUE","UMA-UKPAI","USEN","VALLEY VIEW","VINEYARD-POLY","WESTLAND-POLY","WOLEX","WUFPOBK","YABATECH","ZUNGERU"]
     },
     {
       "course": "CO-OPERATIVE ECONOMICS & MANAGEMENT",
@@ -195,7 +61,7 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "ELECTRICAL/ELECTRONICS ENGINEERING TECHNOLOGY",
-      "institutions": ["AKPOLY","AL-HIKMA-P","ALLOVER-POLY","ALOOMA","ANSPOLY","ASHI-POLY","ATAPOLY","AUCHIPOLY","BELLARKS","BEN-POLY","BOLMOR-POLY","BESTPOTECH","BUPOLY-HAD","BRAINFILL","BYSPOLY","CALVARYPOLY","CITI-POLY","COASTAL","COLAGRIC-GUJ","COLAGRIC-LAF","COVENANT-POLY","CROWN","D.S. ADEGBENRO","DSS-MARINE","EASTERN-POLY","IGBO-OWU POLY","FEDPO-OHODO","FEDPO-OIL","FEDPO-OKO","FEDPO-OLUJI","FEDPO-OROGUN","FEDPO-PLATEAU","FEDPO-UKA","FIDEIPOLY","FOUNDATION","FEDPO-KALTUNGO","FEDPO-KAZAURE","GBOKO-POLY","GLOBALPOLY","GLORYLAND-POLY","GRACELAND","GRACE-POLY","GRUNDTVIG","GSPB","HARRY-PASS","HARVARD-POLY","HERITAGE","HOPE-POLY","IBADAN-CITYPOLY","IBD-POLY","IBOM-POLY","ICON-POLY","IGBAO-POLY","IGBO-OWU POLY","ILE-IFE","IMA-POLY","IMO-POLY","IMIT","IMT-ENU","INSPOTECH","INTERLINK","IWO-POLY","JIG-POLY","JSIITK","KAD-POLY","KALACKAN-POLY","KAT-POLY","KSITM-ND","FEDPO-KAZAURE","KINGS-POLY","KOGI-POLY","KWA-POLY","LAG-CITY","LASPOTECH","LENS-POLY","LIGHTHOUSE","LNDMK-POLY","LOAM-POLY","MAN-ORON","MARIST","MATER-DEI","MTINACABSPOLY","NACEST","NBPZ","NCAT-ZAR","NEWLAND","NICT","NOVELTY","ODAJI-POLY","OGITECH","OGWASHIUKU","MAPOLY","ODUWA-POLY","OGWASHIUKU","OSISATECH","OSUNPOLY","OSUNTECH","OTEFE","OYSCATECH","OZORO","PARAMOUNT","PH-POLY","PLS-POLY","POLY-ADOKA","POLY-ARAN","POLY-IMESI","POLY-IRESI","POLY-QUOKU","POLY-OMUO","POLY-YOLA","PRIME-POLY","PTI","RAMAT-POLY","RECTEM","RONIK","RUGIPO","SA-POLY","SAAPADE","SAF-POLY","SHAKA","SPEEDWAY","ST MARY-POLY","SURE-POLY","TAR-POLY","TIMKAI","TEMPLE-GATE","AO-POLY","TOWER-POLY","TRINITY","UAS-POLY","UEC-TECH","UNIPOLY","NATIONBTECH","UMA-UKPAI","USEN","UYO-CITYPOLY","VALLEY VIEW","VINEYARD-POLY","WESTLAND-POLY","WOLEX","WUFPOBK","YABATECH","ZUNGERU"]
+      "institutions": ["AKPOLY","AL-HIKMA-P","ALLOVER-POLY","ALOOMA","ANSPOLY","ASHI-POLY","ATAPOLY","AUCHIPOLY","BELLARKS","BEN-POLY","BOLMOR-POLY","BESTPOTECH","BUPOLY-HAD","BRAINFILL","BYSPOLY","CALVARYPOLY","CITI-POLY","COASTAL","COLAGRIC-GUJ","COLAGRIC-LAF","COVENANT-POLY","CROWN","D.S. ADEGBENRO","DSS-MARINE","EASTERN-POLY","IGBO-OWU POLY","FEDPO-OHODO","FEDPO-OIL","FEDPO-OKO","FEDPO-OLUJI","FEDPO-OROGUN","FEDPO-PLATEAU","FEDPO-UKA","FIDEIPOLY","FOUNDATION","FEDPO-KALTUNGO","FEDPO-KAZAURE","GBOKO-POLY","GLOBALPOLY","GLORYLAND-POLY","GRACELAND","GRACE-POLY","GRUNDTVIG","GSPB","HARRY-PASS","HARVARD-POLY","HERITAGE","HOPE-POLY","IBADAN-CITYPOLY","IBD-POLY","IBOM-POLY","ICON-POLY","IGBAO-POLY","IGBO-OWU POLY","ILE-IFE","IMA-POLY","IMO-POLY","IMIT","IMT-ENU","INSPOTECH","INTERLINK","IWO-POLY","JIG-POLY","JSIITK","KAD-POLY","KALACKAN-POLY","KAT-POLY","KSITM-ND","FEDPO-KAZAURE","KINGS-POLY","KOGI-POLY","KWA-POLY","LAG-CITY","LASPOTECH","LENS-POLY","LIGHTHOUSE","LNDMK-POLY","LOAM-POLY","MAN-ORON","MARIST","MATER-DEI","MTINACABSPOLY","NACEST","NBPZ","NCAT-ZAR","NEWLAND","NICT","NOVELTY","ODAJI-POLY","OGITECH","OGWASHIUKU","MAPOLY","ODUWA-POLY","OGWASHIUKU","OSISATECH","OSUNPOLY","OSUNTECH","OTEFE","OYSCATECH","OZORO","PARAMOUNT","PH-POLY","PLS-POLY","POLY-ADOKA","POLY-ARAN","POLY-IMESI","POLY-IRESI","POLY-QUOKU","POLY-OMUO","POLY-YOLA","PRIME-POLY","PTI","RAMAT-POLY","RECTEM","RONIK","RUGIPO","SA-POLY","SAAPADE","SAF-POLY","SARO-WIWA POLY","SHAKA","SPEEDWAY","ST MARY-POLY","STARS-POLY","SURE-POLY","TAR-POLY","TIMKAI","TEMPLE-GATE","AO-POLY","TOWER-POLY","TRINITY","UAS-POLY","UEC-TECH","UNIPOLY","NATIONBTECH","UMA-UKPAI","USEN","UYO-CITYPOLY","VALLEY VIEW","VINEYARD-POLY","WESTLAND-POLY","WOLEX","WUFPOBK","YABATECH","ZUNGERU"]
     },
     {
       "course": "ESTATE MANAGEMENT AND VALUATION",
@@ -423,7 +289,7 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "ACCOUNTING TECHNOLOGY",
-      "institutions": ["FUTA", "ATBU", "BELLS", "UNICAL"]
+      "institutions": []
     },
     {
       "course": "AGRICULTURAL AND BIO-ENVIRONMENTAL ENGINEERING TECHNOLOGY",
@@ -431,7 +297,7 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "AGRICULTURAL AND BIO-ENVIRONMENTAL ENGINEERING TECHNOLOGY (continued)",
-      "institutions": ["AUCHIPOLY","COLAGRIC-GUJ","COLAGRIC-LAF","FEDAGRIC-AKR","FEDCOFM-AFAKA","FEDPO-BAL","FEDPO-BAU","FEDPO-BID","FEDPO-ADO","FEDPO-OFFA","FEDPO-ILA","FEDPO-MUB","FEDPO-MONGUNO","FEDPO-NEK","IMO-POLY","IMT-ENU","KAD-POLY","KOGI-POLY","NWRI-MANDO","OGWASHIUKU","OKE-OGUN POLY","OSUNPOLY","OYSCATECH","OZORO","POLY-YOLA","RUGIPO","YABATECH"]
+      "institutions": []
     },
     {
       "course": "AUTO BODY TECHNOLOGY",
@@ -487,7 +353,7 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "COMPUTER AND INFORMATION SCIENCE",
-      "institutions": ["LCITY", "COVENANT", "IGBINEDION"]
+      "institutions": []
     },
     {
       "course": "COMPUTER SCIENCE WITH (ECONOMICS) (MATHEMATICS)",
@@ -495,7 +361,7 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "COMPUTER SCIENCE WITH ACCOUNTING",
-      "institutions": ["BIU", "LASU", "UNIPORT", "ATBU"]
+      "institutions": []
     },
     {
       "course": "COMPUTER SCIENCE WITH ECONOMICS",
@@ -503,7 +369,7 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "COMPUTER SCIENCE WITH ISLAMIC RELIGIOUS STUDIES",
-      "institutions": ["AL-QALAM", "FUDUTSINMA"]
+      "institutions": []
     },
     {
       "course": "COMPUTER SCIENCE WITH MATHEMATICS",
@@ -667,7 +533,7 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "GEOGRAPHY/PHYSICS",
-      "institutions": ["UNILAG", "UNIPORT", "MAIDUGURI"]
+      "institutions": []
     },
     {
       "course": "GEOLOGY AND MINING",
@@ -683,7 +549,7 @@ const rawCourseInstitutionData = `
     },
     {
       "course": "GEOLOGY/GEOPHYSICS",
-      "institutions": ["UNILAG", "UNIPORT", "OAU", "FUTA"]
+      "institutions": []
     },
     {
       "course": "GEOSCIENCE",
@@ -826,579 +692,3 @@ const rawCourseInstitutionData = `
       "institutions": ["ANSCOHTECH","CENTCOHTECH","CHT-KEFFI","KANCOHTECH","POGIL","RIVCOST","SHEHU IDRIS"]
     }
   ]
-}`
-
-function parseCourseInstitutionData(raw: string): Record<string, string[]> {
-  const map: Record<string, string[]> = {};
-  const entryRegex = /{[\s\S]*?"course"\s*:\s*"([^"]+)"[\s\S]*?"institutions"\s*:\s*\[([\s\S]*?)\][\s\S]*?}/g;
-  let match: RegExpExecArray | null;
-
-  while ((match = entryRegex.exec(raw)) !== null) {
-    const course = match[1].trim();
-    const institutionsText = match[2];
-    const institutions: string[] = [];
-    const institutionRegex = /"([^"]+)"/g;
-    let institutionMatch: RegExpExecArray | null;
-
-    while ((institutionMatch = institutionRegex.exec(institutionsText)) !== null) {
-      institutions.push(institutionMatch[1].trim());
-    }
-
-    map[course] = institutions;
-  }
-
-  return map;
-}
-
-const validInstitutionIdSet = new Set(allInstitutionIds);
-const nursingCollegeInstitutionIds = nursingColleges.map(institution => institution.value);
-const stateToZone = Object.fromEntries(
-  Object.entries(geopoliticalZones).flatMap(([zone, states]) =>
-    states.map((state) => [state, zone] as const)
-  )
-);
-
-const institutionIdAliasMap: Record<string, string> = {
-  'ABUJA': 'UNIABUJA',
-  'AKPOLY': 'AKWAPOLY',
-  'AUCHEPOLY': 'AUCHIPOLY',
-  'AUCIIPOLY': 'AUCHIPOLY',
-  'AUCIPOLY': 'AUCHIPOLY',
-  'BASU': 'BASUG',
-  'BAYERO': 'BUK',
-  'BENIN': 'UNIBEN',
-  'BEN-POLY': 'BENUEPOLY',
-  'BYSPOLY': 'BAYELSAPOLY',
-  'FED-DUTSE': 'FUDUTSE',
-  'FED-DUTSINMA': 'FUDMA',
-  'FEDOHODO': 'FEDPO-OHODO',
-  'FEDPO-BAU': 'FEDPOLYBAUCHI',
-  'FEDPO-BID': 'FEDPOLYBIDA',
-  'FEDPO-DAM': 'FEDPOLYDAMATURU',
-  'FEDPO-EDE': 'FEDPOLYEDE',
-  'FEDPO-EKO': 'FEDPOLYEKOWE',
-  'FEDPO-ILA': 'FEDPOLYILARO',
-  'FEDPO-KAZAURE': 'HUSSAINIADAMU',
-  'FEDPO-KAL TUNGO': 'FEDPO-KALTUNGO',
-  'FEDPO-MUB': 'FEDPOLYMUBI',
-  'FEDPO-NAS': 'FEDPOLYNASARAWA',
-  'FEDPO-NEK': 'FEDPOLYNEKEDE',
-  'FEDPO-OFFA': 'FEDPOLYOFFA',
-  'FEDPO-OKO': 'FEDPOLYOKO',
-  'FCLRT-KURU': 'FEDLANDKURU',
-  'FECOFOR-JOS': 'FEDFORESTRYJOS',
-  'FEDCOOP-IBD': 'FEDCOOPIBADAN',
-  'FEDFISH-LAG': 'FISHERIESLAGOS',
-  'FUDUTSINMA': 'FUDMA',
-  'IBD-POLY': 'POLYIBADAN',
-  'IBADAN': 'UI',
-  'IGBAO-POLY': 'IGBAJO-POLY',
-  'IMT-ENU': 'IMTENUGU',
-  'JOS': 'UNIJOS',
-  'KAD-POLY': 'KADUNAPOLY',
-  'KADPOLY': 'KADUNAPOLY',
-  'KOGI-POLY': 'KOGIPOLYLOKOJA',
-  'KWA-POLY': 'KWARAPOLY',
-  'MAIDUGURI': 'UNIMAID',
-  'MINNA': 'FUTMINNA',
-  'NASARAWA': 'NASARAWAU',
-  'OAKOGITECH': 'OGITECH',
-  'OAKOGWASHIUKU': 'OGWASHIUKU',
-  'OZORO': 'DELTAPOLYOZORO',
-  'OTEFE': 'DELTAPOLYOTEFE',
-  'OYSATECH': 'OYSCATECH',
-  'OYSCTECH': 'OYSCATECH',
-  'PAN-ATLANTIC': 'PANATLANTIC',
-  'PHC': 'UNIPORT',
-  'POLY-ORAN': 'POLY-ARAN',
-  'PTI': 'PTIEFFURUN',
-  'RAMAT-POLY': 'RAMATPOLY',
-  'SARO-WWA POLY': 'SARO-WIWA POLY',
-  'SHEHU IRIS': 'SHEHU IDRIS',
-  'WUPOBK': 'WAZIRIUMARU',
-  'WUFPOBK': 'WAZIRIUMARU',
-  'FEDPOMUB': 'FEDPOLYMUBI',
-};
-
-const courseInstitutionSourceAliasMap: Record<string, string> = {
-  'ACCOUNTING TECHNOLOGY': 'ACCOUNTANCY',
-  'AGRICULTURAL AND BIO-ENVIRONMENTAL ENGINEERING TECHNOLOGY (continued)': 'AGRICULTURAL AND BIO-ENVIRONMENTAL ENGINEERING TECHNOLOGY',
-  'COMPUTER AND INFORMATION SCIENCE': 'COMPUTER SCIENCE',
-  'COMPUTER SCIENCE WITH ACCOUNTING': 'COMPUTER SCIENCE',
-  'COMPUTER SCIENCE WITH ISLAMIC RELIGIOUS STUDIES': 'COMPUTER SCIENCE',
-  'ELECTRICAL ENGINEERING TECHNOLOGY': 'ELECTRICAL/ELECTRONICS ENGINEERING TECHNOLOGY',
-  'FILM AND VIDEO STUDIES': 'FILM AND MULTI MEDIA STUDIES',
-  'FILM PRODUCTION': 'FILM AND MULTI MEDIA STUDIES',
-  'INFORMATION SYSTEMS AND TECHNOLOGY': 'INFORMATION SYSTEMS',
-};
-
-const healthFallbackInstitutionIds = Array.from(new Set([
-  ...nursingCollegeInstitutionIds,
-  'UNILAG',
-  'UI',
-  'OAU',
-  'UNIBEN',
-  'UNN',
-  'UNIZIK',
-  'FUNAAB',
-  'ABU',
-])).filter(id => validInstitutionIdSet.has(id));
-
-const transportFallbackInstitutionIds = ['MARITIMEACADEMYORON', 'NCATZARIA', 'PTIEFFURUN', 'FUPRE', 'YABATECH']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const creativeFallbackInstitutionIds = ['YABATECH', 'LASU', 'IMSU', 'DELSU', 'KWASU', 'MADONNA', 'PANATLANTIC']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const agricultureFallbackInstitutionIds = ['FUNAAB', 'FEDFORESTRYJOS', 'FISHERIESLAGOS', 'FEDLANDKURU', 'FEDCOOPIBADAN', 'AUCHIPOLY', 'YABATECH']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const earthScienceFallbackInstitutionIds = ['FUTA', 'FUPRE', 'UNIZIK', 'AAUA', 'KUST', 'OAU', 'UNIJOS', 'ABU']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const computingFallbackInstitutionIds = ['FUTA', 'FUTMINNA', 'FUTO', 'UNIZIK', 'COVENANT', 'BABCOCK', 'AAUA', 'YABATECH', 'AUCHIPOLY', 'OAU', 'UNN']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const technologyFallbackInstitutionIds = ['YABATECH', 'AUCHIPOLY', 'PTIEFFURUN', 'FUTA', 'FUTMINNA', 'FUTO', 'UNIZIK', 'KUST', 'LASU', 'FUPRE']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const sportsFallbackInstitutionIds = ['UNILAG', 'UNIBEN', 'UNIUYO', 'AAUA', 'OAU']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const businessFallbackInstitutionIds = ['YABATECH', 'AUCHIPOLY', 'COVENANT', 'BABCOCK', 'AAUA', 'LASU', 'UNILORIN']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const educationFallbackInstitutionIds = ['FCEZARIA', 'FCEAKOKA', 'FCEKANO', 'ADEYEMICOL', 'ALVANIKOKU', 'AAUA', 'OAU']
-  .filter(id => validInstitutionIdSet.has(id));
-
-const generalAcademicFallbackInstitutionIds = ['UNILAG', 'UI', 'OAU', 'UNIBEN', 'UNN', 'FUTA', 'FUTO', 'AAUA']
-  .filter(id => validInstitutionIdSet.has(id));
-
-function normalizeInstitutionId(id: string): string {
-  const resolvedId = institutionIdAliasMap[id] ?? id;
-  return resolvedId;
-}
-
-function inferFallbackInstitutionIds(course: string): string[] {
-  const upperCourse = course.toUpperCase();
-
-  if (/\b(SPORTS|PHYSICAL)\b/.test(upperCourse)) {
-    return sportsFallbackInstitutionIds;
-  }
-
-  if (/\b(NURSING|DENTAL|MEDICAL|HEALTH|THERAPY|OPTICIANRY|ORTHOTICS|PROSTHETICS|EPIDEMIOLOGY)\b/.test(upperCourse)) {
-    return healthFallbackInstitutionIds;
-  }
-
-  if (/\b(MARINE|NAUTICAL|SHIPPING|TRANSPORT|AVIATION|AUTO BODY|HIGHWAY)\b/.test(upperCourse)) {
-    return transportFallbackInstitutionIds;
-  }
-
-  if (/\b(FILM|MULTI MEDIA|MULTIMEDIA|GRAPHICS|PHOTOGRAPHY|FASHION|CULTURAL|MUSIC)\b/.test(upperCourse)) {
-    return creativeFallbackInstitutionIds;
-  }
-
-  if (/\b(AGRIC|FORESTRY|FISHERIES|HORTICULT|CROP|VETERINARY|WATER RESOURCES|HYDROLOGY|LEATHER)\b/.test(upperCourse)) {
-    return agricultureFallbackInstitutionIds;
-  }
-
-  if (/\b(GEOLOGY|GEOGRAPHY|CARTOGRAPHY|CLIMATE|ENVIRONMENTAL|GEOSCIENCE|MINING)\b/.test(upperCourse)) {
-    return earthScienceFallbackInstitutionIds;
-  }
-
-  if (/\b(COMPUTER|INFORMATION|SYSTEMS|COMMUNICATION|MEDIA)\b/.test(upperCourse)) {
-    return computingFallbackInstitutionIds;
-  }
-
-  if (/\b(ACCOUNT|FINANCE|BUSINESS|MANAGEMENT|ADMINISTRATION|CRIME|INSURANCE|MARKETING|TAXATION)\b/.test(upperCourse)) {
-    return businessFallbackInstitutionIds;
-  }
-
-  if (/\b(EDUCATION)\b/.test(upperCourse)) {
-    return educationFallbackInstitutionIds;
-  }
-
-  if (/\b(ENGINEERING|TECHNOLOGY|ENERGY|GAS|WELDING|ELECTRICAL|ELECTRONICS)\b/.test(upperCourse)) {
-    return technologyFallbackInstitutionIds;
-  }
-
-  return generalAcademicFallbackInstitutionIds;
-}
-
-function formatCourseLabel(course: string): string {
-  return course
-    .toLowerCase()
-    .replace(/\b[a-z]/g, char => char.toUpperCase());
-}
-
-const parsedCourseInstitutionMap = parseCourseInstitutionData(rawCourseInstitutionData);
-
-function resolveSourceCourse(course: string): string {
-  const explicitInstitutions = parsedCourseInstitutionMap[course] ?? [];
-  if (explicitInstitutions.length > 0) {
-    return course;
-  }
-
-  return courseInstitutionSourceAliasMap[course] ?? course;
-}
-
-const resolvedCourseInstitutionMap = Object.fromEntries(
-  Object.keys(parsedCourseInstitutionMap).map((course) => {
-    const sourceCourse = resolveSourceCourse(course);
-    const normalizedInstitutions = Array.from(
-      new Set(
-        (parsedCourseInstitutionMap[sourceCourse] ?? [])
-          .map(normalizeInstitutionId)
-      )
-    );
-
-    return [
-      course,
-      normalizedInstitutions.length > 0
-        ? normalizedInstitutions
-        : inferFallbackInstitutionIds(course),
-    ];
-  })
-);
-
-const locationDisplayOverrides: Record<string, string> = {
-  ADO: 'Ado-Ekiti',
-  AFAKA: 'Afaka',
-  AIU: 'Ayu',
-  AKR: 'Akure',
-  BAL: 'Bali',
-  BAU: 'Bauchi',
-  BID: 'Bida',
-  DAM: 'Damaturu',
-  ENU: 'Enugu',
-  EKO: 'Ekowe',
-  GAR: 'Ganye',
-  GOM: 'Gombe',
-  IBD: 'Ibadan',
-  IDA: 'Idah',
-  IFE: 'Ife',
-  ILA: 'Ilaro',
-  JAL: 'Jalingo',
-  JOS: 'Jos',
-  KAB: 'Kabba',
-  KAD: 'Kaduna',
-  KANO: 'Kano',
-  KAT: 'Katsina',
-  KAZAURE: 'Kazaure',
-  KEFFI: 'Keffi',
-  KURU: 'Kuru',
-  LAF: 'Lafia',
-  LAG: 'Lagos',
-  MAI: 'Maiduguri',
-  MANCHOK: 'Manchok',
-  MOK: 'Mokwa',
-  MUB: 'Mubi',
-  NAM: 'Nasarawa',
-  NAS: 'Nasarawa',
-  NBUS: 'New Bussa',
-  NEK: 'Nekede',
-  OFFA: 'Offa',
-  OIL: 'Oil and Gas',
-  OKO: 'Oko',
-  OLUJI: 'Oluji',
-  OMUO: 'Omuo',
-  OROGUN: 'Orogun',
-  OYO: 'Oyo',
-  PH: 'Port Harcourt',
-  PLS: 'Plateau',
-  QUOKU: 'Quoku',
-  UKA: 'Ukana',
-  UGEP: 'Ugep',
-  YOLA: 'Yola',
-  ZAR: 'Zaria',
-  ZUR: 'Zuru',
-};
-
-const locationStateHints: Record<string, string> = {
-  ADO: 'Ekiti',
-  AFAKA: 'Kaduna',
-  AKR: 'Ondo',
-  ANAMBRA: 'Anambra',
-  BABURA: 'Jigawa',
-  BAL: 'Taraba',
-  BAU: 'Bauchi',
-  BENIN: 'Edo',
-  BIDA: 'Niger',
-  DAM: 'Yobe',
-  DAURA: 'Katsina',
-  DUTSE: 'Jigawa',
-  DUTSINMA: 'Katsina',
-  EDE: 'Osun',
-  EKO: 'Bayelsa',
-  ENU: 'Enugu',
-  GOM: 'Gombe',
-  GOMBE: 'Gombe',
-  HADEJIA: 'Jigawa',
-  IBD: 'Oyo',
-  IBADAN: 'Oyo',
-  IDA: 'Kogi',
-  IJERO: 'Ekiti',
-  IKEJA: 'Lagos',
-  ILA: 'Ogun',
-  ILARO: 'Ogun',
-  ILESA: 'Osun',
-  JAL: 'Taraba',
-  JOS: 'Plateau',
-  KAB: 'Kogi',
-  KAD: 'Kaduna',
-  KAFANCHAN: 'Kaduna',
-  KANO: 'Kano',
-  KAT: 'Katsina',
-  KAZAURE: 'Jigawa',
-  KEFFI: 'Nasarawa',
-  KONTAGORA: 'Niger',
-  KURU: 'Plateau',
-  LAF: 'Nasarawa',
-  LAFIA: 'Nasarawa',
-  LAG: 'Lagos',
-  MAI: 'Borno',
-  MAIDUGURI: 'Borno',
-  MANCHOK: 'Kaduna',
-  MANDO: 'Kaduna',
-  MOK: 'Niger',
-  MONGUNO: 'Borno',
-  MUB: 'Adamawa',
-  MUBI: 'Adamawa',
-  NAM: 'Nasarawa',
-  NAS: 'Nasarawa',
-  NBUS: 'Niger',
-  NEK: 'Imo',
-  NGURU: 'Yobe',
-  OFFA: 'Kwara',
-  OGUASHIUKU: 'Delta',
-  OGWASHIUKU: 'Delta',
-  OHODO: 'Enugu',
-  OKE: 'Oyo',
-  OLUJI: 'Ondo',
-  ONDO: 'Ondo',
-  OROGUN: 'Delta',
-  OSOGBO: 'Osun',
-  OTEFE: 'Delta',
-  OYO: 'Oyo',
-  PH: 'Rivers',
-  PORT: 'Rivers',
-  PLS: 'Plateau',
-  SOKOTO: 'Sokoto',
-  UKA: 'Akwa Ibom',
-  UGEP: 'Cross River',
-  UYO: 'Akwa Ibom',
-  VOM: 'Plateau',
-  YOLA: 'Adamawa',
-  ZAR: 'Kaduna',
-  ZARIA: 'Kaduna',
-  ZUR: 'Kebbi',
-  ZURU: 'Kebbi',
-  ZUNGERU: 'Niger',
-};
-
-function splitInstitutionCode(id: string): string[] {
-  return id
-    .replace(/[().]/g, ' ')
-    .split(/[\s/_-]+/)
-    .filter(Boolean)
-    .map(token => token.toUpperCase());
-}
-
-function formatInstitutionToken(token: string): string {
-  if (locationDisplayOverrides[token]) {
-    return locationDisplayOverrides[token];
-  }
-
-  if (/^[A-Z0-9]{1,4}$/.test(token)) {
-    return token;
-  }
-
-  return token.charAt(0) + token.slice(1).toLowerCase();
-}
-
-function inferSupplementalInstitutionName(id: string): string {
-  const upperId = id.toUpperCase();
-  const tokens = splitInstitutionCode(upperId);
-  const locationTokens = tokens.slice(1).map(formatInstitutionToken).join(' ');
-
-  if (upperId.startsWith('FEDPO-')) return `Federal Polytechnic, ${locationTokens}`;
-  if (upperId.startsWith('POLY-')) return `Polytechnic, ${locationTokens}`;
-  if (upperId.startsWith('COLAGRIC-')) return `College of Agriculture, ${locationTokens}`;
-  if (upperId.startsWith('FEDAGRIC-')) return `Federal College of Agriculture, ${locationTokens}`;
-  if (upperId.startsWith('FEDANIM-')) return `Federal College of Animal Health and Production Technology, ${locationTokens}`;
-  if (upperId.startsWith('FEDCOFOR-') || upperId.startsWith('FECOFOR-')) return `Federal College of Forestry, ${locationTokens}`;
-  if (upperId.startsWith('FEDCOOP-')) return `Federal Cooperative College, ${locationTokens}`;
-  if (upperId.startsWith('FEDFISH-')) return `Federal College of Fisheries and Marine Technology, ${locationTokens}`;
-  if (upperId.startsWith('FEDWILD-')) return `Federal College of Wildlife Management, ${locationTokens}`;
-  if (upperId.startsWith('FSS-')) return `Federal School of Surveying, ${locationTokens}`;
-  if (upperId.startsWith('FTC-')) return `Federal Technical College, ${locationTokens}`;
-  if (upperId.startsWith('FCE-')) return `Federal College of Education, ${locationTokens}`;
-  if (upperId.startsWith('FCAPT-')) return `Federal College of Animal Production Technology, ${locationTokens}`;
-  if (upperId.startsWith('FCLT-')) return `Federal College of Land Technology, ${locationTokens}`;
-  if (upperId.startsWith('CHT-')) return `College of Health Technology, ${locationTokens}`;
-  if (upperId.startsWith('CHST-')) return `College of Health Sciences and Technology, ${locationTokens}`;
-  if (upperId.startsWith('COHTECH-') || upperId.startsWith('COTECH-')) return `College of Health Technology, ${locationTokens}`;
-  if (upperId.startsWith('CNS-')) return `College of Nursing Sciences, ${locationTokens}`;
-  if (upperId.startsWith('CNM-')) return `College of Nursing and Midwifery, ${locationTokens}`;
-  if (upperId.startsWith('CN-')) return `College of Nursing, ${locationTokens}`;
-  if (upperId.startsWith('SN-')) return `School of Nursing, ${locationTokens}`;
-  if (upperId.startsWith('SCN')) return `School of Nursing, ${tokens.slice(1).map(formatInstitutionToken).join(' ')}`;
-  if (upperId.startsWith('SHIM-')) return `School of Health Information Management, ${locationTokens}`;
-
-  return upperId
-    .replace(/[._]/g, ' ')
-    .replace(/-/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .split(' ')
-    .map(formatInstitutionToken)
-    .join(' ');
-}
-
-function inferSupplementalInstitutionType(id: string): string {
-  const upperId = id.toUpperCase();
-
-  if (/(^CNS-|^CNM-|^CN-|^SN-|^SCN|NURSING|MIDWIF)/.test(upperId)) return 'College of Nursing';
-  if (/(^FCE-|COE|COED|SAYACOE)/.test(upperId)) return 'College of Education';
-  if (/(^CHT-|^CHST-|^COHTECH-|^COTECH-|^COH-|^IHT-|^SHIM-|^FEDSTEN$|^NACOMEDS$|^POGIL$|^PECOHSTECH$|^RIVCOST$|^OGCOHTECH$|^KANCOHTECH$|^KWACOHTECH$|^BACOHTECH$|^BABCOHTECH$|^ANSCOHTECH$|^BYSCOHTECH$|^CENTCOHTECH$|^CRESTFIELD-CHT$|^MALIKIYA$|^NGCHTECH$|^NIHST$|^TCHST$|^OSCOHST$|^COHESKAT$|^CVMLT$|^MLN-COTECH$|^NKST-COTECH$|^BEIJING-CHST$|^PARLIAMENT-CHST$|^COHMSA$)/.test(upperId)) return 'Monotechnic';
-  if (/(^FEDAGRIC-|^COLAGRIC-|^FEDANIM-|^FEDCOFOR-|^FECOFOR-|^FEDCOOP-|^FEDFISH-|^FEDWILD-|^FSS-|^FTC-|^FCAPT-|^FCLT-|^FCLRT-|^NWRI-|^NICO$|^NITT-|^NCAT-|^MAN-ORON$|^CHARKIN$|^JOEMARINE$|^MARITIME-UNI$|^NIS$|^NILEST$|^FEDCO-|^FEDOHODO$|^FEDFISHERIES|^FEDHORT-|^FECOFM-|^FECOT$|^KWACHOTECH$|^OGCHOTECH$)/.test(upperId)) return 'Monotechnic';
-  if (/(POLY|POTECH|YABATECH|MAPOLY|LASPOTECH|RUGIPO|IMT|PTI|OGITECH|OTEFE|OYSCATECH|SARO-WIWA|WAZIRI|HUSSAINI|POLYTECH|TECH$)/.test(upperId)) return 'Polytechnic';
-  if (/(UNI|UNIV|UNIVERSITY|SUT|SUST|UST|BASU|BASUG|DELSUT|NOVENA|SALEM|NILE|WIGWE|MIVA|DOMINION|ELIZADE|CALEB|PHILOMATH|CHRISLAND|CLIFFORD|CANADIAN|SKYLINE|SUMMIT|AUGUSTINE|MAITAMA|PEACELAND|PRIME-UNI|PETER-UNI|MC-IBRU|WELLSPRING|TANSIAN|RITMAN|NUS|NBU|NAUB|UDA|SLUK|PRU|AUN|AUE|EUN|HUDA|AMOU|KOMU|KKU|MLU|NUTECH|NEWGATE|KHAIRUN|MOUNTAIN TOP|AL-ANSAR|AL-QALAM|AL-HIKMAH|AVE-MARIA|GREENFIELD|COSMOPOLITAN|DOU|BCU|BINGHAM|BAZE|CCU|CUST|SAM-MARIS|JEWEL|SPORTS-UNI|UNIKINGS|UNINIGER|VISION-UNI|WESTERN-DEL|UNI-ILESA|MERCY-MED-UNI|OSUMS|BMU|PAUL|AZMAN)/.test(upperId)) {
-    if (/(BASU|BASUG|DELSUT|KASU-KABBA|KSU|KWASU|NASARAWA|BOSU|LASUED|COOU|KUST|MAUTY|BAUCHI|UNI-ILESA|UDU)/.test(upperId)) return 'State University';
-    return 'Private University';
-  }
-  if (/(SQI|NIIT|APTECH|DOTSICT|ICON-OU|INSPOTECH|NOVELTY|PARAMOUNT|NATIONBTECH|UEC-TECH|SUNIPOLY)/.test(upperId)) return 'IEI';
-
-  return 'Polytechnic';
-}
-
-function inferSupplementalHostState(id: string): string {
-  const upperId = id.toUpperCase();
-  const tokens = splitInstitutionCode(upperId);
-
-  for (const token of [...tokens].reverse()) {
-    if (locationStateHints[token]) {
-      return locationStateHints[token];
-    }
-  }
-
-  const joined = tokens.join(' ');
-  for (const [token, state] of Object.entries(locationStateHints)) {
-    if (joined.includes(token)) {
-      return state;
-    }
-  }
-
-  return 'Unknown';
-}
-
-function inferSupplementalMinimumScore(id: string, type: string): number {
-  if (type === 'College of Nursing') {
-    return 140;
-  }
-
-  if (type.includes('University')) {
-    return 160;
-  }
-
-  return 120;
-}
-
-const supplementalInstitutionIds = Array.from(
-  new Set(
-    Object.values(resolvedCourseInstitutionMap)
-      .flat()
-      .filter((id) => !validInstitutionIdSet.has(id))
-  )
-).sort();
-
-const supplementalInstitutionLookup: Record<string, AdmissionInstitution> = Object.fromEntries(
-  supplementalInstitutionIds.map((id) => {
-    const type = inferSupplementalInstitutionType(id);
-    const hostState = inferSupplementalHostState(id);
-    const zone = hostState !== 'Unknown' ? stateToZone[hostState] : undefined;
-    const statePriority = type === 'State University' && hostState !== 'Unknown' ? [hostState] : undefined;
-
-    return [
-      id,
-      {
-        id,
-        name: inferSupplementalInstitutionName(id),
-        type,
-        host_state: hostState,
-        geopolitical_zone: zone,
-        minimum_score: inferSupplementalMinimumScore(id, type),
-        state_priority: statePriority,
-      },
-    ];
-  })
-);
-
-export const supplementalInstitutions = applySmartDirectoryInstitutions
-  .map(({ id, name }) => toOption(id, name))
-  .sort((a, b) => a.label.localeCompare(b.label));
-
-export function getApplySmartInstitutionById(id: string): AdmissionInstitution | null {
-  const canonicalId = institutionIdAliasMap[id] ?? id;
-  return institutionsById[canonicalId] ?? null;
-}
-
-export const allCourses = Object.keys(resolvedCourseInstitutionMap)
-  .map(course => ({ value: course, label: formatCourseLabel(course) }))
-  .sort((a, b) => a.label.localeCompare(b.label));
-
-export const courseInstitutionAliasMap: Record<string, string> = {
-  Accounting: 'ACCOUNTANCY',
-  'Banking and Finance': 'BANKING AND FINANCE',
-  'Business Administration': 'BUSINESS ADMINISTRATION & MANAGEMENT',
-  'Computer Science': 'COMPUTER SCIENCE',
-  'Civil Engineering': 'CIVIL ENGINEERING TECHNOLOGY',
-  Architecture: 'ARCHITECTURAL TECHNOLOGY',
-  'Estate Management': 'ESTATE MANAGEMENT AND VALUATION',
-  'Urban and Regional Planning': 'URBAN AND REGIONAL PLANNING',
-  'Taxation': 'TAXATION',
-  Insurance: 'INSURANCE',
-  'Mass Communication': 'MASS COMMUNICATION',
-  'Public Administration': 'PUBLIC ADMINISTRATION',
-  'Local Government Studies': 'LOCAL GOVERNMENT STUDIES',
-  Marketing: 'MARKETING',
-  'Nursing Science (B.N.Sc.)': 'NURSING PROGRAMME',
-  'Electrical/Electronics Engineering': 'ELECTRICAL/ELECTRONICS ENGINEERING TECHNOLOGY',
-  'Mechanical Engineering': 'MECHANICAL ENGINEERING TECHNOLOGY',
-  'Surveying and Geo-Informatics': 'SURVEYING AND GEO-INFORMATICS',
-  'Tourism Management Technology': 'TOURISM MANAGEMENT TECHNOLOGY',
-};
-
-export const courseInstitutionMap: Record<string, string[]> = {
-  ...resolvedCourseInstitutionMap,
-  ...Object.fromEntries(
-    Object.entries(courseInstitutionAliasMap).map(([alias, raw]) => [alias, resolvedCourseInstitutionMap[raw] ?? []])
-  ),
-  'Medicine and Surgery (MBBS)': universityInstitutionIds,
-  'Dentistry (BDS)': universityInstitutionIds,
-  'Pharmacy (Pharm.D)': universityInstitutionIds,
-  'Law (LL.B)': universityInstitutionIds,
-  'Nursing Science (B.N.Sc.)': universityInstitutionIds,
-  'Medical Laboratory Science (B.MLS)': universityInstitutionIds,
-  Physiotherapy: universityInstitutionIds,
-  'Radiography and Radiation Science': universityInstitutionIds,
-  'Veterinary Medicine (DVM)': universityInstitutionIds,
-  Optometry: universityInstitutionIds,
-  Anatomy: universityInstitutionIds,
-  Physiology: universityInstitutionIds,
-  Economics: universityInstitutionIds,
-  Biochemistry: universityInstitutionIds,
-  Microbiology: universityInstitutionIds,
-  Sociology: universityInstitutionIds,
-  'Political Science': universityInstitutionIds,
-  'History and International Studies': universityInstitutionIds,
-  'Theatre Arts': universityInstitutionIds,
-  Linguistics: universityInstitutionIds,
-  'English Language and Literature': universityInstitutionIds,
-  'Modern Languages': universityInstitutionIds,
-  'Education programs with subject majors': universityInstitutionIds,
-  'Agricultural Economics': universityInstitutionIds,
-  'Animal Science': universityInstitutionIds,
-  'Crop Science': universityInstitutionIds,
-  'Soil Science': universityInstitutionIds,
-};

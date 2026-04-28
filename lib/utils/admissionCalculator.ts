@@ -1,8 +1,8 @@
 import {
   AdmissionInstitution,
   educationallyLessDevelopedStates,
-  getInstitutionById,
 } from '@/lib/data/admissionDataset';
+import { getApplySmartInstitutionById } from '@/lib/data/applysmart';
 
 /**
  * Admission Calculator Utility Functions
@@ -104,7 +104,7 @@ function inferCourseDataFromName(course: string): CourseData {
   return defaultCourseData;
 }
 
-function getCourseData(course: string): CourseData {
+export function resolveCourseData(course: string): CourseData {
   const normalizedCourse = course.trim().toUpperCase();
   const aliasKey = courseAliasMap[normalizedCourse];
   if (aliasKey && courseData[aliasKey]) {
@@ -160,6 +160,179 @@ export const courseData: Record<string, CourseData> = {
   animal_science: { tier: 3, cutoff: 160, competition: 'Low' },
   crop_science: { tier: 3, cutoff: 160, competition: 'Low' },
   soil_science: { tier: 3, cutoff: 160, competition: 'Low' },
+
+  accountancy: { tier: 2, cutoff: 220, competition: 'High' },
+  agricultural_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  agricultural_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  architectural_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  arts_and_design: { tier: 3, cutoff: 180, competition: 'Low' },
+  banking_and_finance: { tier: 2, cutoff: 200, competition: 'Medium' },
+  building_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  business_administration_and_management: { tier: 2, cutoff: 210, competition: 'Medium' },
+  chemical_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  civil_engineering_technology: { tier: 2, cutoff: 210, competition: 'Medium' },
+  computer_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  co_operative_economics_and_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  dental_technology: { tier: 1, cutoff: 250, competition: 'High' },
+  dental_therapy: { tier: 1, cutoff: 250, competition: 'High' },
+  electrical_electronics_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  estate_management_and_valuation: { tier: 2, cutoff: 180, competition: 'Low' },
+  fashion_design_and_clothing_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  food_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  forestry_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  geological_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  glass_ceramics_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  horticultural_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  hospitality_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  insurance: { tier: 2, cutoff: 200, competition: 'Medium' },
+  library_and_information_science: { tier: 3, cutoff: 170, competition: 'Low' },
+  local_government_studies: { tier: 3, cutoff: 160, competition: 'Low' },
+  marine_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  marine_transport_and_business_studies: { tier: 2, cutoff: 220, competition: 'High' },
+  marketing: { tier: 2, cutoff: 200, competition: 'Medium' },
+  mass_communication: { tier: 2, cutoff: 230, competition: 'High' },
+  mechanical_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  mechatronics_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  metallurgical_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  mineral_resources_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  multimedia_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  music_technology: { tier: 3, cutoff: 180, competition: 'Low' },
+  nautical_science: { tier: 3, cutoff: 170, competition: 'Low' },
+  nursing_programme: { tier: 1, cutoff: 250, competition: 'High' },
+  office_technology_and_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  pension_administration_and_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  petroleum_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  petroleum_marketing_and_business_studies: { tier: 2, cutoff: 220, competition: 'High' },
+  pharmaceutical_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  photography: { tier: 3, cutoff: 170, competition: 'Low' },
+  physical_and_health_education: { tier: 2, cutoff: 200, competition: 'Medium' },
+  polymer_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  printing_technology: { tier: 2, cutoff: 190, competition: 'Medium' },
+  procurement_and_supply_chain_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  prosthetics_orthotics_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  public_administration: { tier: 3, cutoff: 180, competition: 'Low' },
+  public_health: { tier: 2, cutoff: 200, competition: 'Medium' },
+  quantity_surveying: { tier: 2, cutoff: 220, competition: 'High' },
+  railway_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  science_laboratory_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  shipping_and_port_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  social_development: { tier: 3, cutoff: 170, competition: 'Low' },
+  sports_coaching_and_training: { tier: 3, cutoff: 170, competition: 'Low' },
+  sports_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  surveying_and_geo_informatics: { tier: 2, cutoff: 220, competition: 'High' },
+  taxation: { tier: 2, cutoff: 200, competition: 'Medium' },
+  textiles_technology: { tier: 2, cutoff: 190, competition: 'Medium' },
+  tourism_management_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  transport_planning_and_management: { tier: 2, cutoff: 220, competition: 'High' },
+  transport_and_logistics_management: { tier: 2, cutoff: 220, competition: 'High' },
+  transport_safety_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  urban_and_regional_planning: { tier: 2, cutoff: 180, competition: 'Low' },
+  veterinary_laboratory_technology: { tier: 1, cutoff: 250, competition: 'High' },
+  water_resources_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  welding_and_fabrication_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  welding_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  wood_and_paper_technology: { tier: 2, cutoff: 180, competition: 'Low' },
+  accounting_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  agricultural_and_bio_environmental_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  agricultural_and_bio_environmental_engineering_technology_continued: { tier: 2, cutoff: 220, competition: 'High' },
+  auto_body_technology: { tier: 2, cutoff: 180, competition: 'Low' },
+  automobile_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  aviation_management: { tier: 2, cutoff: 220, competition: 'High' },
+  aviation_security: { tier: 2, cutoff: 220, competition: 'High' },
+  boat_and_ship_building_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  cartography_and_geographic_information_system: { tier: 2, cutoff: 200, competition: 'Medium' },
+  ceramics_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  civil_and_construction_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  civil_and_water_resources_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  climate_change_sciences: { tier: 2, cutoff: 200, competition: 'Medium' },
+  communication_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  community_health: { tier: 2, cutoff: 200, competition: 'Medium' },
+  computer_and_communication_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  computer_and_information_science: { tier: 2, cutoff: 220, competition: 'High' },
+  computer_science_with_economics_mathematics: { tier: 2, cutoff: 220, competition: 'High' },
+  computer_science_with_accounting: { tier: 2, cutoff: 220, competition: 'High' },
+  computer_science_with_economics: { tier: 2, cutoff: 220, competition: 'High' },
+  computer_science_with_islamic_religious_studies: { tier: 2, cutoff: 220, competition: 'High' },
+  computer_science_with_mathematics: { tier: 2, cutoff: 220, competition: 'High' },
+  computer_with_statistics: { tier: 2, cutoff: 220, competition: 'High' },
+  construction_technology_education: { tier: 2, cutoff: 200, competition: 'Medium' },
+  crime_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  crop_production_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  cultural_administration_and_resource_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  cyber_security_science: { tier: 2, cutoff: 220, competition: 'High' },
+  dental_surgery_technology: { tier: 1, cutoff: 250, competition: 'High' },
+  dispensing_opticianry: { tier: 2, cutoff: 220, competition: 'High' },
+  electrical_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  electrical_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  electronics_and_computer_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  electronics_and_computer_systems: { tier: 2, cutoff: 220, competition: 'High' },
+  electronics_and_telecommunications_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  electronics_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  energy_and_petroleum_studies: { tier: 2, cutoff: 220, competition: 'High' },
+  energy_studies: { tier: 2, cutoff: 210, competition: 'Medium' },
+  environmental_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  environmental_health: { tier: 2, cutoff: 200, competition: 'Medium' },
+  environmental_health_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  environmental_management_and_toxicology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  environmental_management_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  environmental_resources_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  environmental_science_and_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  environmental_science_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  environmental_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  epidemiology_and_disease_control: { tier: 2, cutoff: 210, competition: 'Medium' },
+  exercise_and_sports_science: { tier: 3, cutoff: 170, competition: 'Low' },
+  explosive_ordnance_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  fashion_design: { tier: 2, cutoff: 200, competition: 'Medium' },
+  film_and_multi_media_studies: { tier: 2, cutoff: 200, competition: 'Medium' },
+  film_and_video_studies: { tier: 2, cutoff: 200, competition: 'Medium' },
+  film_production: { tier: 2, cutoff: 200, competition: 'Medium' },
+  film_studies_and_production: { tier: 2, cutoff: 200, competition: 'Medium' },
+  fisheries_and_aquatic_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  foundry_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  gas_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  geography_and_meteorology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  geography_and_planning: { tier: 2, cutoff: 200, competition: 'Medium' },
+  geography_and_regional_planning: { tier: 2, cutoff: 200, competition: 'Medium' },
+  geography_physics: { tier: 2, cutoff: 200, competition: 'Medium' },
+  geology_and_mining: { tier: 2, cutoff: 200, competition: 'Medium' },
+  geology_and_mineral_sciences: { tier: 2, cutoff: 200, competition: 'Medium' },
+  geology_and_petroleum_studies: { tier: 2, cutoff: 220, competition: 'High' },
+  geology_geophysics: { tier: 2, cutoff: 200, competition: 'Medium' },
+  geoscience: { tier: 3, cutoff: 170, competition: 'Low' },
+  geosciences_information_system: { tier: 2, cutoff: 200, competition: 'Medium' },
+  graphics_design_and_advertising: { tier: 2, cutoff: 200, competition: 'Medium' },
+  health_information_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  health_information_system: { tier: 2, cutoff: 200, competition: 'Medium' },
+  health_information_management_system: { tier: 2, cutoff: 200, competition: 'Medium' },
+  healthcare_and_hospital_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  healthcare_administration_and_hospital_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  highway_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  home_and_rural_economics: { tier: 2, cutoff: 200, competition: 'Medium' },
+  horticulture_and_landscape_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  hydrology_and_water_resources_management: { tier: 2, cutoff: 220, competition: 'High' },
+  industrial_and_labour_relations: { tier: 2, cutoff: 190, competition: 'Medium' },
+  industrial_design: { tier: 2, cutoff: 200, competition: 'Medium' },
+  industrial_maintenance_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  industrial_safety_and_environmental_engineering_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  information_and_communication_engineering: { tier: 2, cutoff: 220, competition: 'High' },
+  information_and_communication_technology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  information_and_media_science: { tier: 3, cutoff: 170, competition: 'Low' },
+  information_and_media_studies: { tier: 2, cutoff: 200, competition: 'Medium' },
+  information_and_media_technology: { tier: 2, cutoff: 210, competition: 'Medium' },
+  information_resource_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  information_science: { tier: 3, cutoff: 170, competition: 'Low' },
+  information_systems: { tier: 2, cutoff: 220, competition: 'High' },
+  information_systems_and_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  information_technology: { tier: 2, cutoff: 220, competition: 'High' },
+  information_technology_and_health_informatics: { tier: 2, cutoff: 220, competition: 'High' },
+  laundry_and_dry_cleaning_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  leather_technology: { tier: 3, cutoff: 170, competition: 'Low' },
+  marine_geology: { tier: 2, cutoff: 200, competition: 'Medium' },
+  marine_meteorology_and_coastal_management: { tier: 2, cutoff: 200, competition: 'Medium' },
+  maritime_economics_and_finance: { tier: 2, cutoff: 220, competition: 'High' },
+  maritime_science: { tier: 2, cutoff: 220, competition: 'High' },
+  maritime_transport_and_logistics: { tier: 2, cutoff: 220, competition: 'High' },
+  medical_imaging_technology: { tier: 1, cutoff: 250, competition: 'High' },
 };
 
 export function calculateAdmissionChance(
@@ -170,14 +343,15 @@ export function calculateAdmissionChance(
 ): CalculationResult | null {
   if (!institutionId || !course || !score) return null;
 
-  const courseInfo = getCourseData(course);
-  const institution = getInstitutionById(institutionId);
+  const courseInfo = resolveCourseData(course);
+  const institution = getApplySmartInstitutionById(institutionId);
   if (!institution) return null;
 
   const factors: string[] = [];
   let chance = 0; // Base chance starts at 0
   const normalizedState = state?.trim();
   const isELDS = educationallyLessDevelopedStates.includes(normalizedState);
+  const hasCompletePolicyData = institution.policy_data_complete !== false;
 
   // 1. Base score vs institution minimum
   if (score >= institution.minimum_score) {
@@ -221,7 +395,9 @@ export function calculateAdmissionChance(
   // 3. State of origin advantage (Catchment/ELDS/Priority)
   const catchmentStates = institution.catchment_states ?? [];
   
-  if (institution.type === 'Federal University') {
+  if (!hasCompletePolicyData) {
+    factors.push('Note: institution-specific quota and catchment policy data is limited for this institution, so this estimate uses general score benchmarks only.');
+  } else if (institution.type === 'Federal University') {
     if (catchmentStates.includes(normalizedState)) {
       chance += 20;
       factors.push(`✓ Your state (${normalizedState}) is in the catchment area, giving you an advantage`);
@@ -248,7 +424,7 @@ export function calculateAdmissionChance(
 
   // 4. Institution and Course competitiveness modifiers
   const highCompUnis = ['unilag', 'ui', 'unilorin', 'abu', 'unn', 'oau'];
-  if (institution.type === 'Federal University' && highCompUnis.some(id => institutionId.toLowerCase().includes(id))) {
+  if (hasCompletePolicyData && institution.type === 'Federal University' && highCompUnis.some(id => institutionId.toLowerCase().includes(id))) {
     chance -= 10;
     factors.push('⚠ This institution is highly competitive');
   }

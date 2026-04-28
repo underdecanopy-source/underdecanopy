@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { federalUniversities, stateUniversities, privateUniversities, polytechnics, statePolytechnics, collegesOfEducation, monotechnics, nursingColleges, ieis, allCourses, states, courseInstitutionMap } from "@/lib/data/applysmart";
+import { federalUniversities, stateUniversities, privateUniversities, polytechnics, statePolytechnics, collegesOfEducation, monotechnics, nursingColleges, ieis, supplementalInstitutions, allCourses, states, courseInstitutionMap } from "@/lib/data/applysmart";
 import { calculateAdmissionChance } from "@/lib/utils/admissionCalculator";
 
 export function AdmissionCalculator() {
@@ -21,6 +21,7 @@ export function AdmissionCalculator() {
         ...monotechnics,
         ...nursingColleges,
         ...ieis,
+        ...supplementalInstitutions,
     ].map(option => option.value);
 
     const allowedInstitutionIds = course
@@ -41,6 +42,7 @@ export function AdmissionCalculator() {
         { label: 'Monotechnics', options: filterOptions(monotechnics) },
         { label: 'College of Nursing', options: filterOptions(nursingColleges) },
         { label: 'Institutes of Education/IEIs', options: filterOptions(ieis) },
+        { label: 'Additional Institutions', options: filterOptions(supplementalInstitutions) },
     ];
 
     const hasAvailableInstitutions = institutionGroups.some(group => group.options.length > 0);

@@ -11,13 +11,13 @@ const filedReturnSchema = z.object({
     metadata: z.object({
         taxType: z.enum(['VAT', 'PIT', 'WHT', 'CIT']),
         taxId: z.string().min(1),
-        tin: z.string().optional(),
+        tin: z.string().nullable().optional(),
         taxpayerName: z.string().min(1),
         filingPeriod: z.string().min(1),
         createdAt: z.string().min(1),
         verificationHash: z.string().min(1),
-        email: z.string().email().optional().or(z.literal('')),
-        phone: z.string().optional(),
+        email: z.string().email().nullable().optional().or(z.literal('').nullable().optional()),
+        phone: z.string().nullable().optional(),
     }),
 });
 
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
                 mimeType: body.mimeType,
                 taxType: body.metadata.taxType,
                 taxId: body.metadata.taxId,
-                tin: body.metadata.tin,
+                tin: body.metadata.tin || undefined,
                 taxpayerName: body.metadata.taxpayerName,
                 filingPeriod: body.metadata.filingPeriod,
                 createdAt: body.metadata.createdAt,
@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
             },
             { status: 201 }
         );
-    } catch (error) {
-        if (error instanceof z.ZodError) {
+    } catch (error: any) {
+        if (error instanceof z.ZodError || error?.name === 'ZodError') {
             return NextResponse.json({ error: 'Validation failed', details: error.issues }, { status: 400 });
         }
 

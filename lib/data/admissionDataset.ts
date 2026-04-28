@@ -1,3 +1,5 @@
+import { applySmartInstitutionDirectory } from './applysmartInstitutionDirectory';
+
 export interface AdmissionInstitution {
   id: string;
   name: string;
@@ -9,6 +11,8 @@ export interface AdmissionInstitution {
   state_priority?: string[];
   fct_quota_enabled?: boolean;
   historical_score_ranges?: Record<string, string>;
+  data_source?: 'canonical' | 'applysmart_directory';
+  policy_data_complete?: boolean;
 }
 
 export interface AdmissionQuotaBreakdown {
@@ -67,7 +71,7 @@ export const admissionQuotaBreakdown: AdmissionQuotaBreakdown = {
   private_institutions: { merit: 100 },
 };
 
-export const institutions: AdmissionInstitution[] = [
+const canonicalInstitutions: AdmissionInstitution[] = [
   {
     id: 'UNILAG',
     name: 'University of Lagos',
@@ -1373,20 +1377,27 @@ export const institutions: AdmissionInstitution[] = [
   },
 ];
 
+export const applySmartDirectoryInstitutions = applySmartInstitutionDirectory;
+
+export const institutions: AdmissionInstitution[] = [
+  ...canonicalInstitutions,
+  ...applySmartDirectoryInstitutions,
+];
+
 export const institutionsById = institutions.reduce<Record<string, AdmissionInstitution>>((acc, institution) => {
   acc[institution.id] = institution;
   return acc;
 }, {});
 
-export const federalInstitutions = institutions.filter(i => i.type === 'Federal University');
-export const stateUniversities = institutions.filter(i => i.type === 'State University');
-export const privateInstitutions = institutions.filter(i => i.type === 'Private University');
-export const polytechnics = institutions.filter(i => i.type === 'Polytechnic');
-export const statePolytechnics = institutions.filter(i => i.type === 'State Polytechnic');
-export const collegesOfEducation = institutions.filter(i => i.type === 'College of Education');
-export const monotechnics = institutions.filter(i => i.type === 'Monotechnic');
-export const nursingColleges = institutions.filter(i => i.type === 'College of Nursing');
-export const ieis = institutions.filter(i => i.type === 'IEI');
+export const federalInstitutions = canonicalInstitutions.filter(i => i.type === 'Federal University');
+export const stateUniversities = canonicalInstitutions.filter(i => i.type === 'State University');
+export const privateInstitutions = canonicalInstitutions.filter(i => i.type === 'Private University');
+export const polytechnics = canonicalInstitutions.filter(i => i.type === 'Polytechnic');
+export const statePolytechnics = canonicalInstitutions.filter(i => i.type === 'State Polytechnic');
+export const collegesOfEducation = canonicalInstitutions.filter(i => i.type === 'College of Education');
+export const monotechnics = canonicalInstitutions.filter(i => i.type === 'Monotechnic');
+export const nursingColleges = canonicalInstitutions.filter(i => i.type === 'College of Nursing');
+export const ieis = canonicalInstitutions.filter(i => i.type === 'IEI');
 
 export const allInstitutions = institutions;
 

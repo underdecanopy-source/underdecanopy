@@ -1,5 +1,16 @@
-import { calculateAdmissionChance, getChanceColor, courseData } from '../admissionCalculator';
-import { allInstitutions } from '@/lib/data/admissionDataset';
+import { calculateAdmissionChance, getChanceColor, courseData, resolveCourseData } from '../admissionCalculator';
+import { allInstitutions, getInstitutionById } from '@/lib/data/admissionDataset';
+import { allCourses, courseInstitutionMap, getApplySmartInstitutionById, supplementalInstitutions } from '@/lib/data/applysmart';
+
+function normalizeCourseKey(course: string): string {
+  return course
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .replace(/_+/g, '_');
+}
 
 describe('Admission Calculator', () => {
   describe('calculateAdmissionChance', () => {
@@ -73,6 +84,17 @@ describe('Admission Calculator', () => {
 
       expect(result).not.toBeNull();
       expect(result!.factors.length).toBeGreaterThan(0);
+    });
+
+    it('should calculate admission chance for supplemental applysmart institutions', () => {
+      const result = calculateAdmissionChance('AAP', 'BANKING AND FINANCE', 240, 'Lagos');
+
+      expect(result).not.toBeNull();
+      expect(result!.chance).toBeGreaterThan(0);
+      expect(result!.chance).toBeLessThanOrEqual(100);
+      expect(result!.factors).toContain(
+        'Note: institution-specific quota and catchment policy data is limited for this institution, so this estimate uses general score benchmarks only.'
+      );
     });
 
     it('should return consistent results for same inputs', () => {
@@ -198,6 +220,113 @@ describe('Admission Calculator', () => {
         expect(course.cutoff).toBeLessThanOrEqual(400);
       });
     });
+
+    it('should expose at least one institution for every applysmart course', () => {
+      expect(allCourses).toHaveLength(173);
+
+      allCourses.forEach(({ value }) => {
+        expect(courseInstitutionMap[value]).toBeDefined();
+        expect(courseInstitutionMap[value].length).toBeGreaterThan(0);
+      });
+    });
+
+    it('should preserve raw institutions that do not exist in the canonical dataset', () => {
+      expect(courseInstitutionMap['BANKING AND FINANCE']).toContain('AAP');
+      expect(courseInstitutionMap['AVIATION MANAGEMENT']).toContain('AZMAN');
+      expect(supplementalInstitutions.some((option) => option.value === 'AAP')).toBe(true);
+      expect(supplementalInstitutions.some((option) => option.value === 'AZMAN')).toBe(true);
+    });
+
+    it('should resolve every applysmart institution through the shared registry', () => {
+      const institutionIds = new Set(Object.values(courseInstitutionMap).flat());
+
+      institutionIds.forEach((institutionId) => {
+        expect(getApplySmartInstitutionById(institutionId)).not.toBeNull();
+        expect(getInstitutionById(institutionId)).not.toBeNull();
+      });
+    });
+
+    it('should prefer explicit course institution lists over broad source aliases', () => {
+      expect(courseInstitutionMap['ACCOUNTING TECHNOLOGY']).toEqual(['FUTA', 'ATBU', 'BELLS', 'UNICAL']);
+      expect(courseInstitutionMap['COMPUTER AND INFORMATION SCIENCE']).toEqual(['LCITY', 'COVENANT', 'IGBINEDION']);
+      expect(courseInstitutionMap['COMPUTER SCIENCE WITH ACCOUNTING']).toEqual(['BIU', 'LASU', 'UNIPORT', 'ATBU']);
+      expect(courseInstitutionMap['COMPUTER SCIENCE WITH ISLAMIC RELIGIOUS STUDIES']).toEqual(['AL-QALAM', 'FUDMA']);
+      expect(courseInstitutionMap['ELECTRICAL ENGINEERING TECHNOLOGY']).toEqual(['EASTERN-POLY', 'IGBO-OWU POLY']);
+      expect(courseInstitutionMap['FILM PRODUCTION']).toEqual(['CCU', 'NOUN-ELUON', 'UNIPORT']);
+      expect(courseInstitutionMap['INFORMATION SYSTEMS AND TECHNOLOGY']).toEqual(['DELSUT', 'NILE']);
+    });
+
+    it('should normalize known institution code variants without collapsing distinct schools', () => {
+      expect(courseInstitutionMap['MASS COMMUNICATION']).toContain('SARO-WIWA POLY');
+      expect(courseInstitutionMap['MASS COMMUNICATION']).not.toContain('SARO-WWA POLY');
+      expect(courseInstitutionMap['ENVIRONMENTAL HEALTH TECHNOLOGY']).toContain('SHEHU IDRIS');
+      expect(courseInstitutionMap['ENVIRONMENTAL HEALTH TECHNOLOGY']).not.toContain('SHEHU IRIS');
+      expect(courseInstitutionMap['FORESTRY TECHNOLOGY']).toContain('FEDFORESTRYJOS');
+      expect(courseInstitutionMap['FORESTRY TECHNOLOGY']).toContain('FEDCOFOR-IBD');
+      expect(courseInstitutionMap['FORESTRY TECHNOLOGY']).toHaveLength(17);
+    });
+
+    it('should provide an explicit course profile for every applysmart course', () => {
+      expect(allCourses).toHaveLength(173);
+
+      allCourses.forEach(({ value }) => {
+        const explicitProfile = courseData[normalizeCourseKey(value)];
+
+        expect(explicitProfile).toBeDefined();
+        expect(resolveCourseData(value)).toEqual(explicitProfile);
+      });
+    });
+
+    it('should provide concrete profiles for previously generic applysmart courses', () => {
+      const tunedCourses = [
+        { course: 'ACCOUNTANCY', expected: { tier: 2, cutoff: 220, competition: 'High' } },
+        { course: 'AGRICULTURAL TECHNOLOGY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'ARTS AND DESIGN', expected: { tier: 3, cutoff: 180, competition: 'Low' } },
+        { course: 'BUILDING TECHNOLOGY', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'FOOD TECHNOLOGY', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'FORESTRY TECHNOLOGY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'GEOLOGICAL TECHNOLOGY', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'GLASS/CERAMICS TECHNOLOGY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'HORTICULTURAL TECHNOLOGY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'INSURANCE', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'MULTIMEDIA TECHNOLOGY', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'MUSIC TECHNOLOGY', expected: { tier: 3, cutoff: 180, competition: 'Low' } },
+        { course: 'PHOTOGRAPHY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'POLYMER TECHNOLOGY', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'PRINTING TECHNOLOGY', expected: { tier: 2, cutoff: 190, competition: 'Medium' } },
+        { course: 'PROSTHETICS/ORTHOTICS TECHNOLOGY', expected: { tier: 2, cutoff: 220, competition: 'High' } },
+        { course: 'TEXTILES TECHNOLOGY', expected: { tier: 2, cutoff: 190, competition: 'Medium' } },
+        { course: 'WELDING AND FABRICATION TECHNOLOGY', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'WOOD AND PAPER TECHNOLOGY', expected: { tier: 2, cutoff: 180, competition: 'Low' } },
+        { course: 'AUTO BODY TECHNOLOGY', expected: { tier: 2, cutoff: 180, competition: 'Low' } },
+        { course: 'CARTOGRAPHY AND GEOGRAPHIC INFORMATION SYSTEM', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'CERAMICS TECHNOLOGY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'CLIMATE CHANGE SCIENCES', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'CROP PRODUCTION TECHNOLOGY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'DISPENSING OPTICIANRY', expected: { tier: 2, cutoff: 220, competition: 'High' } },
+        { course: 'ELECTRICAL TECHNOLOGY', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'ENERGY STUDIES', expected: { tier: 2, cutoff: 210, competition: 'Medium' } },
+        { course: 'EPIDEMIOLOGY AND DISEASE CONTROL', expected: { tier: 2, cutoff: 210, competition: 'Medium' } },
+        { course: 'EXPLOSIVE ORDNANCE TECHNOLOGY', expected: { tier: 2, cutoff: 220, competition: 'High' } },
+        { course: 'FILM AND MULTI MEDIA STUDIES', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'FILM AND VIDEO STUDIES', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'FILM PRODUCTION', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'FILM STUDIES AND PRODUCTION', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'FISHERIES AND AQUATIC TECHNOLOGY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'GEOSCIENCES INFORMATION SYSTEM', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'HORTICULTURE AND LANDSCAPE TECHNOLOGY', expected: { tier: 3, cutoff: 170, competition: 'Low' } },
+        { course: 'INDUSTRIAL AND LABOUR RELATIONS', expected: { tier: 2, cutoff: 190, competition: 'Medium' } },
+        { course: 'INDUSTRIAL DESIGN', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'INFORMATION AND MEDIA STUDIES', expected: { tier: 2, cutoff: 200, competition: 'Medium' } },
+        { course: 'INFORMATION AND MEDIA TECHNOLOGY', expected: { tier: 2, cutoff: 210, competition: 'Medium' } },
+        { course: 'INFORMATION SYSTEMS', expected: { tier: 2, cutoff: 220, competition: 'High' } },
+        { course: 'INFORMATION SYSTEMS AND TECHNOLOGY', expected: { tier: 2, cutoff: 220, competition: 'High' } },
+      ] as const;
+
+      tunedCourses.forEach(({ course, expected }) => {
+        expect(resolveCourseData(course)).toEqual(expected);
+      });
+    });
   });
 
   describe('Institution Data', () => {
@@ -215,6 +344,31 @@ describe('Admission Calculator', () => {
         expect(institution.name).toBeDefined();
         expect(institution.host_state).toBeDefined();
         expect(typeof institution.minimum_score).toBe('number');
+      });
+    });
+
+    it('should provide structured directory institution records for applysmart-only ids', () => {
+      const forestryIbadan = getApplySmartInstitutionById('FEDCOFOR-IBD');
+      const nursingAnambra = getApplySmartInstitutionById('CNS-ANAMBRA');
+
+      expect(forestryIbadan).toMatchObject({
+        id: 'FEDCOFOR-IBD',
+        name: 'Federal College of Forestry, Ibadan',
+        type: 'Monotechnic',
+        host_state: 'Oyo',
+        minimum_score: 120,
+        data_source: 'applysmart_directory',
+        policy_data_complete: false,
+      });
+
+      expect(nursingAnambra).toMatchObject({
+        id: 'CNS-ANAMBRA',
+        name: 'College of Nursing Sciences, Anambra',
+        type: 'College of Nursing',
+        host_state: 'Anambra',
+        minimum_score: 140,
+        data_source: 'applysmart_directory',
+        policy_data_complete: false,
       });
     });
 
@@ -272,4 +426,3 @@ describe('Admission Calculator', () => {
     });
   });
 });
-
