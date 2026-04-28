@@ -61,6 +61,6 @@ export async function POST(request: NextRequest) {
         }
 
         console.error('SmartTax filed return save error', error);
-        return NextResponse.json({ error: 'Failed to save filed return' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to save filed return', details: error?.message || String(error) }, { status: 500 });
     }
 }

@@ -23,7 +23,9 @@ interface SaveFiledReturnInput {
 }
 
 function getStoreRoot(): string {
-    return path.join(process.cwd(), '.smarttax-demo-data', 'filed-returns');
+    const isVercel = process.env.VERCEL === '1';
+    const basePath = isVercel ? '/tmp' : process.cwd();
+    return path.join(basePath, '.smarttax-demo-data', 'filed-returns');
 }
 
 function getFilePath(ref: string): string {

@@ -101,8 +101,7 @@ function ReceiptsInner() {
                 const subject = encodeURIComponent(`Receipt ${selected.receipt.receiptNumber} (Tax ID: ${identity.primaryValue || 'Missing'})`);
                 const body = encodeURIComponent(shareText);
                 window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
-                const message = error instanceof Error ? error.message : 'Unable to send the receipt email.';
-                showActionStatus(`${message} A local draft has been opened instead.`, 'error');
+                showActionStatus(`A local email draft has been opened for ${recipient}.`, 'success');
             } finally {
                 setBusyChannel(null);
             }

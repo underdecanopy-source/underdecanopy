@@ -1,6 +1,7 @@
 import {
   AdmissionInstitution,
   educationallyLessDevelopedStates,
+  geopoliticalZones,
 } from '@/lib/data/admissionDataset';
 import { getApplySmartInstitutionById } from '@/lib/data/applysmart';
 
@@ -393,40 +394,62 @@ export function calculateAdmissionChance(
   }
 
   // 3. State of origin advantage (Catchment/ELDS/Priority)
-  const catchmentStates = institution.catchment_states ?? [];
-  
+  const hostState = institution.host_state;
+  let catchmentStates = institution.catchment_states ?? [];
+
+  // Infer catchment from the host state's geopolitical zone if empty
+  if (catchmentStates.length === 0 && hostState) {
+    for (const [zone, states] of Object.entries(geopoliticalZones)) {
+      if (states.includes(hostState)) {
+        catchmentStates = states;
+        break;
+      }
+    }
+  }
+
+  const instType = institution.type.toLowerCase();
+  // Include federal institutions but exclude "state polytechnic"
+  const isFederal = (instType.includes('federal') || instType.includes('polytechnic') || instType.includes('college of education') || instType.includes('monotechnic')) && !instType.includes('state');
+  const isState = instType.includes('state');
+
   if (!hasCompletePolicyData) {
-    factors.push('Note: institution-specific quota and catchment policy data is limited for this institution, so this estimate uses general score benchmarks only.');
-  } else if (institution.type === 'Federal University') {
-    if (catchmentStates.includes(normalizedState)) {
-      chance += 20;
-      factors.push(`✓ Your state (${normalizedState}) is in the catchment area, giving you an advantage`);
-    } else if (isELDS) {
-      chance += 15;
-      factors.push(`✓ ELDS concession applies – you may be considered with a slightly lower score`);
-    } else {
-      factors.push(`✗ You are not from a catchment state for this institution`);
-    }
-    
-    // Special UNIABUJA FCT quota
-    if (institutionId.toLowerCase().includes('uniabuja') && normalizedState === 'FCT') {
-      chance += 5;
-      factors.push(`✓ FCT quota (2%) gives you a small advantage at this institution`);
-    }
-  } else if (institution.type === 'State University') {
-    if (institution.state_priority?.includes(normalizedState)) {
+    factors.push('⚠ Note: institution-specific policy data is limited; using score benchmarks and general catchment/indigene policies.');
+  }
+
+  if (isFederal) {
+    if (hostState && normalizedState === hostState) {
       chance += 25;
-      factors.push(`✓ Indigene quota greatly improves your chance at this state university`);
+      factors.push(`✓ Your state (${normalizedState}) is the Host State, giving you a significant advantage`);
+    } else if (catchmentStates.includes(normalizedState)) {
+      chance += 15;
+      factors.push(`✓ Your state (${normalizedState}) is in the Core Catchment Geopolitical Zone, giving you a moderate advantage`);
+    } else if (isELDS) {
+      chance += 10;
+      factors.push(`✓ ELDS concession applies – giving you a slight advantage (quota-based)`);
     } else {
-      factors.push(`✗ Non-indigene status; only 50% of seats are available to non-indigenes`);
+      factors.push(`✗ You are not from the host state or core catchment area for this federal institution`);
+    }
+
+    if (normalizedState === 'FCT' || normalizedState === 'Federal Capital Territory') {
+      chance += 5;
+      factors.push(`✓ FCT quota (2%) gives you a reserved minimum slot at federal institutions`);
+    }
+  } else if (isState) {
+    const ownerStates = institution.state_priority ?? (hostState ? [hostState] : []);
+    if (ownerStates.includes(normalizedState)) {
+      chance += 30;
+      factors.push(`✓ Owner State indigene quota provides a massive advantage, securing 90%+ of slots`);
+    } else {
+      chance -= 10;
+      factors.push(`⚠ Non-indigene status; you are competing for a very limited number of "outsider" slots`);
     }
   }
 
   // 4. Institution and Course competitiveness modifiers
-  const highCompUnis = ['unilag', 'ui', 'unilorin', 'abu', 'unn', 'oau'];
-  if (hasCompletePolicyData && institution.type === 'Federal University' && highCompUnis.some(id => institutionId.toLowerCase().includes(id))) {
+  const highCompUnis = ['lasu', 'unilag', 'unilorin', 'fuoye', 'unizik', 'ui', 'unn', 'uniben', 'oau', 'fulafia', 'abu'];
+  if (highCompUnis.includes(institutionId.toLowerCase())) {
     chance -= 10;
-    factors.push('⚠ This institution is highly competitive');
+    factors.push('⚠ This institution is highly competitive based on application volume');
   }
 
   if (courseInfo.competition === 'Very High' || courseInfo.competition === 'High') {
