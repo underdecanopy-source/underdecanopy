@@ -417,17 +417,21 @@ export function calculateAdmissionChance(
   }
 
   if (isFederal) {
-    if (hostState && normalizedState === hostState) {
-      chance += 25;
-      factors.push(`✓ Your state (${normalizedState}) is the Host State, giving you a significant advantage`);
-    } else if (catchmentStates.includes(normalizedState)) {
-      chance += 15;
-      factors.push(`✓ Your state (${normalizedState}) is in the Core Catchment Geopolitical Zone, giving you a moderate advantage`);
-    } else if (isELDS) {
+    let appliedCatchment = false;
+
+    if (catchmentStates.includes(normalizedState)) {
+      chance += 20;
+      appliedCatchment = true;
+      factors.push(`✓ Your state (${normalizedState}) is in the Catchment Area, giving you a significant advantage`);
+    }
+
+    if (isELDS) {
       chance += 10;
-      factors.push(`✓ ELDS concession applies – giving you a slight advantage (quota-based)`);
-    } else {
-      factors.push(`✗ You are not from the host state or core catchment area for this federal institution`);
+      factors.push(`✓ ELDS concession applies – giving you an additional quota-based advantage`);
+    }
+
+    if (!appliedCatchment && !isELDS) {
+      factors.push(`✗ You are not from the catchment area or an ELDS for this federal institution`);
     }
 
     if (normalizedState === 'FCT' || normalizedState === 'Federal Capital Territory') {
