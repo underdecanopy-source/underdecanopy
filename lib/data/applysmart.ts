@@ -1343,10 +1343,6 @@ export function getApplySmartInstitutionById(id: string): AdmissionInstitution |
   return institutionsById[canonicalId] ?? null;
 }
 
-export const allCourses = Object.keys(resolvedCourseInstitutionMap)
-  .map(course => ({ value: course, label: formatCourseLabel(course) }))
-  .sort((a, b) => a.label.localeCompare(b.label));
-
 export const courseInstitutionAliasMap: Record<string, string> = {
   Accounting: 'ACCOUNTANCY',
   'Banking and Finance': 'BANKING AND FINANCE',
@@ -1402,3 +1398,13 @@ export const courseInstitutionMap: Record<string, string[]> = {
   'Crop Science': universityInstitutionIds,
   'Soil Science': universityInstitutionIds,
 };
+
+const tierCourseLabels: Record<string, string> = {
+  ...Object.fromEntries(firstTierCourses.map(c => [c.value, c.label])),
+  ...Object.fromEntries(secondTierCourses.map(c => [c.value, c.label])),
+  ...Object.fromEntries(thirdTierCourses.map(c => [c.value, c.label])),
+};
+
+export const allCourses = Object.keys(courseInstitutionMap)
+  .map(course => ({ value: course, label: tierCourseLabels[course] || formatCourseLabel(course) }))
+  .sort((a, b) => a.label.localeCompare(b.label));
