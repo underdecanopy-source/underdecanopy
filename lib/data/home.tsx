@@ -68,7 +68,7 @@ export const coreServices = [
       title: 'NaijaPolis',
       description:
         'A modular, open-source political campaign management platform built for Nigerian electoral conditions. Track analytics, canvassing, and volunteer activities.',
-      link: 'http://localhost:3000',
+      link: '/naijapolis',
     },
   ];
   
