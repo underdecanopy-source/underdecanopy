@@ -63,6 +63,13 @@ export const coreServices = [
         'Our digital receipt system not only makes receiving receipts more convenient for your customers, it takes the stress out of customers having to hold onto their receipts when tax time rolls around.',
       link: '/smarttax',
     },
+    {
+      icon: <Map size={40} />,
+      title: 'NaijaPolis',
+      description:
+        'A modular, open-source political campaign management platform built for Nigerian electoral conditions. Track analytics, canvassing, and volunteer activities.',
+      link: 'http://localhost:3000',
+    },
   ];
   
   export const professionalServices = [
