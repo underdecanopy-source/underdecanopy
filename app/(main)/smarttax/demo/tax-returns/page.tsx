@@ -30,7 +30,7 @@ export default function TaxReturnsPage() {
     const [selectedAuditReturnId, setSelectedAuditReturnId] = useState<string | null>(null);
     const [statusMessage, setStatusMessage] = useState<StatusMessage>(null);
     const [busyReturnId, setBusyReturnId] = useState<string | null>(null);
-    const now = new Date();
+    const now = useMemo(() => new Date(), []);
     const [year, setYear] = useState<string>(String(now.getFullYear()));
     const [month, setMonth] = useState<string>(String(now.getMonth() + 1).padStart(2, '0'));
     const [pitForm, setPitForm] = useState({
