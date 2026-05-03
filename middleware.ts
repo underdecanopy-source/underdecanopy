@@ -44,7 +44,7 @@ export default function middleware(req: NextRequest) {
   }
 
   // Sub-site names that have their own /sites/<name>/ folder
-  const subSites = ['coophub', 'applysmart', 'smarttax', 'swiftwheel', 'techlift', 'trustfix'];
+  const subSites = ['coophub', 'applysmart', 'smarttax', 'swiftwheel', 'techlift', 'trustfix', 'naijapolis'];
 
   // On the main domain, if the path starts with a sub-site name, let Next.js
   // route it to the (main) route group which has the full page content
