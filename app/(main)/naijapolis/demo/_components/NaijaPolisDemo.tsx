@@ -28,6 +28,7 @@ import {
   Settings,
   ShieldCheck,
   Target,
+  Trash2,
   Users,
   X,
 } from 'lucide-react';
@@ -66,9 +67,13 @@ import type {
   AppSettings,
   AuditEntry,
   CanvassRecord,
+  CampaignSelfDetermination,
+  DeterminationCategory,
+  DeterminationStatus,
   DonationStatus,
   Event,
   Goal,
+  GoalType,
   ModuleId,
   NaijaPolisState,
   PaymentChannel,
@@ -182,6 +187,31 @@ const donationStatuses: Array<{ value: DonationStatus; label: string }> = [
   { value: 'pledged', label: 'Pledged' },
 ];
 
+const goalTypes: Array<{ value: GoalType; label: string; unit: string }> = [
+  { value: 'donation', label: 'Successful Donations', unit: 'currency' },
+  { value: 'volunteers', label: 'Volunteers', unit: 'people' },
+  { value: 'canvass', label: 'Canvass Visits', unit: 'visits' },
+  { value: 'rsvp', label: 'Event RSVPs', unit: 'RSVPs' },
+  { value: 'advocacy', label: 'Advocacy Messages', unit: 'messages' },
+  { value: 'whatsapp_response', label: 'WhatsApp Responses', unit: 'responses' },
+  { value: 'events', label: 'Events Created', unit: 'events' },
+  { value: 'people', label: 'People in Database', unit: 'records' },
+];
+
+const determinationCategories: Array<{ value: DeterminationCategory; label: string }> = [
+  { value: 'priority', label: 'Priority' },
+  { value: 'pledge', label: 'Pledge' },
+  { value: 'boundary', label: 'Boundary' },
+  { value: 'message', label: 'Message' },
+  { value: 'risk', label: 'Risk' },
+];
+
+const determinationStatuses: Array<{ value: DeterminationStatus; label: string }> = [
+  { value: 'active', label: 'Active' },
+  { value: 'monitoring', label: 'Monitoring' },
+  { value: 'complete', label: 'Complete' },
+];
+
 type Metrics = ReturnType<typeof getMetrics>;
 
 function audit(module: ModuleId, action: string, detail: string): AuditEntry {
@@ -224,6 +254,7 @@ function getMetrics(state: NaijaPolisState) {
     }, {}),
   ).sort((a, b) => b[1] - a[1]);
   const whatsappOpen = state.whatsapp_messages.filter((message) => message.status !== 'responded').length;
+  const whatsappResponses = state.whatsapp_messages.filter((message) => message.status === 'responded').length;
   const upcomingEvents = state.events.filter((event) => new Date(event.date) >= new Date()).length;
 
   return {
@@ -236,6 +267,7 @@ function getMetrics(state: NaijaPolisState) {
     support,
     topIssues,
     whatsappOpen,
+    whatsappResponses,
     upcomingEvents,
     peopleCount: state.people.length,
     eventCount: state.events.length,
@@ -246,16 +278,40 @@ function getMetrics(state: NaijaPolisState) {
 
 function deriveGoals(goals: Goal[], metrics: Metrics) {
   return goals.map((goal) => {
-    const current_value =
-      goal.type === 'donation'
-        ? metrics.totalRaised
-        : goal.type === 'volunteers'
-          ? metrics.volunteers
-          : goal.type === 'canvass'
-            ? metrics.canvassCount
-            : metrics.rsvps;
+    const current_value = getGoalCurrentValue(goal.type, metrics);
     return { ...goal, current_value };
   });
+}
+
+function getGoalCurrentValue(type: GoalType, metrics: Metrics) {
+  switch (type) {
+    case 'donation':
+      return metrics.totalRaised;
+    case 'volunteers':
+      return metrics.volunteers;
+    case 'canvass':
+      return metrics.canvassCount;
+    case 'rsvp':
+      return metrics.rsvps;
+    case 'advocacy':
+      return metrics.advocacyCount;
+    case 'whatsapp_response':
+      return metrics.whatsappResponses;
+    case 'events':
+      return metrics.eventCount;
+    case 'people':
+      return metrics.peopleCount;
+    default:
+      return 0;
+  }
+}
+
+function getGoalTypeLabel(type: GoalType) {
+  return goalTypes.find((goalType) => goalType.value === type)?.label ?? type;
+}
+
+function formatGoalValue(type: GoalType, value: number, currency: string) {
+  return type === 'donation' ? formatCurrency(value, currency) : value.toLocaleString();
 }
 
 function getActivitySummary(activity: CampaignActivity, currency: string) {
@@ -687,6 +743,12 @@ export function NaijaPolisDemo() {
       campaign_name: sanitizeText(settings.campaign_name || 'Campaign', 120),
       candidate_name: sanitizeText(settings.candidate_name, 120),
       party: sanitizeText(settings.party, 80),
+      campaign_slogan: sanitizeText(settings.campaign_slogan, 140),
+      mission_statement: sanitizeLongText(settings.mission_statement, 700),
+      target_voter_segment: sanitizeLongText(settings.target_voter_segment, 500),
+      priority_wards: sanitizeLongText(settings.priority_wards, 500),
+      decision_rules: sanitizeLongText(settings.decision_rules, 700),
+      victory_threshold: Math.max(0, Math.round(Number(settings.victory_threshold) || 0)),
       lga: sanitizeText(settings.lga, 80),
       whatsapp_number: normalizePhone(settings.whatsapp_number),
       operator_pin: sanitizeText(settings.operator_pin, 12),
@@ -713,6 +775,139 @@ export function NaijaPolisDemo() {
       audit_log: [audit('settings', 'save_settings', `Updated ${cleaned.platform_name}`), ...current.audit_log],
     }));
     return '';
+  }
+
+  function addGoal(data: { name: string; description: string; type: GoalType; target: string }) {
+    const name = sanitizeText(data.name, 120);
+    const description = sanitizeLongText(data.description, 400);
+    const target = Math.round(Number(data.target));
+    if (!name || !description || !Number.isFinite(target) || target <= 0) {
+      return 'Goal name, description and a positive target are required.';
+    }
+
+    const goal: Goal = {
+      id: generateId('goal'),
+      name,
+      description,
+      type: data.type,
+      target,
+      current_value: 0,
+      created_at: nowISO(),
+    };
+
+    updateState((current) => ({
+      ...current,
+      goals: [goal, ...current.goals],
+      audit_log: [audit('settings', 'create_goal', `${goal.name}: ${goal.target}`), ...current.audit_log],
+    }));
+    return '';
+  }
+
+  function updateGoal(goalId: string, data: { name: string; description: string; type: GoalType; target: string }) {
+    const name = sanitizeText(data.name, 120);
+    const description = sanitizeLongText(data.description, 400);
+    const target = Math.round(Number(data.target));
+    if (!name || !description || !Number.isFinite(target) || target <= 0) {
+      return 'Goal name, description and a positive target are required.';
+    }
+
+    updateState((current) => ({
+      ...current,
+      goals: current.goals.map((goal) =>
+        goal.id === goalId
+          ? { ...goal, name, description, type: data.type, target }
+          : goal,
+      ),
+      audit_log: [audit('settings', 'update_goal', `${name}: ${target}`), ...current.audit_log],
+    }));
+    return '';
+  }
+
+  function deleteGoal(goalId: string) {
+    const goal = state.goals.find((item) => item.id === goalId);
+    if (!goal) return;
+    const confirmed = window.confirm(`Delete goal "${goal.name}"?`);
+    if (!confirmed) return;
+
+    updateState((current) => ({
+      ...current,
+      goals: current.goals.filter((item) => item.id !== goalId),
+      audit_log: [audit('settings', 'delete_goal', goal.name), ...current.audit_log],
+    }));
+  }
+
+  function addDetermination(data: {
+    title: string;
+    category: DeterminationCategory;
+    description: string;
+    owner: string;
+    status: DeterminationStatus;
+  }) {
+    const title = sanitizeText(data.title, 120);
+    const description = sanitizeLongText(data.description, 500);
+    const owner = sanitizeText(data.owner, 80);
+    if (!title || !description || !owner) {
+      return 'Title, owner and description are required.';
+    }
+
+    const determination: CampaignSelfDetermination = {
+      id: generateId('determine'),
+      title,
+      category: data.category,
+      description,
+      owner,
+      status: data.status,
+      created_at: nowISO(),
+    };
+
+    updateState((current) => ({
+      ...current,
+      self_determinations: [determination, ...current.self_determinations],
+      audit_log: [audit('settings', 'create_determination', determination.title), ...current.audit_log],
+    }));
+    return '';
+  }
+
+  function updateDetermination(
+    determinationId: string,
+    data: {
+      title: string;
+      category: DeterminationCategory;
+      description: string;
+      owner: string;
+      status: DeterminationStatus;
+    },
+  ) {
+    const title = sanitizeText(data.title, 120);
+    const description = sanitizeLongText(data.description, 500);
+    const owner = sanitizeText(data.owner, 80);
+    if (!title || !description || !owner) {
+      return 'Title, owner and description are required.';
+    }
+
+    updateState((current) => ({
+      ...current,
+      self_determinations: current.self_determinations.map((item) =>
+        item.id === determinationId
+          ? { ...item, title, category: data.category, description, owner, status: data.status }
+          : item,
+      ),
+      audit_log: [audit('settings', 'update_determination', title), ...current.audit_log],
+    }));
+    return '';
+  }
+
+  function deleteDetermination(determinationId: string) {
+    const determination = state.self_determinations.find((item) => item.id === determinationId);
+    if (!determination) return;
+    const confirmed = window.confirm(`Delete determination "${determination.title}"?`);
+    if (!confirmed) return;
+
+    updateState((current) => ({
+      ...current,
+      self_determinations: current.self_determinations.filter((item) => item.id !== determinationId),
+      audit_log: [audit('settings', 'delete_determination', determination.title), ...current.audit_log],
+    }));
   }
 
   function exportData() {
@@ -899,7 +1094,14 @@ export function NaijaPolisDemo() {
               {activeModule === 'settings' && (
                 <SettingsView
                   state={state}
+                  goals={derivedGoals}
                   onSaveSettings={saveSettings}
+                  onAddGoal={addGoal}
+                  onUpdateGoal={updateGoal}
+                  onDeleteGoal={deleteGoal}
+                  onAddDetermination={addDetermination}
+                  onUpdateDetermination={updateDetermination}
+                  onDeleteDetermination={deleteDetermination}
                   onExportData={exportData}
                   onResetDemo={resetDemo}
                   onLock={lockWorkspace}
@@ -1428,14 +1630,15 @@ function GoalsView({ goals, metrics, currency }: { goals: Goal[]; metrics: Metri
       <div className="grid gap-4 md:grid-cols-2">
         {goals.map((goal) => {
           const percent = Math.min(100, Math.round((goal.current_value / goal.target) * 100));
-          const displayValue = goal.type === 'donation' ? formatCurrency(goal.current_value, currency) : goal.current_value.toLocaleString();
-          const displayTarget = goal.type === 'donation' ? formatCurrency(goal.target, currency) : goal.target.toLocaleString();
+          const displayValue = formatGoalValue(goal.type, goal.current_value, currency);
+          const displayTarget = formatGoalValue(goal.type, goal.target, currency);
           return (
             <div key={goal.id} className="rounded-lg bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
                   <h2 className="font-semibold text-gray-900">{goal.name}</h2>
                   <p className="mt-1 text-sm text-gray-500">{goal.description}</p>
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-gray-400">{getGoalTypeLabel(goal.type)}</p>
                 </div>
                 <span className="text-2xl font-bold text-green-700">{percent}%</span>
               </div>
@@ -1755,6 +1958,28 @@ function ReportsView({
           <StatCard label="Advocacy" value={String(metrics.advocacyCount)} icon={Megaphone} color="bg-amber-600" />
         </div>
         <div className="mt-8 grid gap-6 xl:grid-cols-2">
+          <ReportPanel title="Campaign Charter">
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Slogan</p>
+                <p className="font-medium text-gray-900">{state.settings.campaign_slogan || 'Not set'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Mission</p>
+                <p className="text-gray-600">{state.settings.mission_statement || 'Not set'}</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Target Voters</p>
+                  <p className="text-gray-600">{state.settings.target_voter_segment || 'Not set'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Victory Threshold</p>
+                  <p className="font-semibold text-gray-900">{state.settings.victory_threshold.toLocaleString()} votes</p>
+                </div>
+              </div>
+            </div>
+          </ReportPanel>
           <ReportPanel title="Goal Performance">
             <div className="space-y-4">
               {goals.map((goal) => {
@@ -1802,6 +2027,19 @@ function ReportsView({
               <div className="flex justify-between"><span>Retention</span><span className="font-semibold">{state.settings.data_retention_days} days</span></div>
             </div>
           </ReportPanel>
+          <ReportPanel title="Determinations">
+            <div className="space-y-3">
+              {state.self_determinations.slice(0, 6).map((determination) => (
+                <div key={determination.id} className="rounded-md border border-gray-200 p-3">
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <span className="font-semibold text-gray-900">{determination.title}</span>
+                    <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-semibold capitalize text-gray-600">{determination.status}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">{determination.description}</p>
+                </div>
+              ))}
+            </div>
+          </ReportPanel>
         </div>
       </div>
     </>
@@ -1819,20 +2057,66 @@ function ReportPanel({ title, children }: { title: string; children: ReactNode }
 
 function SettingsView({
   state,
+  goals,
   onSaveSettings,
+  onAddGoal,
+  onUpdateGoal,
+  onDeleteGoal,
+  onAddDetermination,
+  onUpdateDetermination,
+  onDeleteDetermination,
   onExportData,
   onResetDemo,
   onLock,
 }: {
   state: NaijaPolisState;
+  goals: Goal[];
   onSaveSettings: (settings: AppSettings) => string;
+  onAddGoal: (data: { name: string; description: string; type: GoalType; target: string }) => string;
+  onUpdateGoal: (goalId: string, data: { name: string; description: string; type: GoalType; target: string }) => string;
+  onDeleteGoal: (goalId: string) => void;
+  onAddDetermination: (data: {
+    title: string;
+    category: DeterminationCategory;
+    description: string;
+    owner: string;
+    status: DeterminationStatus;
+  }) => string;
+  onUpdateDetermination: (
+    determinationId: string,
+    data: {
+      title: string;
+      category: DeterminationCategory;
+      description: string;
+      owner: string;
+      status: DeterminationStatus;
+    },
+  ) => string;
+  onDeleteDetermination: (determinationId: string) => void;
   onExportData: () => void;
   onResetDemo: () => void;
   onLock: () => void;
 }) {
   const [form, setForm] = useState<AppSettings>(state.settings);
+  const [goalForm, setGoalForm] = useState({
+    name: '',
+    description: '',
+    type: 'donation' as GoalType,
+    target: '',
+  });
+  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
+  const [determinationForm, setDeterminationForm] = useState({
+    title: '',
+    category: 'priority' as DeterminationCategory,
+    description: '',
+    owner: '',
+    status: 'active' as DeterminationStatus,
+  });
+  const [editingDeterminationId, setEditingDeterminationId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const [goalError, setGoalError] = useState('');
+  const [determinationError, setDeterminationError] = useState('');
 
   useEffect(() => setForm(state.settings), [state.settings]);
 
@@ -1846,6 +2130,61 @@ function SettingsView({
     setError(result);
     setSaved(!result);
     if (!result) window.setTimeout(() => setSaved(false), 2500);
+  }
+
+  function resetGoalForm() {
+    setGoalForm({ name: '', description: '', type: 'donation', target: '' });
+    setEditingGoalId(null);
+    setGoalError('');
+  }
+
+  function submitGoal() {
+    const result = editingGoalId ? onUpdateGoal(editingGoalId, goalForm) : onAddGoal(goalForm);
+    setGoalError(result);
+    if (!result) resetGoalForm();
+  }
+
+  function editGoal(goal: Goal) {
+    setGoalForm({
+      name: goal.name,
+      description: goal.description,
+      type: goal.type,
+      target: String(goal.target),
+    });
+    setEditingGoalId(goal.id);
+    setGoalError('');
+  }
+
+  function resetDeterminationForm() {
+    setDeterminationForm({
+      title: '',
+      category: 'priority',
+      description: '',
+      owner: '',
+      status: 'active',
+    });
+    setEditingDeterminationId(null);
+    setDeterminationError('');
+  }
+
+  function submitDetermination() {
+    const result = editingDeterminationId
+      ? onUpdateDetermination(editingDeterminationId, determinationForm)
+      : onAddDetermination(determinationForm);
+    setDeterminationError(result);
+    if (!result) resetDeterminationForm();
+  }
+
+  function editDetermination(determination: CampaignSelfDetermination) {
+    setDeterminationForm({
+      title: determination.title,
+      category: determination.category,
+      description: determination.description,
+      owner: determination.owner,
+      status: determination.status,
+    });
+    setEditingDeterminationId(determination.id);
+    setDeterminationError('');
   }
 
   return (
@@ -1868,6 +2207,30 @@ function SettingsView({
                 <input className="form-input" value={form.party} onChange={(event) => update('party', event.target.value)} />
               </FormField>
             </div>
+          </SettingsPanel>
+          <SettingsPanel title="Campaign Self-Determination" icon={Target}>
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField label="Campaign Slogan">
+                <input className="form-input" value={form.campaign_slogan} onChange={(event) => update('campaign_slogan', event.target.value)} />
+              </FormField>
+              <FormField label="Victory Threshold">
+                <input type="number" min="0" className="form-input" value={form.victory_threshold} onChange={(event) => update('victory_threshold', Number(event.target.value))} />
+              </FormField>
+            </div>
+            <FormField label="Mission Statement">
+              <textarea className="form-input min-h-24" value={form.mission_statement} onChange={(event) => update('mission_statement', event.target.value)} />
+            </FormField>
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField label="Target Voter Segment">
+                <textarea className="form-input min-h-24" value={form.target_voter_segment} onChange={(event) => update('target_voter_segment', event.target.value)} />
+              </FormField>
+              <FormField label="Priority Wards">
+                <textarea className="form-input min-h-24" value={form.priority_wards} onChange={(event) => update('priority_wards', event.target.value)} />
+              </FormField>
+            </div>
+            <FormField label="Decision Rules">
+              <textarea className="form-input min-h-24" value={form.decision_rules} onChange={(event) => update('decision_rules', event.target.value)} />
+            </FormField>
           </SettingsPanel>
           <SettingsPanel title="Location and Payments" icon={MapPin}>
             <div className="grid gap-4 md:grid-cols-2">
@@ -1921,6 +2284,128 @@ function SettingsView({
               <FormField label="Data Retention Days">
                 <input type="number" min="30" max="3650" className="form-input" value={form.data_retention_days} onChange={(event) => update('data_retention_days', Number(event.target.value))} />
               </FormField>
+            </div>
+          </SettingsPanel>
+          <SettingsPanel title="Goal Studio" icon={BarChart3}>
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField label="Goal Name">
+                <input className="form-input" value={goalForm.name} onChange={(event) => setGoalForm((current) => ({ ...current, name: event.target.value }))} />
+              </FormField>
+              <FormField label="Metric">
+                <select className="form-input" value={goalForm.type} onChange={(event) => setGoalForm((current) => ({ ...current, type: event.target.value as GoalType }))}>
+                  {goalTypes.map((goalType) => <option key={goalType.value} value={goalType.value}>{goalType.label}</option>)}
+                </select>
+              </FormField>
+              <FormField label="Target">
+                <input type="number" min="1" className="form-input" value={goalForm.target} onChange={(event) => setGoalForm((current) => ({ ...current, target: event.target.value }))} />
+              </FormField>
+              <FormField label="Description">
+                <input className="form-input" value={goalForm.description} onChange={(event) => setGoalForm((current) => ({ ...current, description: event.target.value }))} />
+              </FormField>
+            </div>
+            {goalError && <p className="mb-3 text-sm text-red-600">{goalError}</p>}
+            <div className="mb-5 flex flex-wrap gap-2">
+              <button type="button" onClick={submitGoal} className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+                {editingGoalId ? 'Update Goal' : 'Add Goal'}
+              </button>
+              {editingGoalId && (
+                <button type="button" onClick={resetGoalForm} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50">
+                  Cancel Edit
+                </button>
+              )}
+            </div>
+            <div className="space-y-3">
+              {goals.map((goal) => {
+                const percent = Math.min(100, Math.round((goal.current_value / goal.target) * 100));
+                return (
+                  <div key={goal.id} className="rounded-md border border-gray-200 p-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-semibold text-gray-900">{goal.name}</h3>
+                          <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600">{getGoalTypeLabel(goal.type)}</span>
+                        </div>
+                        <p className="mt-1 text-sm text-gray-500">{goal.description}</p>
+                        <p className="mt-2 text-xs text-gray-500">
+                          {formatGoalValue(goal.type, goal.current_value, state.settings.currency)} of {formatGoalValue(goal.type, goal.target, state.settings.currency)}
+                        </p>
+                        <div className="mt-2 h-2 rounded-full bg-gray-100">
+                          <div className="h-2 rounded-full bg-green-600" style={{ width: `${percent}%` }} />
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 gap-2">
+                        <button type="button" onClick={() => editGoal(goal)} className="rounded-md border border-gray-300 px-3 py-2 text-xs font-semibold hover:bg-gray-50">
+                          Edit
+                        </button>
+                        <button type="button" onClick={() => onDeleteGoal(goal.id)} className="inline-flex items-center gap-1 rounded-md border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50">
+                          <Trash2 className="h-3 w-3" />
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </SettingsPanel>
+          <SettingsPanel title="Determination Register" icon={ShieldCheck}>
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField label="Title">
+                <input className="form-input" value={determinationForm.title} onChange={(event) => setDeterminationForm((current) => ({ ...current, title: event.target.value }))} />
+              </FormField>
+              <FormField label="Owner">
+                <input className="form-input" value={determinationForm.owner} onChange={(event) => setDeterminationForm((current) => ({ ...current, owner: event.target.value }))} />
+              </FormField>
+              <FormField label="Category">
+                <select className="form-input" value={determinationForm.category} onChange={(event) => setDeterminationForm((current) => ({ ...current, category: event.target.value as DeterminationCategory }))}>
+                  {determinationCategories.map((category) => <option key={category.value} value={category.value}>{category.label}</option>)}
+                </select>
+              </FormField>
+              <FormField label="Status">
+                <select className="form-input" value={determinationForm.status} onChange={(event) => setDeterminationForm((current) => ({ ...current, status: event.target.value as DeterminationStatus }))}>
+                  {determinationStatuses.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}
+                </select>
+              </FormField>
+            </div>
+            <FormField label="Description">
+              <textarea className="form-input min-h-24" value={determinationForm.description} onChange={(event) => setDeterminationForm((current) => ({ ...current, description: event.target.value }))} />
+            </FormField>
+            {determinationError && <p className="mb-3 text-sm text-red-600">{determinationError}</p>}
+            <div className="mb-5 flex flex-wrap gap-2">
+              <button type="button" onClick={submitDetermination} className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+                {editingDeterminationId ? 'Update Determination' : 'Add Determination'}
+              </button>
+              {editingDeterminationId && (
+                <button type="button" onClick={resetDeterminationForm} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50">
+                  Cancel Edit
+                </button>
+              )}
+            </div>
+            <div className="space-y-3">
+              {state.self_determinations.map((determination) => (
+                <div key={determination.id} className="rounded-md border border-gray-200 p-3">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-semibold text-gray-900">{determination.title}</h3>
+                        <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold capitalize text-blue-700">{determination.category}</span>
+                        <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-semibold capitalize text-green-700">{determination.status}</span>
+                      </div>
+                      <p className="mt-1 text-sm text-gray-600">{determination.description}</p>
+                      <p className="mt-2 text-xs text-gray-400">Owner: {determination.owner}</p>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <button type="button" onClick={() => editDetermination(determination)} className="rounded-md border border-gray-300 px-3 py-2 text-xs font-semibold hover:bg-gray-50">
+                        Edit
+                      </button>
+                      <button type="button" onClick={() => onDeleteDetermination(determination.id)} className="inline-flex items-center gap-1 rounded-md border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50">
+                        <Trash2 className="h-3 w-3" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </SettingsPanel>
           {error && <p className="text-sm text-red-600">{error}</p>}

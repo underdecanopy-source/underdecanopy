@@ -27,9 +27,19 @@ export type Source = 'web' | 'mobile' | 'ussd' | 'whatsapp';
 export type SupportLevel = 'strong' | 'lean' | 'neutral' | 'opposed';
 export type PaymentChannel = 'paystack' | 'flutterwave' | 'cash' | 'bank_transfer' | 'ussd' | 'other';
 export type DonationStatus = 'successful' | 'pending' | 'pledged';
-export type GoalType = 'donation' | 'volunteers' | 'canvass' | 'rsvp';
+export type GoalType =
+  | 'donation'
+  | 'volunteers'
+  | 'canvass'
+  | 'rsvp'
+  | 'advocacy'
+  | 'whatsapp_response'
+  | 'events'
+  | 'people';
 export type WhatsAppDirection = 'incoming' | 'outgoing';
 export type WhatsAppStatus = 'new' | 'in_review' | 'responded';
+export type DeterminationCategory = 'priority' | 'pledge' | 'boundary' | 'message' | 'risk';
+export type DeterminationStatus = 'active' | 'monitoring' | 'complete';
 
 export interface PollingUnit {
   id: string;
@@ -120,6 +130,16 @@ export interface Goal {
   created_at: string;
 }
 
+export interface CampaignSelfDetermination {
+  id: string;
+  title: string;
+  category: DeterminationCategory;
+  description: string;
+  owner: string;
+  status: DeterminationStatus;
+  created_at: string;
+}
+
 export interface CanvassRecord {
   id: string;
   person_id: string;
@@ -166,6 +186,12 @@ export interface AppSettings {
   campaign_name: string;
   candidate_name: string;
   party: string;
+  campaign_slogan: string;
+  mission_statement: string;
+  target_voter_segment: string;
+  priority_wards: string;
+  decision_rules: string;
+  victory_threshold: number;
   timezone: string;
   currency: string;
   payment_provider: string;
@@ -198,6 +224,7 @@ export interface NaijaPolisState {
   canvass_records: CanvassRecord[];
   advocacy_contacts: AdvocacyContact[];
   whatsapp_messages: WhatsAppMessage[];
+  self_determinations: CampaignSelfDetermination[];
   settings: AppSettings;
   audit_log: AuditEntry[];
 }
