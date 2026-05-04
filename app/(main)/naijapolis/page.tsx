@@ -11,14 +11,14 @@ export default function NaijaPolisPage() {
 
       <main>
         {/* Hero Section */}
-        <section className="bg-green-700 text-white py-12 md:py-20">
+        <section className="bg-gray-900 text-white py-12 md:py-20">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-4xl font-bold mb-4">NaijaPolis: Empowering Nigerian Political Campaigns</h2>
             <p className="text-lg mb-6 max-w-3xl mx-auto">
               A comprehensive, modular, open-source political campaign management platform specifically engineered for Nigerian electoral conditions. Track real-time activities, manage finances, and empower field operations effortlessly.
             </p>
-            <a href="https://wa.me/2348064852108" className="bg-white text-green-700 px-6 py-3 rounded shadow font-semibold hover:bg-gray-100 transition">
-              Request a Demo
+            <a href="/naijapolis/demo" className="bg-white text-gray-900 px-6 py-3 rounded shadow font-semibold hover:bg-gray-100 transition">
+              Try a Demo
             </a>
           </div>
         </section>

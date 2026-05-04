@@ -8,8 +8,14 @@
 
 import { Phone, MessageCircle, Mail } from 'lucide-react';
 import { CONTACT_CONFIG } from '@/lib/config/contact';
+import { usePathname } from 'next/navigation';
 
 export function ContactBar() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/naijapolis/demo')) {
+    return null;
+  }
 
   return (
     <>
@@ -82,4 +88,3 @@ export function ContactBar() {
     </>
   );
 }
-

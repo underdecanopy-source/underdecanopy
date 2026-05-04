@@ -39,6 +39,20 @@ export const navItems = {
         { href: '#faq', label: 'FAQ' },
         { href: '#demo', label: 'Demo' },
     ],
+    '/naijapolis': [
+        { href: '/naijapolis', label: 'Home' },
+        { href: '#features', label: 'Features' },
+        { href: '#analytics', label: 'Analytics' },
+        { href: '#contact', label: 'Contact' },
+        { href: '/naijapolis/demo', label: 'Demo' },
+    ],
+    '/naijapolis/demo': [
+        { href: '/naijapolis', label: 'NaijaPolis' },
+        { href: '/naijapolis#features', label: 'Features' },
+        { href: '/naijapolis#analytics', label: 'Analytics' },
+        { href: '/naijapolis#contact', label: 'Contact' },
+        { href: '/naijapolis/demo', label: 'Demo' },
+    ],
     '/swiftwheel': [
         { href: '/swiftwheel', label: 'Home' },
         { href: '#services', label: 'Services' },

@@ -12,3 +12,5 @@ tsc-local-output.txt
 git-status.txt
 git-status-utf8.txt
 tsconfig.tsbuildinfo
+naijapolis-dev.out.log
+naijapolis-dev.err.log
