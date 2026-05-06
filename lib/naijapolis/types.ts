@@ -55,6 +55,9 @@ export interface Person {
   full_name: string;
   phone: string;
   email?: string;
+  state?: string;
+  lga?: string;
+  ward?: string;
   polling_unit_id?: string;
   tags: string[];
   custom_fields: Record<string, unknown>;

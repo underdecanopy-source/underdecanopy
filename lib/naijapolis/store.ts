@@ -1,7 +1,7 @@
 import { INITIAL_NAIJAPOLIS_STATE } from './data';
 import type { NaijaPolisState } from './types';
 
-const STORAGE_KEY = 'underdecanopy.naijapolis.demo.v1';
+const STORAGE_KEY = 'underdecanopy.naijapolis.demo.v2';
 
 function cloneInitialState(): NaijaPolisState {
   return JSON.parse(JSON.stringify(INITIAL_NAIJAPOLIS_STATE)) as NaijaPolisState;

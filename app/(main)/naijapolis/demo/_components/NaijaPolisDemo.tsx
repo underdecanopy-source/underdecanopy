@@ -36,6 +36,15 @@ import { useEffect, useMemo, useState, type ComponentType, type FormEvent, type 
 import Link from 'next/link';
 import { POLLING_UNITS } from '@/lib/naijapolis/data';
 import {
+  getCoveredStateOptions,
+  getLgaOptions,
+  getPersonLocationLabel,
+  getPollingUnitById,
+  getPollingUnitOptions,
+  getWardOptions,
+  isPollingUnitSelectionValid,
+} from '@/lib/naijapolis/locations';
+import {
   buildEventShareText,
   buildMailtoUrl,
   buildWhatsAppUrl,
@@ -109,46 +118,6 @@ const issueOptions = [
   'Water Supply',
   'Housing',
   'Other',
-];
-
-const nigerianStates = [
-  'Abia',
-  'Adamawa',
-  'Akwa Ibom',
-  'Anambra',
-  'Bauchi',
-  'Bayelsa',
-  'Benue',
-  'Borno',
-  'Cross River',
-  'Delta',
-  'Ebonyi',
-  'Edo',
-  'Ekiti',
-  'Enugu',
-  'FCT Abuja',
-  'Gombe',
-  'Imo',
-  'Jigawa',
-  'Kaduna',
-  'Kano',
-  'Katsina',
-  'Kebbi',
-  'Kogi',
-  'Kwara',
-  'Lagos',
-  'Nasarawa',
-  'Niger',
-  'Ogun',
-  'Ondo',
-  'Osun',
-  'Oyo',
-  'Plateau',
-  'Rivers',
-  'Sokoto',
-  'Taraba',
-  'Yobe',
-  'Zamfara',
 ];
 
 const supportConfig: Record<SupportLevel, { label: string; color: string; bg: string; dot: string }> = {
@@ -228,18 +197,39 @@ function sortByDateDesc<T extends { created_at: string }>(items: T[]) {
   return [...items].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 }
 
+function countPeopleWithTag(people: Person[], tag: string) {
+  return people.filter((person) => person.tags.includes(tag)).length;
+}
+
 function getMetrics(state: NaijaPolisState) {
   const successfulTransactions = state.transactions.filter((tx) => tx.status === 'successful');
   const pendingTransactions = state.transactions.filter((tx) => tx.status === 'pending');
-  const pledgedTransactions = state.transactions.filter((tx) => tx.status === 'pledged');
+  const standalonePledgedTransactions = state.transactions.filter(
+    (tx) =>
+      tx.status === 'pledged' &&
+      !state.pledges.some((pledge) => pledge.person_id === tx.person_id && pledge.amount === tx.amount),
+  );
   const totalRaised = successfulTransactions.reduce((sum, tx) => sum + tx.amount, 0);
   const pendingAmount = pendingTransactions.reduce((sum, tx) => sum + tx.amount, 0);
   const pledgedAmount =
     state.pledges.filter((pledge) => !pledge.fulfilled).reduce((sum, pledge) => sum + pledge.amount, 0) +
-    pledgedTransactions.reduce((sum, tx) => sum + tx.amount, 0);
-  const volunteers = state.people.filter((person) => person.tags.includes('volunteer')).length;
+    standalonePledgedTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+  const volunteers = countPeopleWithTag(state.people, 'volunteer');
+  const donors = new Set([
+    ...state.people.filter((person) => person.tags.includes('donor')).map((person) => person.id),
+    ...state.transactions.map((transaction) => transaction.person_id),
+    ...state.pledges.map((pledge) => pledge.person_id),
+  ]).size;
+  const canvassers = new Set([
+    ...state.people
+      .filter((person) => person.tags.some((tag) => ['canvasser', 'ward_coordinator'].includes(tag)))
+      .map((person) => person.id),
+    ...state.canvass_records.map((record) => record.agent_name.toLowerCase()),
+  ]).size;
+  const supporters = countPeopleWithTag(state.people, 'supporter');
   const canvassCount = state.canvass_records.length;
   const rsvps = state.event_rsvps.length;
+  const rsvpPeople = new Set(state.event_rsvps.map((rsvp) => rsvp.person_id)).size;
   const support = state.canvass_records.reduce<Record<SupportLevel, number>>(
     (acc, record) => {
       acc[record.support_level] += 1;
@@ -256,21 +246,48 @@ function getMetrics(state: NaijaPolisState) {
   const whatsappOpen = state.whatsapp_messages.filter((message) => message.status !== 'responded').length;
   const whatsappResponses = state.whatsapp_messages.filter((message) => message.status === 'responded').length;
   const upcomingEvents = state.events.filter((event) => new Date(event.date) >= new Date()).length;
+  const successfulDonationCount = successfulTransactions.length;
+  const pendingDonationCount = pendingTransactions.length;
+  const unfulfilledPledgeCount = state.pledges.filter((pledge) => !pledge.fulfilled).length;
+  const averageSuccessfulDonation = successfulDonationCount > 0 ? Math.round(totalRaised / successfulDonationCount) : 0;
+  const totalCommitted = totalRaised + pendingAmount + pledgedAmount;
+  const representedStates = new Set(state.people.map((person) => person.state).filter(Boolean)).size;
+  const representedLgas = new Set(
+    state.people.map((person) => [person.state, person.lga].filter(Boolean).join('|')).filter(Boolean),
+  ).size;
+  const representedWards = new Set(
+    state.people.map((person) => [person.state, person.lga, person.ward].filter(Boolean).join('|')).filter(Boolean),
+  ).size;
+  const representedPollingUnits = new Set(state.people.map((person) => person.polling_unit_id).filter(Boolean)).size;
 
   return {
     totalRaised,
     pendingAmount,
     pledgedAmount,
+    totalCommitted,
     volunteers,
+    donors,
+    canvassers,
+    supporters,
     canvassCount,
     rsvps,
+    rsvpPeople,
     support,
     topIssues,
     whatsappOpen,
     whatsappResponses,
     upcomingEvents,
+    successfulDonationCount,
+    pendingDonationCount,
+    unfulfilledPledgeCount,
+    averageSuccessfulDonation,
+    representedStates,
+    representedLgas,
+    representedWards,
+    representedPollingUnits,
     peopleCount: state.people.length,
     eventCount: state.events.length,
+    fundraiserCount: state.fundraisers.length,
     advocacyCount: state.advocacy_contacts.length,
     auditCount: state.audit_log.length,
   };
@@ -369,22 +386,52 @@ export function NaijaPolisDemo() {
     setState((current) => mutator(current));
   }
 
-  function addPerson(data: { full_name: string; phone: string; email?: string; polling_unit_id?: string; tags: string[] }) {
+  function addPerson(data: {
+    full_name: string;
+    phone: string;
+    email?: string;
+    state: string;
+    lga: string;
+    ward: string;
+    polling_unit_id?: string;
+    tags: string[];
+  }) {
     const fullName = sanitizeText(data.full_name, 120);
     const phone = normalizePhone(data.phone);
     const email = data.email?.trim().toLowerCase();
+    const stateName = sanitizeText(data.state, 80);
+    const lgaName = sanitizeText(data.lga, 120);
+    const wardName = sanitizeText(data.ward, 120);
     if (!fullName || !isValidPhone(phone) || !isValidEmail(email)) return 'Enter a valid name, phone and email.';
+    if (!stateName || !lgaName || !wardName || !data.polling_unit_id) {
+      return 'Select a state, local government area, ward and polling unit.';
+    }
+    if (
+      !isPollingUnitSelectionValid({
+        state: stateName,
+        lga: lgaName,
+        ward: wardName,
+        polling_unit_id: data.polling_unit_id,
+      })
+    ) {
+      return 'Selected location fields do not match the polling unit.';
+    }
 
     const person: Person = {
       id: generateId('person'),
       full_name: fullName,
       phone,
       email: email || undefined,
-      polling_unit_id: data.polling_unit_id || undefined,
+      state: stateName,
+      lga: lgaName,
+      ward: wardName,
+      polling_unit_id: data.polling_unit_id,
       tags: data.tags.map((tag) => sanitizeText(tag.toLowerCase(), 32)).filter(Boolean),
       custom_fields: {},
       created_at: nowISO(),
     };
+
+    const pollingUnit = getPollingUnitById(person.polling_unit_id);
 
     updateState((current) => ({
       ...current,
@@ -395,14 +442,27 @@ export function NaijaPolisDemo() {
           person_id: person.id,
           person_name: person.full_name,
           type: 'volunteer_signup',
-          metadata: { role: person.tags[0] ?? 'Supporter' },
+          metadata: {
+            role: person.tags[0] ?? 'supporter',
+            state: person.state,
+            lga: person.lga,
+            ward: person.ward,
+            polling_unit: pollingUnit?.name,
+          },
           source: 'web',
           sync_status: 'synced',
           created_at: nowISO(),
         },
         ...current.activities,
       ],
-      audit_log: [audit('people', 'create_person', `Added ${person.full_name}`), ...current.audit_log],
+      audit_log: [
+        audit(
+          'people',
+          'create_person',
+          `Added ${person.full_name} to ${person.ward}, ${person.lga}${pollingUnit ? ` (${pollingUnit.name})` : ''}`,
+        ),
+        ...current.audit_log,
+      ],
     }));
     return '';
   }
@@ -1300,16 +1360,75 @@ function PeopleView({
   onAddPerson,
 }: {
   state: NaijaPolisState;
-  onAddPerson: (data: { full_name: string; phone: string; email?: string; polling_unit_id?: string; tags: string[] }) => string;
+  onAddPerson: (data: {
+    full_name: string;
+    phone: string;
+    email?: string;
+    state: string;
+    lga: string;
+    ward: string;
+    polling_unit_id?: string;
+    tags: string[];
+  }) => string;
 }) {
   const [search, setSearch] = useState('');
-  const [form, setForm] = useState({ full_name: '', phone: '', email: '', polling_unit_id: '', tags: '' });
+  const [form, setForm] = useState({
+    full_name: '',
+    phone: '',
+    email: '',
+    state: '',
+    lga: '',
+    ward: '',
+    polling_unit_id: '',
+    tags: '',
+  });
   const [error, setError] = useState('');
+  const stateOptions = getCoveredStateOptions();
+  const lgaOptions = getLgaOptions(form.state);
+  const wardOptions = getWardOptions(form.state, form.lga);
+  const pollingUnitOptions = getPollingUnitOptions(form.state, form.lga, form.ward);
 
   const filtered = state.people.filter((person) => {
     const query = search.toLowerCase();
-    return person.full_name.toLowerCase().includes(query) || person.phone.includes(search) || (person.email ?? '').toLowerCase().includes(query);
+    const location = getPersonLocationLabel(person);
+
+    return (
+      person.full_name.toLowerCase().includes(query) ||
+      person.phone.includes(search) ||
+      (person.email ?? '').toLowerCase().includes(query) ||
+      location.state.toLowerCase().includes(query) ||
+      location.lga.toLowerCase().includes(query) ||
+      location.ward.toLowerCase().includes(query) ||
+      (location.pollingUnit?.name ?? '').toLowerCase().includes(query) ||
+      (location.pollingUnit?.pu_code ?? '').toLowerCase().includes(query) ||
+      person.tags.join(' ').toLowerCase().includes(query)
+    );
   });
+
+  function resetForm() {
+    setForm({
+      full_name: '',
+      phone: '',
+      email: '',
+      state: '',
+      lga: '',
+      ward: '',
+      polling_unit_id: '',
+      tags: '',
+    });
+  }
+
+  function updateStateSelection(stateName: string) {
+    setForm((current) => ({ ...current, state: stateName, lga: '', ward: '', polling_unit_id: '' }));
+  }
+
+  function updateLgaSelection(lgaName: string) {
+    setForm((current) => ({ ...current, lga: lgaName, ward: '', polling_unit_id: '' }));
+  }
+
+  function updateWardSelection(wardName: string) {
+    setForm((current) => ({ ...current, ward: wardName, polling_unit_id: '' }));
+  }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -1317,17 +1436,20 @@ function PeopleView({
       full_name: form.full_name,
       phone: form.phone,
       email: form.email,
+      state: form.state,
+      lga: form.lga,
+      ward: form.ward,
       polling_unit_id: form.polling_unit_id,
       tags: form.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
     });
     setError(result);
-    if (!result) setForm({ full_name: '', phone: '', email: '', polling_unit_id: '', tags: '' });
+    if (!result) resetForm();
   }
 
   return (
     <>
       <SectionHeader title="People" subtitle={`${state.people.length} supporters, volunteers and donors`} />
-      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
         <div>
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -1344,47 +1466,58 @@ function PeopleView({
                 <tr>
                   <th className="px-4 py-3 font-semibold">Name</th>
                   <th className="hidden px-4 py-3 font-semibold sm:table-cell">Contact</th>
-                  <th className="hidden px-4 py-3 font-semibold lg:table-cell">Polling Unit</th>
+                  <th className="hidden px-4 py-3 font-semibold lg:table-cell">Location</th>
                   <th className="hidden px-4 py-3 font-semibold xl:table-cell">Tags</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filtered.map((person) => (
-                  <tr key={person.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-700">
-                          {person.full_name.split(' ').map((part) => part[0]).join('').slice(0, 2)}
+                {filtered.map((person) => {
+                  const location = getPersonLocationLabel(person);
+
+                  return (
+                    <tr key={person.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-700">
+                            {person.full_name.split(' ').map((part) => part[0]).join('').slice(0, 2)}
+                          </div>
+                          <span className="font-medium">{person.full_name}</span>
                         </div>
-                        <span className="font-medium">{person.full_name}</span>
-                      </div>
-                    </td>
-                    <td className="hidden px-4 py-3 sm:table-cell">
-                      <div className="space-y-1 text-gray-600">
-                        <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{person.phone}</span>
-                        {person.email && <span className="flex items-center gap-1 text-xs"><Mail className="h-3 w-3" />{person.email}</span>}
-                      </div>
-                    </td>
-                    <td className="hidden px-4 py-3 text-gray-600 lg:table-cell">
-                      {POLLING_UNITS.find((unit) => unit.id === person.polling_unit_id)?.name ?? 'Unassigned'}
-                    </td>
-                    <td className="hidden px-4 py-3 xl:table-cell">
-                      <div className="flex flex-wrap gap-1">
-                        {person.tags.map((tag) => (
-                          <span key={tag} className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium capitalize text-gray-600">
-                            {tag.replace('_', ' ')}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="hidden px-4 py-3 sm:table-cell">
+                        <div className="space-y-1 text-gray-600">
+                          <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{person.phone}</span>
+                          {person.email && <span className="flex items-center gap-1 text-xs"><Mail className="h-3 w-3" />{person.email}</span>}
+                        </div>
+                      </td>
+                      <td className="hidden px-4 py-3 text-gray-600 lg:table-cell">
+                        <div className="space-y-1">
+                          <p className="font-medium text-gray-900">{location.pollingUnit?.name ?? 'Unassigned'}</p>
+                          <p className="text-xs text-gray-500">{location.lines.join(' / ') || 'No location assigned'}</p>
+                          {location.pollingUnit?.pu_code && <p className="text-xs text-gray-400">{location.pollingUnit.pu_code}</p>}
+                        </div>
+                      </td>
+                      <td className="hidden px-4 py-3 xl:table-cell">
+                        <div className="flex flex-wrap gap-1">
+                          {person.tags.map((tag) => (
+                            <span key={tag} className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium capitalize text-gray-600">
+                              {tag.replace('_', ' ')}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
         <form onSubmit={submit} className="rounded-lg bg-white p-5 shadow-sm">
           <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-gray-600">Add Person</h2>
+          <p className="mb-4 text-xs text-gray-500">
+            State options follow the INEC state list. LGA, ward, and polling unit options load from the bundled demo polling-unit dataset.
+          </p>
           <FormField label="Full Name">
             <input className="form-input" value={form.full_name} onChange={(event) => setForm((current) => ({ ...current, full_name: event.target.value }))} required />
           </FormField>
@@ -1394,10 +1527,50 @@ function PeopleView({
           <FormField label="Email">
             <input type="email" className="form-input" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
           </FormField>
+          <FormField label="State">
+            <select className="form-input" value={form.state} onChange={(event) => updateStateSelection(event.target.value)} required>
+              <option value="">Select state</option>
+              {stateOptions.map((stateOption) => (
+                <option key={stateOption.name} value={stateOption.name} disabled={!stateOption.covered}>
+                  {stateOption.covered ? stateOption.name : `${stateOption.name} (no demo polling units)`}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Local Government Area">
+            <select
+              className="form-input"
+              value={form.lga}
+              onChange={(event) => updateLgaSelection(event.target.value)}
+              disabled={!form.state}
+              required
+            >
+              <option value="">{form.state ? 'Select local government area' : 'Select state first'}</option>
+              {lgaOptions.map((lga) => <option key={lga} value={lga}>{lga}</option>)}
+            </select>
+          </FormField>
+          <FormField label="Ward">
+            <select
+              className="form-input"
+              value={form.ward}
+              onChange={(event) => updateWardSelection(event.target.value)}
+              disabled={!form.lga}
+              required
+            >
+              <option value="">{form.lga ? 'Select ward' : 'Select local government area first'}</option>
+              {wardOptions.map((ward) => <option key={ward} value={ward}>{ward}</option>)}
+            </select>
+          </FormField>
           <FormField label="Polling Unit">
-            <select className="form-input" value={form.polling_unit_id} onChange={(event) => setForm((current) => ({ ...current, polling_unit_id: event.target.value }))}>
+            <select
+              className="form-input"
+              value={form.polling_unit_id}
+              onChange={(event) => setForm((current) => ({ ...current, polling_unit_id: event.target.value }))}
+              disabled={!form.ward}
+              required
+            >
               <option value="">Select polling unit</option>
-              {POLLING_UNITS.map((unit) => <option key={unit.id} value={unit.id}>{unit.pu_code} - {unit.name}</option>)}
+              {pollingUnitOptions.map((unit) => <option key={unit.id} value={unit.id}>{unit.pu_code} - {unit.name}</option>)}
             </select>
           </FormField>
           <FormField label="Tags">
@@ -1930,6 +2103,16 @@ function ReportsView({
   goals: Goal[];
   onPrint: () => void;
 }) {
+  const peopleByState = Object.entries(
+    state.people.reduce<Record<string, number>>((acc, person) => {
+      const stateName = person.state || 'Unassigned';
+      acc[stateName] = (acc[stateName] ?? 0) + 1;
+      return acc;
+    }, {}),
+  )
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 5);
+
   return (
     <>
       <SectionHeader
@@ -1951,11 +2134,13 @@ function ReportsView({
           <h2 className="text-xl font-bold text-gray-900">{state.settings.campaign_name} Report</h2>
           <p className="text-sm text-gray-500">Generated {formatDateTime(nowISO())}</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <StatCard label="Total Raised" value={formatCurrency(metrics.totalRaised, state.settings.currency)} icon={DollarSign} color="bg-green-600" />
-          <StatCard label="People" value={String(metrics.peopleCount)} icon={Users} color="bg-blue-600" />
-          <StatCard label="Events" value={String(metrics.eventCount)} icon={Calendar} color="bg-purple-600" />
-          <StatCard label="Advocacy" value={String(metrics.advocacyCount)} icon={Megaphone} color="bg-amber-600" />
+          <StatCard label="Total Committed" value={formatCurrency(metrics.totalCommitted, state.settings.currency)} icon={Target} color="bg-emerald-700" />
+          <StatCard label="Volunteers" value={String(metrics.volunteers)} icon={Users} color="bg-blue-600" />
+          <StatCard label="Donors" value={String(metrics.donors)} icon={DollarSign} color="bg-amber-600" />
+          <StatCard label="RSVPs" value={String(metrics.rsvps)} icon={Calendar} color="bg-purple-600" />
+          <StatCard label="Canvassers" value={String(metrics.canvassers)} icon={Map} color="bg-sky-600" />
         </div>
         <div className="mt-8 grid gap-6 xl:grid-cols-2">
           <ReportPanel title="Campaign Charter">
@@ -1980,6 +2165,30 @@ function ReportsView({
               </div>
             </div>
           </ReportPanel>
+          <ReportPanel title="Finance Overview">
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between gap-3"><span>Successful donations</span><span className="font-semibold">{metrics.successfulDonationCount}</span></div>
+              <div className="flex justify-between gap-3"><span>Pending donations</span><span className="font-semibold">{metrics.pendingDonationCount}</span></div>
+              <div className="flex justify-between gap-3"><span>Active pledges</span><span className="font-semibold">{metrics.unfulfilledPledgeCount}</span></div>
+              <div className="flex justify-between gap-3"><span>Total raised</span><span className="font-semibold">{formatCurrency(metrics.totalRaised, state.settings.currency)}</span></div>
+              <div className="flex justify-between gap-3"><span>Pending amount</span><span className="font-semibold">{formatCurrency(metrics.pendingAmount, state.settings.currency)}</span></div>
+              <div className="flex justify-between gap-3"><span>Outstanding pledges</span><span className="font-semibold">{formatCurrency(metrics.pledgedAmount, state.settings.currency)}</span></div>
+              <div className="flex justify-between gap-3"><span>Average successful gift</span><span className="font-semibold">{formatCurrency(metrics.averageSuccessfulDonation, state.settings.currency)}</span></div>
+              <div className="flex justify-between gap-3"><span>Active fundraisers</span><span className="font-semibold">{metrics.fundraiserCount}</span></div>
+            </div>
+          </ReportPanel>
+          <ReportPanel title="People and Field Metrics">
+            <div className="grid grid-cols-2 gap-3">
+              <MetricTile label="People" value={String(metrics.peopleCount)} />
+              <MetricTile label="Supporters" value={String(metrics.supporters)} />
+              <MetricTile label="Volunteers" value={String(metrics.volunteers)} />
+              <MetricTile label="Donors" value={String(metrics.donors)} />
+              <MetricTile label="Canvassers" value={String(metrics.canvassers)} />
+              <MetricTile label="Canvass Visits" value={String(metrics.canvassCount)} />
+              <MetricTile label="RSVP Contacts" value={String(metrics.rsvpPeople)} />
+              <MetricTile label="Advocacy Cases" value={String(metrics.advocacyCount)} />
+            </div>
+          </ReportPanel>
           <ReportPanel title="Goal Performance">
             <div className="space-y-4">
               {goals.map((goal) => {
@@ -1990,12 +2199,37 @@ function ReportsView({
                       <span className="font-medium">{goal.name}</span>
                       <span>{percent}%</span>
                     </div>
+                    <p className="mb-2 text-xs text-gray-500">
+                      {formatGoalValue(goal.type, goal.current_value, state.settings.currency)} of{' '}
+                      {formatGoalValue(goal.type, goal.target, state.settings.currency)}
+                    </p>
                     <div className="h-2 rounded-full bg-gray-100">
                       <div className="h-2 rounded-full bg-green-600" style={{ width: `${percent}%` }} />
                     </div>
                   </div>
                 );
               })}
+            </div>
+          </ReportPanel>
+          <ReportPanel title="Geographic Coverage">
+            <div className="space-y-4 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <MetricTile label="States" value={String(metrics.representedStates)} />
+                <MetricTile label="LGAs" value={String(metrics.representedLgas)} />
+                <MetricTile label="Wards" value={String(metrics.representedWards)} />
+                <MetricTile label="Polling Units" value={String(metrics.representedPollingUnits)} />
+              </div>
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Top State Coverage</p>
+                <div className="space-y-2">
+                  {peopleByState.map(([stateName, count]) => (
+                    <div key={stateName} className="flex items-center justify-between text-sm">
+                      <span>{stateName}</span>
+                      <span className="font-semibold">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </ReportPanel>
           <ReportPanel title="Support Model">
@@ -2051,6 +2285,15 @@ function ReportPanel({ title, children }: { title: string; children: ReactNode }
     <div className="rounded-lg border border-gray-200 p-4">
       <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-gray-600">{title}</h3>
       {children}
+    </div>
+  );
+}
+
+function MetricTile({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-gray-200 p-3">
+      <p className="text-lg font-bold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-500">{label}</p>
     </div>
   );
 }
@@ -2236,7 +2479,7 @@ function SettingsView({
             <div className="grid gap-4 md:grid-cols-2">
               <FormField label="State">
                 <select className="form-input" value={form.state} onChange={(event) => update('state', event.target.value)}>
-                  {nigerianStates.map((stateName) => <option key={stateName} value={stateName}>{stateName}</option>)}
+                  {getCoveredStateOptions().map((stateOption) => <option key={stateOption.name} value={stateOption.name}>{stateOption.name}</option>)}
                 </select>
               </FormField>
               <FormField label="LGA">
