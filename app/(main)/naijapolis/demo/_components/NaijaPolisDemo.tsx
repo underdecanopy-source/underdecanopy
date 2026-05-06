@@ -32,8 +32,9 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { useEffect, useMemo, useState, type ComponentType, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent, type ComponentType, type FormEvent, type ReactNode } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { POLLING_UNITS } from '@/lib/naijapolis/data';
 import {
   getCoveredStateOptions,
@@ -120,6 +121,8 @@ const issueOptions = [
   'Other',
 ];
 
+const MAX_LOGO_FILE_BYTES = 1024 * 1024;
+
 const supportConfig: Record<SupportLevel, { label: string; color: string; bg: string; dot: string }> = {
   strong: { label: 'Strong Support', color: 'text-green-700', bg: 'bg-green-100', dot: 'bg-green-500' },
   lean: { label: 'Leaning', color: 'text-teal-700', bg: 'bg-teal-100', dot: 'bg-teal-500' },
@@ -195,6 +198,10 @@ function audit(module: ModuleId, action: string, detail: string): AuditEntry {
 
 function sortByDateDesc<T extends { created_at: string }>(items: T[]) {
   return [...items].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+}
+
+function isValidLogoDataUrl(value: string) {
+  return !value || (value.startsWith('data:image/') && value.length <= MAX_LOGO_FILE_BYTES * 2);
 }
 
 function countPeopleWithTag(people: Person[], tag: string) {
@@ -803,6 +810,7 @@ export function NaijaPolisDemo() {
       campaign_name: sanitizeText(settings.campaign_name || 'Campaign', 120),
       candidate_name: sanitizeText(settings.candidate_name, 120),
       party: sanitizeText(settings.party, 80),
+      campaign_logo_data_url: settings.campaign_logo_data_url || '',
       campaign_slogan: sanitizeText(settings.campaign_slogan, 140),
       mission_statement: sanitizeLongText(settings.mission_statement, 700),
       target_voter_segment: sanitizeLongText(settings.target_voter_segment, 500),
@@ -815,6 +823,7 @@ export function NaijaPolisDemo() {
       data_retention_days: Math.max(30, Math.min(3650, Number(settings.data_retention_days) || 365)),
     };
     if (!isValidPhone(cleaned.whatsapp_number)) return 'Enter a valid WhatsApp number.';
+    if (!isValidLogoDataUrl(cleaned.campaign_logo_data_url)) return 'Upload a PNG, JPG, SVG, GIF, or WebP logo under 1MB.';
 
     updateState((current) => ({
       ...current,
@@ -825,7 +834,11 @@ export function NaijaPolisDemo() {
           person_id: 'settings',
           person_name: cleaned.platform_name,
           type: 'settings_update',
-          metadata: { platform_name: cleaned.platform_name, campaign_name: cleaned.campaign_name },
+          metadata: {
+            platform_name: cleaned.platform_name,
+            campaign_name: cleaned.campaign_name,
+            logo_uploaded: Boolean(cleaned.campaign_logo_data_url),
+          },
           source: 'web',
           sync_status: 'synced',
           created_at: nowISO(),
@@ -1058,6 +1071,7 @@ export function NaijaPolisDemo() {
             activeModule={activeModule}
             platformName={state.settings.platform_name}
             campaignName={state.settings.campaign_name}
+            logoDataUrl={state.settings.campaign_logo_data_url}
             onSelect={setActiveModule}
           />
         </aside>
@@ -1083,6 +1097,7 @@ export function NaijaPolisDemo() {
                 activeModule={activeModule}
                 platformName={state.settings.platform_name}
                 campaignName={state.settings.campaign_name}
+                logoDataUrl={state.settings.campaign_logo_data_url}
                 onSelect={(module) => {
                   setActiveModule(module);
                   setMobileOpen(false);
@@ -1104,6 +1119,12 @@ export function NaijaPolisDemo() {
                 >
                   <Menu className="w-5 h-5" />
                 </button>
+                <CampaignLogo
+                  logoDataUrl={state.settings.campaign_logo_data_url}
+                  label={state.settings.campaign_name || state.settings.platform_name}
+                  className="hidden h-10 w-10 overflow-hidden rounded-lg border border-gray-200 bg-white p-1 sm:flex"
+                  imageClassName="object-contain"
+                />
                 <div>
                   <p className="text-sm font-semibold text-gray-900">{modules.find((module) => module.id === activeModule)?.label}</p>
                   <p className="text-xs text-gray-500">{state.settings.candidate_name} - {state.settings.party}</p>
@@ -1175,24 +1196,58 @@ export function NaijaPolisDemo() {
   );
 }
 
+function CampaignLogo({
+  logoDataUrl,
+  label,
+  className,
+  imageClassName,
+  fallbackClassName,
+}: {
+  logoDataUrl?: string;
+  label: string;
+  className?: string;
+  imageClassName?: string;
+  fallbackClassName?: string;
+}) {
+  if (logoDataUrl) {
+    return (
+      <div className={cn('relative overflow-hidden rounded-md bg-white', className)}>
+        <Image src={logoDataUrl} alt={`${label} logo`} fill unoptimized className={cn('object-cover', imageClassName)} sizes="96px" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn('flex items-center justify-center rounded-md bg-green-600', className)}>
+      <Flag className={cn('h-5 w-5 text-white', fallbackClassName)} />
+    </div>
+  );
+}
+
 function Sidebar({
   activeModule,
   platformName,
   campaignName,
+  logoDataUrl,
   onSelect,
 }: {
   activeModule: ModuleId;
   platformName: string;
   campaignName: string;
+  logoDataUrl: string;
   onSelect: (module: ModuleId) => void;
 }) {
   return (
     <div className="flex h-full flex-col">
       <div className="border-b border-gray-700 px-4 py-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-green-600">
-            <Flag className="w-5 h-5" />
-          </div>
+          <CampaignLogo
+            logoDataUrl={logoDataUrl}
+            label={campaignName || platformName}
+            className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-green-600 p-1"
+            imageClassName="object-contain"
+            fallbackClassName="text-white"
+          />
           <div className="min-w-0">
             <div className="truncate text-sm font-bold">{platformName}</div>
             <div className="truncate text-xs text-gray-400">{campaignName}</div>
@@ -2131,8 +2186,23 @@ function ReportsView({
       />
       <div className="rounded-lg bg-white p-6 shadow-sm print:shadow-none">
         <div className="mb-6 border-b border-gray-200 pb-4">
-          <h2 className="text-xl font-bold text-gray-900">{state.settings.campaign_name} Report</h2>
-          <p className="text-sm text-gray-500">Generated {formatDateTime(nowISO())}</p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <CampaignLogo
+                logoDataUrl={state.settings.campaign_logo_data_url}
+                label={state.settings.campaign_name || state.settings.platform_name}
+                className="h-16 w-16 overflow-hidden rounded-xl border border-gray-200 bg-white p-2"
+                imageClassName="object-contain"
+              />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{state.settings.campaign_name} Report</h2>
+                <p className="text-sm text-gray-500">
+                  {state.settings.candidate_name} · {state.settings.party || state.settings.platform_name}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500">Generated {formatDateTime(nowISO())}</p>
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <StatCard label="Total Raised" value={formatCurrency(metrics.totalRaised, state.settings.currency)} icon={DollarSign} color="bg-green-600" />
@@ -2367,6 +2437,39 @@ function SettingsView({
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  function uploadLogo(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Upload a PNG, JPG, SVG, GIF, or WebP logo.');
+      return;
+    }
+    if (file.size > MAX_LOGO_FILE_BYTES) {
+      setError('Upload a logo under 1MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      if (!isValidLogoDataUrl(result)) {
+        setError('Upload a PNG, JPG, SVG, GIF, or WebP logo under 1MB.');
+        return;
+      }
+      update('campaign_logo_data_url', result);
+      setError('');
+      setSaved(false);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeLogo() {
+    update('campaign_logo_data_url', '');
+    setError('');
+    setSaved(false);
+  }
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const result = onSaveSettings(form);
@@ -2449,6 +2552,38 @@ function SettingsView({
               <FormField label="Political Party">
                 <input className="form-input" value={form.party} onChange={(event) => update('party', event.target.value)} />
               </FormField>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-[1fr_200px]">
+              <FormField label="Party / Campaign Logo">
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/svg+xml"
+                    onChange={uploadLogo}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-green-600 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-green-700"
+                  />
+                  <p className="text-xs text-gray-500">Supported: PNG, JPG, WebP, GIF, SVG. Maximum size: 1MB.</p>
+                  {form.campaign_logo_data_url && (
+                    <button
+                      type="button"
+                      onClick={removeLogo}
+                      className="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Remove Logo
+                    </button>
+                  )}
+                </div>
+              </FormField>
+              <div className="rounded-lg border border-dashed border-gray-300 p-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Preview</p>
+                <CampaignLogo
+                  logoDataUrl={form.campaign_logo_data_url}
+                  label={form.campaign_name || form.platform_name}
+                  className="mx-auto h-24 w-24 overflow-hidden rounded-xl border border-gray-200 bg-white p-2"
+                  imageClassName="object-contain"
+                />
+              </div>
             </div>
           </SettingsPanel>
           <SettingsPanel title="Campaign Self-Determination" icon={Target}>

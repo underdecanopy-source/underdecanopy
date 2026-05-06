@@ -615,6 +615,7 @@ export const INITIAL_NAIJAPOLIS_STATE: NaijaPolisState = {
     campaign_name: 'NaijaPolis Campaign 2027',
     candidate_name: 'Hon. Candidate Name',
     party: 'Your Party',
+    campaign_logo_data_url: '',
     campaign_slogan: 'People. Data. Progress.',
     mission_statement:
       'Organize a transparent, community-led campaign that listens first and acts with measurable accountability.',

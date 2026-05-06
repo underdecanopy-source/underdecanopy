@@ -189,6 +189,7 @@ export interface AppSettings {
   campaign_name: string;
   candidate_name: string;
   party: string;
+  campaign_logo_data_url: string;
   campaign_slogan: string;
   mission_statement: string;
   target_voter_segment: string;
