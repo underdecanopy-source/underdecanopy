@@ -9,7 +9,6 @@ import {
   Clock,
   Database,
   DollarSign,
-  Download,
   Flag,
   KeyRound,
   Lock,
@@ -50,7 +49,6 @@ import {
   buildMailtoUrl,
   buildWhatsAppUrl,
   cn,
-  downloadTextFile,
   formatCurrency,
   formatDate,
   formatDateTime,
@@ -206,6 +204,228 @@ function isValidLogoDataUrl(value: string) {
 
 function countPeopleWithTag(people: Person[], tag: string) {
   return people.filter((person) => person.tags.includes(tag)).length;
+}
+
+type ReportPeriod = 'monthly' | 'yearly';
+
+type ReportRange = {
+  start: Date;
+  end: Date;
+  label: string;
+  year: number;
+  monthIndex: number;
+};
+
+function getSafeReportYear(year: number) {
+  const currentYear = new Date().getFullYear();
+  return Number.isFinite(year) && year >= 2000 && year <= currentYear + 10 ? year : currentYear;
+}
+
+function getSafeMonthIndex(monthIndex: number) {
+  return Number.isFinite(monthIndex) ? Math.min(11, Math.max(0, monthIndex)) : new Date().getMonth();
+}
+
+function getReportRange(period: ReportPeriod, year: number, monthIndex: number): ReportRange {
+  const safeYear = getSafeReportYear(year);
+  const safeMonthIndex = getSafeMonthIndex(monthIndex);
+
+  if (period === 'monthly') {
+    return {
+      start: new Date(safeYear, safeMonthIndex, 1, 0, 0, 0, 0),
+      end: new Date(safeYear, safeMonthIndex + 1, 0, 23, 59, 59, 999),
+      label: new Date(safeYear, safeMonthIndex, 1).toLocaleString('en-NG', { month: 'long', year: 'numeric' }),
+      year: safeYear,
+      monthIndex: safeMonthIndex,
+    };
+  }
+
+  return {
+    start: new Date(safeYear, 0, 1, 0, 0, 0, 0),
+    end: new Date(safeYear, 11, 31, 23, 59, 59, 999),
+    label: String(safeYear),
+    year: safeYear,
+    monthIndex: safeMonthIndex,
+  };
+}
+
+function isDateWithinRange(dateValue: string, range: ReportRange) {
+  const timestamp = new Date(dateValue).getTime();
+  return timestamp >= range.start.getTime() && timestamp <= range.end.getTime();
+}
+
+function filterItemsByDate<T>(items: T[], getDateValue: (item: T) => string, range: ReportRange) {
+  return items.filter((item) => isDateWithinRange(getDateValue(item), range));
+}
+
+function incrementCount(map: Map<string, number>, key: string) {
+  map.set(key, (map.get(key) ?? 0) + 1);
+}
+
+function buildNaijaPolisReport(state: NaijaPolisState, period: ReportPeriod, year: number, monthIndex: number) {
+  const range = getReportRange(period, year, monthIndex);
+  const scopedPeople = filterItemsByDate(state.people, (person) => person.created_at, range);
+  const scopedActivities = filterItemsByDate(state.activities, (activity) => activity.created_at, range);
+  const scopedTransactions = filterItemsByDate(state.transactions, (transaction) => transaction.created_at, range);
+  const scopedPledges = filterItemsByDate(state.pledges, (pledge) => pledge.created_at, range);
+  const scopedEvents = filterItemsByDate(state.events, (event) => event.date, range);
+  const scopedRsvps = filterItemsByDate(state.event_rsvps, (rsvp) => rsvp.created_at, range);
+  const scopedCanvass = filterItemsByDate(state.canvass_records, (record) => record.created_at, range);
+  const scopedAdvocacy = filterItemsByDate(state.advocacy_contacts, (contact) => contact.created_at, range);
+  const scopedWhatsApp = filterItemsByDate(state.whatsapp_messages, (message) => message.created_at, range);
+  const successfulTransactions = scopedTransactions.filter((transaction) => transaction.status === 'successful');
+  const pendingTransactions = scopedTransactions.filter((transaction) => transaction.status === 'pending');
+  const standalonePledgedTransactions = scopedTransactions.filter(
+    (transaction) =>
+      transaction.status === 'pledged' &&
+      !scopedPledges.some(
+        (pledge) => pledge.person_id === transaction.person_id && pledge.amount === transaction.amount,
+      ),
+  );
+
+  const totalRaised = successfulTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  const pendingAmount = pendingTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  const pledgedAmount =
+    scopedPledges.filter((pledge) => !pledge.fulfilled).reduce((sum, pledge) => sum + pledge.amount, 0) +
+    standalonePledgedTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  const totalCommitted = totalRaised + pendingAmount + pledgedAmount;
+  const volunteers = new Set([
+    ...scopedPeople.filter((person) => person.tags.includes('volunteer')).map((person) => person.id),
+    ...scopedActivities
+      .filter((activity) => activity.type === 'volunteer_signup')
+      .map((activity) => activity.person_id),
+  ]).size;
+  const donors = new Set([
+    ...scopedPeople.filter((person) => person.tags.includes('donor')).map((person) => person.id),
+    ...scopedTransactions.map((transaction) => transaction.person_id),
+    ...scopedPledges.map((pledge) => pledge.person_id),
+  ]).size;
+  const canvassers = new Set([
+    ...scopedPeople
+      .filter((person) => person.tags.some((tag) => ['canvasser', 'ward_coordinator'].includes(tag)))
+      .map((person) => person.id),
+    ...scopedCanvass.map((record) => record.agent_name.toLowerCase()),
+  ]).size;
+  const supporters = countPeopleWithTag(scopedPeople, 'supporter');
+  const support = scopedCanvass.reduce<Record<SupportLevel, number>>(
+    (acc, record) => {
+      acc[record.support_level] += 1;
+      return acc;
+    },
+    { strong: 0, lean: 0, neutral: 0, opposed: 0 },
+  );
+  const topIssues = Object.entries(
+    scopedAdvocacy.reduce<Record<string, number>>((acc, contact) => {
+      acc[contact.issue] = (acc[contact.issue] ?? 0) + 1;
+      return acc;
+    }, {}),
+  ).sort((left, right) => right[1] - left[1]);
+  const stateCoverage = new Map<string, number>();
+  const representedStates = new Set<string>();
+  const representedLgas = new Set<string>();
+  const representedWards = new Set<string>();
+  const representedPollingUnits = new Set<string>();
+
+  scopedPeople.forEach((person) => {
+    if (person.state) {
+      representedStates.add(person.state);
+      incrementCount(stateCoverage, person.state);
+    }
+    if (person.state && person.lga) representedLgas.add(`${person.state}|${person.lga}`);
+    if (person.state && person.lga && person.ward) representedWards.add(`${person.state}|${person.lga}|${person.ward}`);
+    if (person.polling_unit_id) representedPollingUnits.add(person.polling_unit_id);
+  });
+
+  scopedCanvass.forEach((record) => {
+    const pollingUnit = getPollingUnitById(record.polling_unit_id);
+    if (!pollingUnit) return;
+    representedStates.add(pollingUnit.state);
+    representedLgas.add(`${pollingUnit.state}|${pollingUnit.lga}`);
+    representedWards.add(`${pollingUnit.state}|${pollingUnit.lga}|${pollingUnit.ward}`);
+    representedPollingUnits.add(pollingUnit.id);
+    incrementCount(stateCoverage, pollingUnit.state);
+  });
+
+  const monthly = Array.from({ length: 12 }, (_, index) => {
+    const monthRange = getReportRange('monthly', range.year, index);
+    const monthTransactions = filterItemsByDate(state.transactions, (transaction) => transaction.created_at, monthRange);
+
+    return {
+      monthIndex: index,
+      label: new Date(range.year, index).toLocaleString('en-NG', { month: 'short' }),
+      raised: monthTransactions
+        .filter((transaction) => transaction.status === 'successful')
+        .reduce((sum, transaction) => sum + transaction.amount, 0),
+      pending: monthTransactions
+        .filter((transaction) => transaction.status === 'pending')
+        .reduce((sum, transaction) => sum + transaction.amount, 0),
+      people: filterItemsByDate(state.people, (person) => person.created_at, monthRange).length,
+      canvass: filterItemsByDate(state.canvass_records, (record) => record.created_at, monthRange).length,
+      rsvps: filterItemsByDate(state.event_rsvps, (rsvp) => rsvp.created_at, monthRange).length,
+    };
+  });
+
+  const engagementMix = [
+    { label: 'People Added', value: scopedPeople.length.toLocaleString() },
+    { label: 'Volunteers', value: volunteers.toLocaleString() },
+    { label: 'Donors', value: donors.toLocaleString() },
+    { label: 'Supporters', value: supporters.toLocaleString() },
+    { label: 'Canvassers', value: canvassers.toLocaleString() },
+    { label: 'RSVP Contacts', value: new Set(scopedRsvps.map((rsvp) => rsvp.person_id)).size.toLocaleString() },
+  ];
+
+  const hasData =
+    scopedPeople.length > 0 ||
+    scopedTransactions.length > 0 ||
+    scopedPledges.length > 0 ||
+    scopedRsvps.length > 0 ||
+    scopedCanvass.length > 0 ||
+    scopedAdvocacy.length > 0 ||
+    scopedWhatsApp.length > 0 ||
+    scopedEvents.length > 0;
+
+  return {
+    range,
+    hasData,
+    scopedPeople,
+    scopedTransactions,
+    scopedPledges,
+    scopedEvents,
+    scopedRsvps,
+    scopedCanvass,
+    scopedAdvocacy,
+    scopedWhatsApp,
+    support,
+    topIssues,
+    monthly,
+    engagementMix,
+    stateCoverage: Array.from(stateCoverage.entries()).sort((left, right) => right[1] - left[1]).slice(0, 5),
+    summary: {
+      totalRaised,
+      pendingAmount,
+      pledgedAmount,
+      totalCommitted,
+      peopleCount: scopedPeople.length,
+      volunteers,
+      donors,
+      supporters,
+      canvassers,
+      canvassCount: scopedCanvass.length,
+      rsvps: scopedRsvps.length,
+      rsvpPeople: new Set(scopedRsvps.map((rsvp) => rsvp.person_id)).size,
+      advocacyCount: scopedAdvocacy.length,
+      eventCount: scopedEvents.length,
+      whatsappResponses: scopedWhatsApp.filter((message) => message.status === 'responded').length,
+      fundraiserCount: new Set(scopedTransactions.map((transaction) => transaction.fundraiser_id).filter(Boolean)).size,
+      successfulDonationCount: successfulTransactions.length,
+      pendingDonationCount: pendingTransactions.length,
+      unfulfilledPledgeCount: scopedPledges.filter((pledge) => !pledge.fulfilled).length,
+      averageSuccessfulDonation: successfulTransactions.length > 0 ? Math.round(totalRaised / successfulTransactions.length) : 0,
+      representedStates: representedStates.size,
+      representedLgas: representedLgas.size,
+      representedWards: representedWards.size,
+      representedPollingUnits: representedPollingUnits.size,
+    },
+  };
 }
 
 function getMetrics(state: NaijaPolisState) {
@@ -983,15 +1203,6 @@ export function NaijaPolisDemo() {
     }));
   }
 
-  function exportData() {
-    const filename = `naijapolis-demo-${new Date().toISOString().slice(0, 10)}.json`;
-    downloadTextFile(filename, JSON.stringify(state, null, 2));
-    updateState((current) => ({
-      ...current,
-      audit_log: [audit('settings', 'export_data', filename), ...current.audit_log],
-    }));
-  }
-
   function resetDemo() {
     const confirmed = window.confirm('Reset the NaijaPolis demo data on this browser?');
     if (!confirmed) return;
@@ -1000,7 +1211,7 @@ export function NaijaPolisDemo() {
     setActiveModule('activity');
   }
 
-  function printReport() {
+  function printReport(reportRange: { period: ReportPeriod; year: number; monthIndex: number; label: string }) {
     updateState((current) => ({
       ...current,
       activities: [
@@ -1009,14 +1220,23 @@ export function NaijaPolisDemo() {
           person_id: 'reports',
           person_name: current.settings.platform_name,
           type: 'report_export',
-          metadata: { generated_at: nowISO() },
+          metadata: {
+            generated_at: nowISO(),
+            period: reportRange.period,
+            year: reportRange.year,
+            month: reportRange.period === 'monthly' ? reportRange.monthIndex + 1 : undefined,
+            label: reportRange.label,
+          },
           source: 'web',
           sync_status: 'synced',
           created_at: nowISO(),
         },
         ...current.activities,
       ],
-      audit_log: [audit('reports', 'print_report', 'Report opened for print or PDF save'), ...current.audit_log],
+      audit_log: [
+        audit('reports', 'print_report', `${reportRange.period === 'monthly' ? 'Monthly' : 'Yearly'} report for ${reportRange.label} opened for print or PDF save`),
+        ...current.audit_log,
+      ],
     }));
     window.setTimeout(() => window.print(), 50);
   }
@@ -1169,9 +1389,7 @@ export function NaijaPolisDemo() {
                   onRespond={respondToWhatsApp}
                 />
               )}
-              {activeModule === 'reports' && (
-                <ReportsView state={state} metrics={metrics} goals={derivedGoals} onPrint={printReport} />
-              )}
+              {activeModule === 'reports' && <ReportsView state={state} onPrint={printReport} />}
               {activeModule === 'settings' && (
                 <SettingsView
                   state={state}
@@ -1183,7 +1401,6 @@ export function NaijaPolisDemo() {
                   onAddDetermination={addDetermination}
                   onUpdateDetermination={updateDetermination}
                   onDeleteDetermination={deleteDetermination}
-                  onExportData={exportData}
                   onResetDemo={resetDemo}
                   onLock={lockWorkspace}
                 />
@@ -2149,222 +2366,277 @@ function AdvocacyForm({
 
 function ReportsView({
   state,
-  metrics,
-  goals,
   onPrint,
 }: {
   state: NaijaPolisState;
-  metrics: Metrics;
-  goals: Goal[];
-  onPrint: () => void;
+  onPrint: (reportRange: { period: ReportPeriod; year: number; monthIndex: number; label: string }) => void;
 }) {
-  const peopleByState = Object.entries(
-    state.people.reduce<Record<string, number>>((acc, person) => {
-      const stateName = person.state || 'Unassigned';
-      acc[stateName] = (acc[stateName] ?? 0) + 1;
-      return acc;
-    }, {}),
-  )
-    .sort((left, right) => right[1] - left[1])
-    .slice(0, 5);
+  const now = new Date();
+  const [period, setPeriod] = useState<ReportPeriod>('yearly');
+  const [year, setYear] = useState(String(now.getFullYear()));
+  const [month, setMonth] = useState(String(now.getMonth() + 1).padStart(2, '0'));
+  const report = useMemo(
+    () => buildNaijaPolisReport(state, period, Number(year), Number(month) - 1),
+    [month, period, state, year],
+  );
 
   return (
     <>
       <SectionHeader
         title="Reports"
-        subtitle="Campaign metrics from finance, people, events, advocacy and canvassing models"
+        subtitle="Time-bound campaign, finance and field metrics aligned to the selected reporting period"
         action={
-          <button
-            type="button"
-            onClick={onPrint}
-            className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 print:hidden"
-          >
-            <Printer className="h-4 w-4" />
-            Print / Save PDF
-          </button>
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
+            <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1">
+              <button
+                type="button"
+                onClick={() => setPeriod('monthly')}
+                className={cn(
+                  'rounded-md px-3 py-1.5 text-sm font-semibold',
+                  period === 'monthly' ? 'bg-blue-600 text-white' : 'text-slate-600',
+                )}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                onClick={() => setPeriod('yearly')}
+                className={cn(
+                  'rounded-md px-3 py-1.5 text-sm font-semibold',
+                  period === 'yearly' ? 'bg-blue-600 text-white' : 'text-slate-600',
+                )}
+              >
+                Yearly
+              </button>
+            </div>
+            <input
+              type="number"
+              min="2000"
+              max="2100"
+              value={year}
+              onChange={(event) => setYear(event.target.value)}
+              className="w-28 rounded-md border border-slate-300 px-3 py-2 text-sm"
+            />
+            {period === 'monthly' && (
+              <select
+                value={month}
+                onChange={(event) => setMonth(event.target.value)}
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+              >
+                {Array.from({ length: 12 }, (_, index) => (
+                  <option key={index} value={String(index + 1).padStart(2, '0')}>
+                    {new Date(report.range.year, index, 1).toLocaleString('en-NG', { month: 'long' })}
+                  </option>
+                ))}
+              </select>
+            )}
+            <button
+              type="button"
+              onClick={() => onPrint({ period, year: report.range.year, monthIndex: report.range.monthIndex, label: report.range.label })}
+              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            >
+              <Printer className="h-4 w-4" />
+              Print / Save PDF
+            </button>
+          </div>
         }
       />
-      <div className="rounded-lg bg-white p-6 shadow-sm print:shadow-none">
-        <div className="mb-6 border-b border-gray-200 pb-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <CampaignLogo
-                logoDataUrl={state.settings.campaign_logo_data_url}
-                label={state.settings.campaign_name || state.settings.platform_name}
-                className="h-16 w-16 overflow-hidden rounded-xl border border-gray-200 bg-white p-2"
-                imageClassName="object-contain"
-              />
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">{state.settings.campaign_name} Report</h2>
-                <p className="text-sm text-gray-500">
-                  {state.settings.candidate_name} · {state.settings.party || state.settings.platform_name}
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">Generated {formatDateTime(nowISO())}</p>
-          </div>
+      {!report.hasData ? (
+        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+          No NaijaPolis activity was recorded for {report.range.label}. Switch the reporting period or enter another year.
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <StatCard label="Total Raised" value={formatCurrency(metrics.totalRaised, state.settings.currency)} icon={DollarSign} color="bg-green-600" />
-          <StatCard label="Total Committed" value={formatCurrency(metrics.totalCommitted, state.settings.currency)} icon={Target} color="bg-emerald-700" />
-          <StatCard label="Volunteers" value={String(metrics.volunteers)} icon={Users} color="bg-blue-600" />
-          <StatCard label="Donors" value={String(metrics.donors)} icon={DollarSign} color="bg-amber-600" />
-          <StatCard label="RSVPs" value={String(metrics.rsvps)} icon={Calendar} color="bg-purple-600" />
-          <StatCard label="Canvassers" value={String(metrics.canvassers)} icon={Map} color="bg-sky-600" />
-        </div>
-        <div className="mt-8 grid gap-6 xl:grid-cols-2">
-          <ReportPanel title="Campaign Charter">
-            <div className="space-y-3 text-sm">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Slogan</p>
-                <p className="font-medium text-gray-900">{state.settings.campaign_slogan || 'Not set'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Mission</p>
-                <p className="text-gray-600">{state.settings.mission_statement || 'Not set'}</p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Target Voters</p>
-                  <p className="text-gray-600">{state.settings.target_voter_segment || 'Not set'}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Victory Threshold</p>
-                  <p className="font-semibold text-gray-900">{state.settings.victory_threshold.toLocaleString()} votes</p>
-                </div>
-              </div>
-            </div>
-          </ReportPanel>
-          <ReportPanel title="Finance Overview">
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between gap-3"><span>Successful donations</span><span className="font-semibold">{metrics.successfulDonationCount}</span></div>
-              <div className="flex justify-between gap-3"><span>Pending donations</span><span className="font-semibold">{metrics.pendingDonationCount}</span></div>
-              <div className="flex justify-between gap-3"><span>Active pledges</span><span className="font-semibold">{metrics.unfulfilledPledgeCount}</span></div>
-              <div className="flex justify-between gap-3"><span>Total raised</span><span className="font-semibold">{formatCurrency(metrics.totalRaised, state.settings.currency)}</span></div>
-              <div className="flex justify-between gap-3"><span>Pending amount</span><span className="font-semibold">{formatCurrency(metrics.pendingAmount, state.settings.currency)}</span></div>
-              <div className="flex justify-between gap-3"><span>Outstanding pledges</span><span className="font-semibold">{formatCurrency(metrics.pledgedAmount, state.settings.currency)}</span></div>
-              <div className="flex justify-between gap-3"><span>Average successful gift</span><span className="font-semibold">{formatCurrency(metrics.averageSuccessfulDonation, state.settings.currency)}</span></div>
-              <div className="flex justify-between gap-3"><span>Active fundraisers</span><span className="font-semibold">{metrics.fundraiserCount}</span></div>
-            </div>
-          </ReportPanel>
-          <ReportPanel title="People and Field Metrics">
-            <div className="grid grid-cols-2 gap-3">
-              <MetricTile label="People" value={String(metrics.peopleCount)} />
-              <MetricTile label="Supporters" value={String(metrics.supporters)} />
-              <MetricTile label="Volunteers" value={String(metrics.volunteers)} />
-              <MetricTile label="Donors" value={String(metrics.donors)} />
-              <MetricTile label="Canvassers" value={String(metrics.canvassers)} />
-              <MetricTile label="Canvass Visits" value={String(metrics.canvassCount)} />
-              <MetricTile label="RSVP Contacts" value={String(metrics.rsvpPeople)} />
-              <MetricTile label="Advocacy Cases" value={String(metrics.advocacyCount)} />
-            </div>
-          </ReportPanel>
-          <ReportPanel title="Goal Performance">
-            <div className="space-y-4">
-              {goals.map((goal) => {
-                const percent = Math.min(100, Math.round((goal.current_value / goal.target) * 100));
-                return (
-                  <div key={goal.id}>
-                    <div className="mb-1 flex justify-between text-sm">
-                      <span className="font-medium">{goal.name}</span>
-                      <span>{percent}%</span>
-                    </div>
-                    <p className="mb-2 text-xs text-gray-500">
-                      {formatGoalValue(goal.type, goal.current_value, state.settings.currency)} of{' '}
-                      {formatGoalValue(goal.type, goal.target, state.settings.currency)}
+      ) : (
+        <>
+          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm print:shadow-none">
+            <div className="mb-6 border-b border-slate-200 pb-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <CampaignLogo
+                    logoDataUrl={state.settings.campaign_logo_data_url}
+                    label={state.settings.campaign_name || state.settings.platform_name}
+                    className="h-16 w-16 overflow-hidden rounded-xl border border-slate-200 bg-white p-2"
+                    imageClassName="object-contain"
+                  />
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900">
+                      {period === 'monthly' ? 'Monthly' : 'Yearly'} Campaign Report
+                    </h2>
+                    <p className="text-sm text-slate-500">
+                      {report.range.label} · {state.settings.candidate_name} · {state.settings.party || state.settings.platform_name}
                     </p>
-                    <div className="h-2 rounded-full bg-gray-100">
-                      <div className="h-2 rounded-full bg-green-600" style={{ width: `${percent}%` }} />
-                    </div>
                   </div>
-                );
-              })}
-            </div>
-          </ReportPanel>
-          <ReportPanel title="Geographic Coverage">
-            <div className="space-y-4 text-sm">
-              <div className="grid grid-cols-2 gap-3">
-                <MetricTile label="States" value={String(metrics.representedStates)} />
-                <MetricTile label="LGAs" value={String(metrics.representedLgas)} />
-                <MetricTile label="Wards" value={String(metrics.representedWards)} />
-                <MetricTile label="Polling Units" value={String(metrics.representedPollingUnits)} />
+                </div>
+                <p className="text-sm text-slate-500">Generated {formatDateTime(nowISO())}</p>
               </div>
-              <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Top State Coverage</p>
-                <div className="space-y-2">
-                  {peopleByState.map(([stateName, count]) => (
-                    <div key={stateName} className="flex items-center justify-between text-sm">
-                      <span>{stateName}</span>
-                      <span className="font-semibold">{count}</span>
+            </div>
+
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              <StatCard label="Total Raised" value={formatCurrency(report.summary.totalRaised, state.settings.currency)} icon={DollarSign} color="bg-blue-600" />
+              <StatCard label="Pending Amount" value={formatCurrency(report.summary.pendingAmount, state.settings.currency)} icon={Clock} color="bg-amber-500" />
+              <StatCard label="People Added" value={report.summary.peopleCount.toLocaleString()} icon={Users} color="bg-emerald-600" />
+              <StatCard label="Volunteers" value={report.summary.volunteers.toLocaleString()} icon={Target} color="bg-indigo-600" />
+              <StatCard label="RSVPs" value={report.summary.rsvps.toLocaleString()} icon={Calendar} color="bg-purple-600" />
+            </div>
+
+            <div className="mb-6 rounded-lg border border-slate-200 p-6">
+              <h2 className="mb-4 font-semibold text-slate-800">Monthly Fundraising Snapshot - {report.range.year}</h2>
+              <div className="space-y-3">
+                {report.monthly.map((item) => {
+                  const max = Math.max(1, item.raised, item.pending);
+                  return (
+                    <div key={item.monthIndex} className="grid grid-cols-[48px,1fr,110px,110px] items-center gap-3">
+                      <span className="text-xs font-semibold text-slate-500">{item.label}</span>
+                      <div className="space-y-1">
+                        <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                          <div className="h-full bg-emerald-500" style={{ width: `${(item.raised / max) * 100}%` }} />
+                        </div>
+                        <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                          <div className="h-full bg-amber-500" style={{ width: `${(item.pending / max) * 100}%` }} />
+                        </div>
+                      </div>
+                      <span className="text-right text-xs font-semibold text-emerald-700">
+                        {formatCurrency(item.raised, state.settings.currency)}
+                      </span>
+                      <span className="text-right text-xs font-semibold text-amber-700">
+                        {formatCurrency(item.pending, state.settings.currency)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="rounded-lg border border-slate-200 p-6">
+                <h2 className="mb-4 font-semibold text-slate-800">Finance Summary</h2>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Total Committed</span>
+                    <span className="font-semibold text-slate-900">{formatCurrency(report.summary.totalCommitted, state.settings.currency)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Successful Donations</span>
+                    <span className="font-semibold text-slate-900">{report.summary.successfulDonationCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Pending Donations</span>
+                    <span className="font-semibold text-slate-900">{report.summary.pendingDonationCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Open Pledges</span>
+                    <span className="font-semibold text-slate-900">{report.summary.unfulfilledPledgeCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Pledged Amount</span>
+                    <span className="font-semibold text-slate-900">{formatCurrency(report.summary.pledgedAmount, state.settings.currency)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Average Successful Gift</span>
+                    <span className="font-semibold text-slate-900">{formatCurrency(report.summary.averageSuccessfulDonation, state.settings.currency)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Active Fundraisers</span>
+                    <span className="font-semibold text-slate-900">{report.summary.fundraiserCount}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-slate-200 p-6">
+                <h2 className="mb-4 font-semibold text-slate-800">Engagement Mix</h2>
+                <ul className="space-y-3">
+                  {report.engagementMix.map((item) => (
+                    <li key={item.label} className="flex items-center justify-between gap-3">
+                      <span className="text-sm text-slate-600">{item.label}</span>
+                      <span className="text-sm font-semibold text-slate-900">{item.value}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-lg border border-slate-200 p-6">
+                <h2 className="mb-4 font-semibold text-slate-800">Field Summary</h2>
+                <div className="mb-4 grid grid-cols-2 gap-3">
+                  {(Object.keys(supportConfig) as SupportLevel[]).map((level) => (
+                    <div key={level} className="rounded-md border border-slate-200 p-3">
+                      <p className={cn('text-xl font-bold', supportConfig[level].color)}>{report.support[level]}</p>
+                      <p className="text-xs text-slate-500">{supportConfig[level].label}</p>
                     </div>
                   ))}
                 </div>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Canvass Visits</span>
+                    <span className="font-semibold text-slate-900">{report.summary.canvassCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Canvassers</span>
+                    <span className="font-semibold text-slate-900">{report.summary.canvassers}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Advocacy Cases</span>
+                    <span className="font-semibold text-slate-900">{report.summary.advocacyCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Events in Period</span>
+                    <span className="font-semibold text-slate-900">{report.summary.eventCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">WhatsApp Responses</span>
+                    <span className="font-semibold text-slate-900">{report.summary.whatsappResponses}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-slate-200 p-6">
+                <h2 className="mb-4 font-semibold text-slate-800">Coverage and Issues</h2>
+                <div className="mb-4 space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">States Covered</span>
+                    <span className="font-semibold text-slate-900">{report.summary.representedStates}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">LGAs Covered</span>
+                    <span className="font-semibold text-slate-900">{report.summary.representedLgas}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Wards Covered</span>
+                    <span className="font-semibold text-slate-900">{report.summary.representedWards}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Polling Units Covered</span>
+                    <span className="font-semibold text-slate-900">{report.summary.representedPollingUnits}</span>
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Top Issues</p>
+                  <div className="space-y-2">
+                    {report.topIssues.slice(0, 5).map(([issue, count]) => (
+                      <div key={issue} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600">{issue}</span>
+                        <span className="font-semibold text-slate-900">{count}</span>
+                      </div>
+                    ))}
+                    {report.topIssues.length === 0 && <p className="text-sm text-slate-500">No issue data in this period.</p>}
+                  </div>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Top State Coverage</p>
+                  <div className="space-y-2">
+                    {report.stateCoverage.map(([stateName, count]) => (
+                      <div key={stateName} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600">{stateName}</span>
+                        <span className="font-semibold text-slate-900">{count}</span>
+                      </div>
+                    ))}
+                    {report.stateCoverage.length === 0 && <p className="text-sm text-slate-500">No coverage data in this period.</p>}
+                  </div>
+                </div>
               </div>
             </div>
-          </ReportPanel>
-          <ReportPanel title="Support Model">
-            <div className="grid grid-cols-2 gap-3">
-              {(Object.keys(supportConfig) as SupportLevel[]).map((level) => (
-                <div key={level} className="rounded-md border border-gray-200 p-3">
-                  <p className={cn('text-xl font-bold', supportConfig[level].color)}>{metrics.support[level]}</p>
-                  <p className="text-xs text-gray-500">{supportConfig[level].label}</p>
-                </div>
-              ))}
-            </div>
-          </ReportPanel>
-          <ReportPanel title="Issue Metrics">
-            <div className="space-y-3">
-              {metrics.topIssues.slice(0, 6).map(([issue, count]) => (
-                <div key={issue} className="flex items-center justify-between text-sm">
-                  <span>{issue}</span>
-                  <span className="font-semibold">{count}</span>
-                </div>
-              ))}
-              {metrics.topIssues.length === 0 && <p className="text-sm text-gray-400">No issue data yet.</p>}
-            </div>
-          </ReportPanel>
-          <ReportPanel title="Security and Audit">
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between"><span>Audit entries</span><span className="font-semibold">{metrics.auditCount}</span></div>
-              <div className="flex justify-between"><span>Share confirmation</span><span className="font-semibold">{state.settings.require_share_confirmation ? 'On' : 'Off'}</span></div>
-              <div className="flex justify-between"><span>Session lock</span><span className="font-semibold">{state.settings.session_lock_enabled ? 'On' : 'Off'}</span></div>
-              <div className="flex justify-between"><span>Retention</span><span className="font-semibold">{state.settings.data_retention_days} days</span></div>
-            </div>
-          </ReportPanel>
-          <ReportPanel title="Determinations">
-            <div className="space-y-3">
-              {state.self_determinations.slice(0, 6).map((determination) => (
-                <div key={determination.id} className="rounded-md border border-gray-200 p-3">
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <span className="font-semibold text-gray-900">{determination.title}</span>
-                    <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-semibold capitalize text-gray-600">{determination.status}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">{determination.description}</p>
-                </div>
-              ))}
-            </div>
-          </ReportPanel>
-        </div>
-      </div>
+          </div>
+        </>
+      )}
     </>
-  );
-}
-
-function ReportPanel({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="rounded-lg border border-gray-200 p-4">
-      <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-gray-600">{title}</h3>
-      {children}
-    </div>
-  );
-}
-
-function MetricTile({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md border border-gray-200 p-3">
-      <p className="text-lg font-bold text-gray-900">{value}</p>
-      <p className="text-xs text-gray-500">{label}</p>
-    </div>
   );
 }
 
@@ -2378,7 +2650,6 @@ function SettingsView({
   onAddDetermination,
   onUpdateDetermination,
   onDeleteDetermination,
-  onExportData,
   onResetDemo,
   onLock,
 }: {
@@ -2406,7 +2677,6 @@ function SettingsView({
     },
   ) => string;
   onDeleteDetermination: (determinationId: string) => void;
-  onExportData: () => void;
   onResetDemo: () => void;
   onLock: () => void;
 }) {
@@ -2797,10 +3067,6 @@ function SettingsView({
         <div className="space-y-6">
           <SettingsPanel title="Data Controls" icon={Database}>
             <div className="grid gap-3">
-              <button type="button" onClick={onExportData} className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50">
-                <Download className="h-4 w-4" />
-                Export JSON
-              </button>
               <button type="button" onClick={onResetDemo} className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50">
                 <RotateCcw className="h-4 w-4" />
                 Reset Demo Data
