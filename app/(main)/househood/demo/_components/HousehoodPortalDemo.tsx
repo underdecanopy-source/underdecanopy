@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
   BookOpen,
@@ -12,13 +12,89 @@ import {
   Search,
   TriangleAlert,
 } from 'lucide-react';
-import { demoAlerts, demoTasks, demoUser, demoWorkspaces } from '@/lib/househood/demoData';
-import type { PortalTask, PortalWorkspace } from '@/lib/househood/types';
+import { demoAlerts, demoTasks, demoWorkspaces } from '@/lib/househood/demoData';
+import type { HousehoodRole, HousehoodUser, PortalTask, PortalWorkspace } from '@/lib/househood/types';
 
-function HousehoodLogin({ onSignIn }: { onSignIn: () => void }) {
-  const [email, setEmail] = useState(demoUser.email);
-  const [password, setPassword] = useState('househood-demo');
+type AuthMode = 'login' | 'register';
+
+const roleConfig: Record<HousehoodRole, { label: string; subtitle: string }> = {
+  resident: {
+    label: 'Resident',
+    subtitle: 'Track requests, documents, and community updates.',
+  },
+  manager: {
+    label: 'Manager',
+    subtitle: 'Approve workflows, oversee occupancy, and coordinate teams.',
+  },
+  operations: {
+    label: 'Operations Staff',
+    subtitle: 'Close service tasks, manage schedules, and deliver field updates.',
+  },
+};
+
+function formatDisplayName(user: HousehoodUser | null) {
+  if (!user) {
+    return '';
+  }
+
+  if (user.displayName) {
+    return user.displayName;
+  }
+
+  const localPart = user.email.split('@')[0] ?? user.email;
+  return localPart
+    .split(/[.\-_]/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function HousehoodAccess({
+  onAuthenticated,
+  initialMode = 'login',
+}: {
+  onAuthenticated: (user: HousehoodUser) => void;
+  initialMode?: AuthMode;
+}) {
+  const [mode, setMode] = useState<AuthMode>(initialMode);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState<HousehoodRole>('resident');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit() {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const endpoint = mode === 'login' ? '/api/househood/auth/login' : '/api/househood/auth/register';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          mode === 'login'
+            ? { email, password }
+            : { email, password, confirmPassword, role },
+        ),
+      });
+
+      const payload = (await response.json()) as { error?: string; user?: HousehoodUser };
+      if (!response.ok || !payload.user) {
+        throw new Error(payload.error || 'Authentication failed.');
+      }
+
+      onAuthenticated(payload.user);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Authentication failed.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="mx-auto flex min-h-[70vh] w-full max-w-md items-center justify-center px-4">
@@ -29,8 +105,29 @@ function HousehoodLogin({ onSignIn }: { onSignIn: () => void }) {
           </div>
           <h1 className="mt-5 text-3xl font-bold text-slate-900">Househood Portals</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Demo access for resident, manager, and operations workflows.
+            Sign in or create access for resident, manager, and operations workflows.
           </p>
+        </div>
+
+        <div className="mb-6 grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+          <button
+            type="button"
+            className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+              mode === 'login' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}
+            onClick={() => setMode('login')}
+          >
+            Sign in
+          </button>
+          <button
+            type="button"
+            className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+              mode === 'register' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}
+            onClick={() => setMode('register')}
+          >
+            Create account
+          </button>
         </div>
 
         <div className="space-y-4">
@@ -57,8 +154,8 @@ function HousehoodLogin({ onSignIn }: { onSignIn: () => void }) {
                 type={showPassword ? 'text' : 'password'}
                 className="w-full rounded-2xl border border-slate-300 px-4 py-3 pr-12 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
+              onChange={(event) => setPassword(event.target.value)}
+            />
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center px-4 text-slate-400"
@@ -69,18 +166,55 @@ function HousehoodLogin({ onSignIn }: { onSignIn: () => void }) {
               </button>
             </div>
           </div>
+
+          {mode === 'register' ? (
+            <>
+              <div>
+                <label htmlFor="househood-confirm-password" className="mb-2 block text-sm font-medium text-slate-700">
+                  Confirm password
+                </label>
+                <input
+                  id="househood-confirm-password"
+                  type={showPassword ? 'text' : 'password'}
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="househood-role" className="mb-2 block text-sm font-medium text-slate-700">
+                  Househood role
+                </label>
+                <select
+                  id="househood-role"
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                  value={role}
+                  onChange={(event) => setRole(event.target.value as HousehoodRole)}
+                >
+                  <option value="resident">Resident</option>
+                  <option value="manager">Manager</option>
+                  <option value="operations">Operations Staff</option>
+                </select>
+                <p className="mt-2 text-xs text-slate-500">{roleConfig[role].subtitle}</p>
+              </div>
+            </>
+          ) : null}
         </div>
+
+        {error ? <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
         <button
           type="button"
-          onClick={onSignIn}
+          onClick={handleSubmit}
+          disabled={loading}
           className="mt-6 w-full rounded-2xl bg-emerald-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
         >
-          Enter demo portal
+          {loading ? 'Please wait...' : mode === 'login' ? 'Sign in to Househood' : 'Create Househood account'}
         </button>
 
         <p className="mt-4 text-center text-xs text-slate-500">
-          This is a contained demo route. No existing repository auth or production data is modified.
+          Access is now backed by the repository database and an HttpOnly session cookie.
         </p>
       </div>
     </div>
@@ -150,7 +284,8 @@ function TasksList({ tasks }: { tasks: PortalTask[] }) {
 }
 
 export function HousehoodPortalDemo() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<HousehoodUser | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
   const [search, setSearch] = useState('');
 
   const urgentTasks = useMemo(
@@ -160,6 +295,37 @@ export function HousehoodPortalDemo() {
       ),
     [],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadUser() {
+      try {
+        const response = await fetch('/api/househood/auth/me', { cache: 'no-store' });
+        if (!response.ok) {
+          if (!cancelled) {
+            setCurrentUser(null);
+          }
+          return;
+        }
+
+        const payload = (await response.json()) as { user?: HousehoodUser | null };
+        if (!cancelled) {
+          setCurrentUser(payload.user ?? null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingUser(false);
+        }
+      }
+    }
+
+    void loadUser();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filteredWorkspaces = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -174,8 +340,21 @@ export function HousehoodPortalDemo() {
     );
   }, [search]);
 
-  if (!isAuthenticated) {
-    return <HousehoodLogin onSignIn={() => setIsAuthenticated(true)} />;
+  async function handleSignOut() {
+    await fetch('/api/househood/auth/logout', { method: 'POST' });
+    setCurrentUser(null);
+  }
+
+  if (loadingUser) {
+    return (
+      <div className="mx-auto flex min-h-[70vh] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-emerald-500" />
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <HousehoodAccess onAuthenticated={setCurrentUser} />;
   }
 
   return (
@@ -213,7 +392,7 @@ export function HousehoodPortalDemo() {
 
             <button
               type="button"
-              onClick={() => setIsAuthenticated(false)}
+              onClick={() => void handleSignOut()}
               className="rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
             >
               Sign out
@@ -226,10 +405,12 @@ export function HousehoodPortalDemo() {
         <section className="rounded-[2rem] bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950 p-8 text-white shadow-2xl">
           <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">Welcome back</p>
           <h2 className="mt-3 text-3xl font-bold">
-            {demoUser.firstName} {demoUser.lastName}
+            {formatDisplayName(currentUser)}
           </h2>
           <p className="mt-3 max-w-2xl text-slate-300">
-            You are covering {demoWorkspaces.length} workspaces and {urgentTasks.length} time-sensitive tasks this week.
+            You are signed in as {roleConfig[currentUser.role].label.toLowerCase()}.
+            {` `}
+            {roleConfig[currentUser.role].subtitle}
           </p>
         </section>
 

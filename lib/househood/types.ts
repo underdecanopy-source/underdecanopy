@@ -1,9 +1,12 @@
+export type HousehoodRole = 'resident' | 'manager' | 'operations';
+
 export interface HousehoodUser {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role: 'resident' | 'manager' | 'operations';
+  role: HousehoodRole;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
 }
 
 export interface PortalWorkspace {
