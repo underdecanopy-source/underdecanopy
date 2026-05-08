@@ -14,6 +14,7 @@ import {
     BookOpen,
     Map,
     Star,
+    Building2,
 } from 'lucide-react';
 import CoffeeIcon from '@/components/icons/Coffee';
 import CookieIcon from '@/components/icons/Cookie';
@@ -69,6 +70,13 @@ export const coreServices = [
       description:
         'A modular, open-source political campaign management platform built for Nigerian electoral conditions. Track analytics, canvassing, and volunteer activities.',
       link: '/naijapolis',
+    },
+    {
+      icon: <Building2 size={40} />,
+      title: 'Househood Portals',
+      description:
+        'A role-based portal experience for residents, managers, and operations teams to coordinate communities, requests, files, and day-to-day tasks from one dashboard.',
+      link: '/househood',
     },
   ];
   

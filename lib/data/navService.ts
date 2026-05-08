@@ -53,6 +53,20 @@ export const navItems = {
         { href: '/naijapolis#contact', label: 'Contact' },
         { href: '/naijapolis/demo', label: 'Demo' },
     ],
+    '/househood': [
+        { href: '/househood', label: 'Home' },
+        { href: '#features', label: 'Features' },
+        { href: '#roles', label: 'Roles' },
+        { href: '#workflow', label: 'Workflow' },
+        { href: '/househood/demo', label: 'Demo' },
+    ],
+    '/househood/demo': [
+        { href: '/househood', label: 'Househood' },
+        { href: '/househood#features', label: 'Features' },
+        { href: '/househood#roles', label: 'Roles' },
+        { href: '/househood#workflow', label: 'Workflow' },
+        { href: '/househood/demo', label: 'Demo' },
+    ],
     '/swiftwheel': [
         { href: '/swiftwheel', label: 'Home' },
         { href: '#services', label: 'Services' },
