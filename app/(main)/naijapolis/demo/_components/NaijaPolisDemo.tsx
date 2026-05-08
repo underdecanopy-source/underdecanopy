@@ -13,7 +13,7 @@ import {
   KeyRound,
   Lock,
   Mail,
-  Map,
+  Map as MapIcon,
   MapPin,
   Megaphone,
   Menu,
@@ -100,7 +100,7 @@ const modules: Array<{ id: ModuleId; label: string; icon: IconComponent }> = [
   { id: 'finance', label: 'Finance', icon: DollarSign },
   { id: 'events', label: 'Events', icon: Calendar },
   { id: 'goals', label: 'Goals', icon: Target },
-  { id: 'canvassing', label: 'Canvassing', icon: Map },
+  { id: 'canvassing', label: 'Canvassing', icon: MapIcon },
   { id: 'advocacy', label: 'Advocacy', icon: Megaphone },
   { id: 'reports', label: 'Reports', icon: BarChart3 },
   { id: 'settings', label: 'Settings', icon: Settings },
@@ -130,7 +130,7 @@ const supportConfig: Record<SupportLevel, { label: string; color: string; bg: st
 
 const activityConfig: Record<ActivityType, { label: string; color: string; bg: string; icon: IconComponent }> = {
   donation: { label: 'Donation', color: 'text-green-700', bg: 'bg-green-100', icon: DollarSign },
-  canvass: { label: 'Canvass', color: 'text-blue-700', bg: 'bg-blue-100', icon: Map },
+  canvass: { label: 'Canvass', color: 'text-blue-700', bg: 'bg-blue-100', icon: MapIcon },
   rsvp: { label: 'RSVP', color: 'text-purple-700', bg: 'bg-purple-100', icon: Calendar },
   contact_candidate: { label: 'Candidate Contact', color: 'text-amber-700', bg: 'bg-amber-100', icon: Megaphone },
   volunteer_signup: { label: 'Volunteer Signup', color: 'text-teal-700', bg: 'bg-teal-100', icon: Users },
@@ -1574,7 +1574,7 @@ function ActivityView({
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total Raised" value={formatCurrency(metrics.totalRaised, state.settings.currency)} icon={DollarSign} color="bg-green-600" />
         <StatCard label="Volunteers" value={String(metrics.volunteers)} icon={Users} color="bg-blue-600" />
-        <StatCard label="Canvasses" value={String(metrics.canvassCount)} icon={Map} color="bg-purple-600" />
+        <StatCard label="Canvasses" value={String(metrics.canvassCount)} icon={MapIcon} color="bg-purple-600" />
         <StatCard label="WhatsApp Open" value={String(metrics.whatsappOpen)} icon={MessageCircle} color="bg-emerald-600" />
       </div>
       <div className="rounded-lg bg-white shadow-sm">
