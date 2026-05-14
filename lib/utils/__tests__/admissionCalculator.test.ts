@@ -244,6 +244,19 @@ describe('Admission Calculator', () => {
       expect(courseInstitutionMap['Economics']).toContain('UI');
     });
 
+    it('should expose alias-backed courses only once in the user-facing course list', () => {
+      const courseValues = allCourses.map((course) => course.value);
+      const courseLabels = allCourses.map((course) => course.label);
+
+      expect(courseValues).toContain('Computer Science');
+      expect(courseValues).not.toContain('COMPUTER SCIENCE');
+      expect(courseValues).toContain('Accounting');
+      expect(courseValues).not.toContain('ACCOUNTANCY');
+      expect(courseValues).toContain('Business Administration');
+      expect(courseValues).not.toContain('BUSINESS ADMINISTRATION & MANAGEMENT');
+      expect(courseLabels.filter((label) => label === 'Computer Science')).toHaveLength(1);
+    });
+
     it('should resolve every applysmart institution through the shared registry', () => {
       const institutionIds = new Set(Object.values(courseInstitutionMap).flat());
 

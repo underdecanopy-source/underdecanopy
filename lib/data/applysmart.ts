@@ -1434,6 +1434,10 @@ export const courseInstitutionAliasMap: Record<string, string> = {
   'Tourism Management Technology': 'TOURISM MANAGEMENT TECHNOLOGY',
 };
 
+const displayCourseKeyBySourceCourse = Object.fromEntries(
+  Object.entries(courseInstitutionAliasMap).map(([alias, raw]) => [raw, alias])
+);
+
 export const courseInstitutionMap: Record<string, string[]> = {
   ...activeCourseInstitutionMap,
   ...Object.fromEntries(
@@ -1482,6 +1486,12 @@ const tierCourseLabels: Record<string, string> = {
   ...Object.fromEntries(thirdTierCourses.map(c => [c.value, c.label])),
 };
 
-export const allCourses = Object.keys(courseInstitutionMap)
+const displayCourseKeys = Array.from(
+  new Set(
+    Object.keys(courseInstitutionMap).map((course) => displayCourseKeyBySourceCourse[course] ?? course)
+  )
+);
+
+export const allCourses = displayCourseKeys
   .map(course => ({ value: course, label: tierCourseLabels[course] || formatCourseLabel(course) }))
   .sort((a, b) => a.label.localeCompare(b.label));
