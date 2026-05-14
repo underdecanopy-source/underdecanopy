@@ -12,6 +12,7 @@ import {
   monotechnics as monotechnicInstitutions,
   nursingColleges as nursingCollegeInstitutions,
   ieis as ieiInstitutions,
+  allInstitutions,
 } from '@/lib/data/admissionDataset';
 
 const toOption = (id: string, name: string) => ({ value: id, label: `${name} (${id})` });
@@ -974,6 +975,23 @@ const educationFallbackInstitutionIds = ['FCEZARIA', 'FCEAKOKA', 'FCEKANO', 'ADE
 const generalAcademicFallbackInstitutionIds = ['UNILAG', 'UI', 'OAU', 'UNIBEN', 'UNN', 'FUTA', 'FUTO', 'AAUA']
   .filter(id => validInstitutionIdSet.has(id));
 
+export const utmeExemptNdAgricultureCourses = [
+  'AGRICULTURAL TECHNOLOGY',
+  'CROP PRODUCTION TECHNOLOGY',
+  'FISHERIES AND AQUATIC TECHNOLOGY',
+  'FORESTRY TECHNOLOGY',
+  'HORTICULTURAL TECHNOLOGY',
+  'HORTICULTURE AND LANDSCAPE TECHNOLOGY',
+] as const;
+
+export function isUtmeExemptNdAgricultureCourse(course: string): boolean {
+  return utmeExemptNdAgricultureCourses.includes(course as typeof utmeExemptNdAgricultureCourses[number]);
+}
+
+export function isUtmeExemptCourse(course: string): boolean {
+  return isUtmeExemptNdAgricultureCourse(course);
+}
+
 function normalizeInstitutionId(id: string): string {
   const resolvedId = institutionIdAliasMap[id] ?? id;
   return resolvedId;
@@ -1029,6 +1047,32 @@ function formatCourseLabel(course: string): string {
   return course
     .toLowerCase()
     .replace(/\b[a-z]/g, char => char.toUpperCase());
+}
+
+function normalizeCourseNameForMatching(course: string): string {
+  return course
+    .trim()
+    .toLowerCase()
+    .replace(/\(.*?\)/g, ' ')
+    .replace(/&/g, ' and ')
+    .replace(/\//g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getCanonicalInstitutionIdsForCourseName(courseName: string): string[] {
+  const normalizedTarget = normalizeCourseNameForMatching(courseName);
+
+  return allInstitutions
+    .filter((institution) =>
+      institution.data_source !== 'applysmart_directory' &&
+      institution.historical_score_ranges &&
+      Object.keys(institution.historical_score_ranges).some((offeredCourse) =>
+        normalizeCourseNameForMatching(offeredCourse) === normalizedTarget
+      )
+    )
+    .map((institution) => institution.id);
 }
 
 const parsedCourseInstitutionMap = parseCourseInstitutionData(rawCourseInstitutionData);
@@ -1334,7 +1378,32 @@ const supplementalInstitutionLookup: Record<string, AdmissionInstitution> = Obje
   })
 );
 
+function getResolvedInstitutionRecord(id: string): AdmissionInstitution | null {
+  const canonicalId = institutionIdAliasMap[id] ?? id;
+  return institutionsById[canonicalId] ?? supplementalInstitutionLookup[canonicalId] ?? supplementalInstitutionLookup[id] ?? null;
+}
+
+function isCollegeOfEducationInstitution(id: string): boolean {
+  const institution = getResolvedInstitutionRecord(id);
+  if (institution) {
+    return institution.type === 'College of Education';
+  }
+
+  const upperId = id.toUpperCase();
+  return /(^FCE-|COE|COED|SAYACOE)/.test(upperId);
+}
+
+const activeCourseInstitutionMap = Object.fromEntries(
+  Object.entries(resolvedCourseInstitutionMap)
+    .map(([course, institutions]) => [
+      course,
+      institutions.filter((institutionId) => !isCollegeOfEducationInstitution(institutionId)),
+    ])
+    .filter(([, institutions]) => institutions.length > 0)
+);
+
 export const supplementalInstitutions = applySmartDirectoryInstitutions
+  .filter(({ id }) => !isCollegeOfEducationInstitution(id))
   .map(({ id, name }) => toOption(id, name))
   .sort((a, b) => a.label.localeCompare(b.label));
 
@@ -1366,9 +1435,17 @@ export const courseInstitutionAliasMap: Record<string, string> = {
 };
 
 export const courseInstitutionMap: Record<string, string[]> = {
-  ...resolvedCourseInstitutionMap,
+  ...activeCourseInstitutionMap,
   ...Object.fromEntries(
-    Object.entries(courseInstitutionAliasMap).map(([alias, raw]) => [alias, resolvedCourseInstitutionMap[raw] ?? []])
+    Object.entries(courseInstitutionAliasMap).map(([alias, raw]) => [
+      alias,
+      Array.from(
+        new Set([
+          ...(activeCourseInstitutionMap[raw] ?? []),
+          ...getCanonicalInstitutionIdsForCourseName(alias),
+        ])
+      ),
+    ])
   ),
   'Medicine and Surgery (MBBS)': universityInstitutionIds,
   'Dentistry (BDS)': universityInstitutionIds,

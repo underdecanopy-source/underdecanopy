@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FullContactSection } from "@/components/contact/FullContactSection";
 import { MobileOptimizedFooter } from "@/components/contact/MobileOptimizedFooter";
 import { AdmissionCalculator } from "@/app/(main)/applysmart/_components/AdmissionCalculator";
+import { applySmartBlogPosts } from "@/lib/data/applysmartBlog";
 
 const Metadata = {
   title: "ApplySmart - University Admission Calculator",
@@ -29,8 +30,8 @@ export default function Page() {
                     <div className="page-container">
                         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                             <div className="text-left">
-                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-blue-900 mb-4">Your Path to University Admission and Scholarships Starts Here</h1>
-                                <p className="text-gray-600 text-base md:text-lg mb-6 md:mb-8">Get personalized admission guidance and scholarship matches based on JAMB CAPS protocols. We analyze your top three choices and provide a detailed report.</p>
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-blue-900 mb-4">Your Path to Smarter Tertiary Admission Starts Here</h1>
+                                <p className="text-gray-600 text-base md:text-lg mb-6 md:mb-8">Get personalized guidance for university, ND, and specialized admission routes, including current JAMB, UTME exemption, and screening realities.</p>
                                 <div className="flex gap-4 flex-wrap">
                                     <a href="#admission-calculator" className="bg-orange-500 text-white py-3 px-6 rounded-full text-lg hover:bg-orange-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95 inline-block">Check Admission Chances</a>
                                     <a href="#how-it-works" className="bg-gray-200 text-gray-800 py-3 px-6 rounded-full text-lg hover:bg-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 active:scale-95 inline-block">How it works</a>
@@ -58,9 +59,9 @@ export default function Page() {
                             <p className="text-gray-600 mt-2 max-w-3xl mx-auto">Our simple 3-step process helps you navigate the admission landscape with confidence</p>
                         </div>
                         <div className="grid md:grid-cols-3 gap-8">
-                            <StepCard number="1" name="Submit Your Preferences" description="Start by sharing your top three institution choices, your preferred courses, and your JAMB score. Our system uses this information to evaluate your chances of admission, considering cut-off marks, catchment areas, and ELDS policies." />
-                            <StepCard number="2" name="Receive Your Analysis" description="Get a detailed admission report within 48 hours showing your chances for each choice and alternative options. Premium users get direct expert access and application support." />
-                            <StepCard number="3" name="Find Your Perfect Scholarship Match" description="ApplySmart uses AI to connect you with scholarships that fit your profile. View opportunities, track your chances, and apply with ease. Premium clients get matches even after admission." />
+                            <StepCard number="1" name="Submit Your Preferences" description="Choose your course and institution path. ApplySmart now separates standard JAMB score routes from policy-based exceptions such as UTME-exempt agriculture-related ND programmes." />
+                            <StepCard number="2" name="Receive Your Analysis" description="Get guidance that reflects score requirements, programme type, catchment realities, and current admission policy direction instead of relying on one generic rule." />
+                            <StepCard number="3" name="Plan Beyond Entry" description="Use ApplySmart to connect admission choices with scholarships, progression options, and policy shifts such as the NCE-to-B.Ed. Dual Mandate pathway." />
                         </div>
                     </div>
                 </section>
@@ -69,7 +70,7 @@ export default function Page() {
                     <div className="page-container">
                         <div className="text-center mb-12">
                             <h2 className="text-3xl font-bold text-gray-800">Admission Calculator</h2>
-                            <p className="text-gray-600 mt-2 max-w-3xl mx-auto">Get an instant assessment of your admission chances based on JAMB score, institution, and course selection.</p>
+                            <p className="text-gray-600 mt-2 max-w-3xl mx-auto">Get an instant assessment based on your institution and course selection. Where UTME exemption applies, ApplySmart switches to route guidance instead of score-based prediction.</p>
                         </div>
                         <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
                             <AdmissionCalculator />
@@ -158,75 +159,22 @@ export default function Page() {
                     <div className="page-container">
                         <div className="text-center mb-12">
                             <h2 className="text-3xl font-bold text-gray-800">ApplySmart Blog</h2>
-                            <p className="text-gray-600 mt-2 max-w-3xl mx-auto">Stay informed with the latest admission tips, scholarship updates, and educational insights.</p>
+                            <p className="text-gray-600 mt-2 max-w-3xl mx-auto">Stay current with the latest admission policy updates, UTME exemptions, scholarship planning, and screening guidance.</p>
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <article className="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div className="bg-blue-900 h-40 flex items-center justify-center">
-                                    <span className="text-white text-5xl">&#128218;</span>
-                                </div>
-                                <div className="p-6">
-                                    <span className="text-xs text-orange-500 font-semibold uppercase">Admission Guide</span>
-                                    <h3 className="text-lg font-bold text-gray-800 mt-2 mb-2">How to Choose the Right Course and University in Nigeria</h3>
-                                    <p className="text-gray-600 text-sm mb-4">Selecting the right course and university is one of the most important decisions you will make. Consider factors like JAMB cut-off marks, course availability, school location, accreditation status, and your long-term career goals. Research past admission statistics and speak with current students to get firsthand insights about the academic environment.</p>
-                                    <a href="/applysmart/blog#how-to-choose-the-right-course" className="text-orange-500 font-semibold text-sm hover:underline">Read More &rarr;</a>
-                                </div>
-                            </article>
-                            <article className="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div className="bg-orange-500 h-40 flex items-center justify-center">
-                                    <span className="text-white text-5xl">&#127891;</span>
-                                </div>
-                                <div className="p-6">
-                                    <span className="text-xs text-blue-600 font-semibold uppercase">Scholarships</span>
-                                    <h3 className="text-lg font-bold text-gray-800 mt-2 mb-2">Top 10 Scholarships Every Nigerian Student Should Apply For</h3>
-                                    <p className="text-gray-600 text-sm mb-4">From the BEA Federal Government Scholarship to the MTN Foundation and Agbami scholarships, there are numerous fully and partially funded opportunities available. Each has specific eligibility criteria, deadlines, and application processes. Start preparing your documents early and ensure your academic records are up to date before applying.</p>
-                                    <a href="/applysmart/blog#top-10-scholarships" className="text-orange-500 font-semibold text-sm hover:underline">Read More &rarr;</a>
-                                </div>
-                            </article>
-                            <article className="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div className="bg-green-600 h-40 flex items-center justify-center">
-                                    <span className="text-white text-5xl">&#128196;</span>
-                                </div>
-                                <div className="p-6">
-                                    <span className="text-xs text-green-600 font-semibold uppercase">JAMB Tips</span>
-                                    <h3 className="text-lg font-bold text-gray-800 mt-2 mb-2">Understanding the JAMB CAPS Admission Process</h3>
-                                    <p className="text-gray-600 text-sm mb-4">The Central Admissions Processing System (CAPS) is how JAMB manages the admission process. Learn how to check your admission status, accept or reject offers, and understand merit, catchment, and ELDS admission lists. Knowing how CAPS works gives you an advantage in securing your preferred institution and course choice.</p>
-                                    <a href="/applysmart/blog#understanding-jamb-caps" className="text-orange-500 font-semibold text-sm hover:underline">Read More &rarr;</a>
-                                </div>
-                            </article>
-                            <article className="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div className="bg-purple-600 h-40 flex items-center justify-center">
-                                    <span className="text-white text-5xl">&#9997;&#65039;</span>
-                                </div>
-                                <div className="p-6">
-                                    <span className="text-xs text-purple-600 font-semibold uppercase">Post-UTME</span>
-                                    <h3 className="text-lg font-bold text-gray-800 mt-2 mb-2">How to Prepare for Post-UTME Screening</h3>
-                                    <p className="text-gray-600 text-sm mb-4">Post-UTME screening is the second hurdle after JAMB. Universities set their own exams, interviews, or document verification processes. Start by reviewing past questions for your chosen institution, practice time management, and ensure all your original documents are ready for verification on the screening day.</p>
-                                    <a href="/applysmart/blog#post-utme-screening" className="text-orange-500 font-semibold text-sm hover:underline">Read More &rarr;</a>
-                                </div>
-                            </article>
-                            <article className="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div className="bg-red-500 h-40 flex items-center justify-center">
-                                    <span className="text-white text-5xl">&#128176;</span>
-                                </div>
-                                <div className="p-6">
-                                    <span className="text-xs text-red-500 font-semibold uppercase">Financial Planning</span>
-                                    <h3 className="text-lg font-bold text-gray-800 mt-2 mb-2">Budgeting for University: What to Expect</h3>
-                                    <p className="text-gray-600 text-sm mb-4">University costs go beyond tuition fees. Factor in accommodation, feeding, textbooks, transportation, and course materials. Create a realistic budget, explore part-time work opportunities on campus, and apply for financial aid or bursaries early to avoid financial stress during the academic session.</p>
-                                    <a href="/applysmart/blog#budgeting-for-university" className="text-orange-500 font-semibold text-sm hover:underline">Read More &rarr;</a>
-                                </div>
-                            </article>
-                            <article className="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div className="bg-yellow-500 h-40 flex items-center justify-center">
-                                    <span className="text-white text-5xl">&#128640;</span>
-                                </div>
-                                <div className="p-6">
-                                    <span className="text-xs text-yellow-600 font-semibold uppercase">Career Guidance</span>
-                                    <h3 className="text-lg font-bold text-gray-800 mt-2 mb-2">From Admission to Career: Planning Your Academic Journey</h3>
-                                    <p className="text-gray-600 text-sm mb-4">Your course of study should align with your career aspirations. Explore internship opportunities early, build practical skills alongside your academics, and network with professionals in your field. A well-planned academic journey sets the foundation for a successful career after graduation.</p>
-                                    <a href="/applysmart/blog#planning-academic-journey" className="text-orange-500 font-semibold text-sm hover:underline">Read More &rarr;</a>
-                                </div>
-                            </article>
+                            {applySmartBlogPosts.slice(0, 6).map((post) => (
+                                <article key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                                    <div className={`${post.accentClassName} h-40 flex items-center justify-center`}>
+                                        <span className="text-white text-5xl">{post.previewIcon}</span>
+                                    </div>
+                                    <div className="p-6">
+                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${post.categoryClassName}`}>{post.category}</span>
+                                        <h3 className="text-lg font-bold text-gray-800 mt-2 mb-2">{post.title}</h3>
+                                        <p className="text-gray-600 text-sm mb-4">{post.excerpt}</p>
+                                        <a href={`/applysmart/blog#${post.id}`} className="text-orange-500 font-semibold text-sm hover:underline">Read More &rarr;</a>
+                                    </div>
+                                </article>
+                            ))}
                         </div>
                     </div>
                 </section>

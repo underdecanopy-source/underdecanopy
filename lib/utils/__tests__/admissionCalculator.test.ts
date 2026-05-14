@@ -1,6 +1,6 @@
 import { calculateAdmissionChance, getChanceColor, courseData, resolveCourseData } from '../admissionCalculator';
 import { allInstitutions, getInstitutionById } from '@/lib/data/admissionDataset';
-import { allCourses, courseInstitutionMap, getApplySmartInstitutionById, supplementalInstitutions } from '@/lib/data/applysmart';
+import { allCourses, courseInstitutionMap, getApplySmartInstitutionById, isUtmeExemptNdAgricultureCourse, supplementalInstitutions, utmeExemptNdAgricultureCourses } from '@/lib/data/applysmart';
 
 function normalizeCourseKey(course: string): string {
   return course
@@ -222,7 +222,7 @@ describe('Admission Calculator', () => {
     });
 
     it('should expose at least one institution for every applysmart course', () => {
-      expect(allCourses.length).toBeGreaterThanOrEqual(173);
+      expect(allCourses.length).toBeGreaterThanOrEqual(160);
 
       allCourses.forEach(({ value }) => {
         expect(courseInstitutionMap[value]).toBeDefined();
@@ -235,6 +235,13 @@ describe('Admission Calculator', () => {
       expect(courseInstitutionMap['AVIATION MANAGEMENT']).toContain('AZMAN');
       expect(supplementalInstitutions.some((option) => option.value === 'AAP')).toBe(true);
       expect(supplementalInstitutions.some((option) => option.value === 'AZMAN')).toBe(true);
+    });
+
+    it('should merge canonical university offerings into user-facing alias courses', () => {
+      expect(courseInstitutionMap['Computer Science']).toContain('UI');
+      expect(courseInstitutionMap['Computer Science']).toContain('UNILAG');
+      expect(courseInstitutionMap['Accounting']).toContain('UI');
+      expect(courseInstitutionMap['Economics']).toContain('UI');
     });
 
     it('should resolve every applysmart institution through the shared registry', () => {
@@ -266,14 +273,35 @@ describe('Admission Calculator', () => {
       expect(courseInstitutionMap['FORESTRY TECHNOLOGY']).toHaveLength(17);
     });
 
+    it('should exclude colleges of education from active applysmart institution options', () => {
+      const institutionIds = new Set(Object.values(courseInstitutionMap).flat());
+
+      institutionIds.forEach((institutionId) => {
+        const institution = getApplySmartInstitutionById(institutionId);
+        expect(institution).not.toBeNull();
+        expect(institution?.type).not.toBe('College of Education');
+      });
+
+      expect(supplementalInstitutions.some((option) => option.value === 'FCE-DAURA')).toBe(false);
+    });
+
     it('should provide an explicit course profile for every applysmart course', () => {
-      expect(allCourses.length).toBeGreaterThanOrEqual(173);
+      expect(allCourses.length).toBeGreaterThanOrEqual(160);
 
       allCourses.forEach(({ value }) => {
         const explicitProfile = resolveCourseData(value);
         expect(explicitProfile).toBeDefined();
         expect(explicitProfile.cutoff).toBeGreaterThan(0);
       });
+    });
+
+    it('should flag ND agriculture-related courses that now use the UTME-exempt JAMB route', () => {
+      utmeExemptNdAgricultureCourses.forEach((course) => {
+        expect(isUtmeExemptNdAgricultureCourse(course)).toBe(true);
+        expect(courseInstitutionMap[course].length).toBeGreaterThan(0);
+      });
+
+      expect(isUtmeExemptNdAgricultureCourse('COMPUTER SCIENCE')).toBe(false);
     });
 
     it('should provide concrete profiles for previously generic applysmart courses', () => {
