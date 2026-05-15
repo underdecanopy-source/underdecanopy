@@ -1095,11 +1095,18 @@ const resolvedCourseInstitutionMap = Object.fromEntries(
           .map(normalizeInstitutionId)
       )
     );
+    const canonicalInstitutionIds = getCanonicalInstitutionIdsForCourseName(course);
+    const mergedInstitutions = Array.from(
+      new Set([
+        ...normalizedInstitutions,
+        ...canonicalInstitutionIds,
+      ])
+    );
 
     return [
       course,
-      normalizedInstitutions.length > 0
-        ? normalizedInstitutions
+      mergedInstitutions.length > 0
+        ? mergedInstitutions
         : inferFallbackInstitutionIds(course),
     ];
   })
@@ -1447,6 +1454,7 @@ export const courseInstitutionMap: Record<string, string[]> = {
         new Set([
           ...(activeCourseInstitutionMap[raw] ?? []),
           ...getCanonicalInstitutionIdsForCourseName(alias),
+          ...inferFallbackInstitutionIds(alias),
         ])
       ),
     ])
