@@ -70,7 +70,6 @@ export default function HousehoodPage() {
           <div className="page-container grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
               <span className="inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-sm font-medium text-emerald-200">
-                Core Service 8
               </span>
               <h1 className="mt-6 text-4xl font-bold tracking-tight md:text-5xl">
                 Househood Portals for modern community operations

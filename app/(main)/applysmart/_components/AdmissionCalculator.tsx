@@ -190,6 +190,21 @@ export function AdmissionCalculator() {
                     </div>
                 </div>
             )}
+
+            <div className="mt-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
+                <div className="text-center">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-2">Prepare Better for JAMB</h4>
+                    <p className="text-sm text-gray-700 mb-4">Learn what to do after writing JAMB with our comprehensive guide.</p>
+                    <a
+                        href="https://selar.com/p/02r5cug80r?affiliate=85118g0363"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block bg-amber-600 text-white py-2 px-6 rounded-full hover:bg-amber-700 transition-colors text-sm font-medium"
+                    >
+                        Get "Now That You've Written JAMB... What Next?" →
+                    </a>
+                </div>
+            </div>
         </form>
     );
 }
