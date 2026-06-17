@@ -11,7 +11,7 @@ import { formatNaira } from './_lib/taxCalculator';
 export default function DashboardPage() {
     const { state, hydrated, loadSampleData } = useSmartTaxStore();
     const [period, setPeriod] = useState<ReportPeriod>('yearly');
-    const now = new Date();
+    const now = useMemo(() => new Date(), []);
 
     const stats = useMemo(() => {
         const scopedTransactions = filterTransactionsByPeriod(
