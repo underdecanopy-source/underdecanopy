@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    async redirects() {
+        return [
+            { source: '/smarttax', destination: '/olowo', permanent: true },
+            { source: '/smarttax/:path*', destination: '/olowo/:path*', permanent: true },
+            { source: '/sites/smarttax', destination: '/sites/olowo', permanent: true },
+            { source: '/sites/smarttax/:path*', destination: '/sites/olowo/:path*', permanent: true },
+        ];
+    },
     images: {
         remotePatterns: [
             {

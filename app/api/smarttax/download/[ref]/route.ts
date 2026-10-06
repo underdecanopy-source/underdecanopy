@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: Params) {
         getFiledReturnFile(params.ref),
     ]);
 
-    if (!record || !fileBuffer) {
+    if (!record || !fileBuffer || typeof record.fileName !== 'string') {
         return NextResponse.json({ error: 'Filed return not found' }, { status: 404 });
     }
 
@@ -32,11 +32,17 @@ export async function GET(request: NextRequest, { params }: Params) {
         return NextResponse.json({ error: 'Download token does not match the stored Tax ID' }, { status: 403 });
     }
 
+    const fileBaseName = record.fileName
+        .replace(/\.pdf$/i, '')
+        .replace(/[^A-Za-z0-9 _.-]/g, '_')
+        .slice(0, 100);
+    const fileName = `${fileBaseName || 'Olowo-Return'}.pdf`;
     return new NextResponse(new Uint8Array(fileBuffer), {
         status: 200,
         headers: {
-            'Content-Type': record.mimeType,
-            'Content-Disposition': `attachment; filename="${record.fileName}"`,
+            'Content-Type': 'application/pdf',
+            'X-Content-Type-Options': 'nosniff',
+            'Content-Disposition': `attachment; filename="${fileName}"`,
             'Cache-Control': 'private, no-store',
         },
     });

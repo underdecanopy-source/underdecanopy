@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
 
   const emailMapping: Record<string, string> = {
     'underdecanopy.com': 'underdecanopy@gmail.com',
+    'olowo.underdecanopy.com': 'underdecanopy@gmail.com',
     'smarttax.underdecanopy.com': 'underdecanopy@gmail.com',
     'swiftwheel.underdecanopy.com': 'underdecanopy@gmail.com',
     'coophub.underdecanopy.com': 'underdecanopy@gmail.com',

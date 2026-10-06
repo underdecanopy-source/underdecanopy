@@ -26,7 +26,8 @@ export default function middleware(req: NextRequest) {
     'www.underdecanopy.com': 'main',
     'coophub.underdecanopy.com': 'coophub',
     'applysmart.underdecanopy.com': 'applysmart',
-    'smarttax.underdecanopy.com': 'smarttax',
+    'olowo.underdecanopy.com': 'olowo',
+    'smarttax.underdecanopy.com': 'olowo',
     'swiftwheel.underdecanopy.com': 'swiftwheel',
     'techlift.underdecanopy.com': 'techlift',
     'trustfix.underdecanopy.com': 'trustfix',
@@ -46,7 +47,7 @@ export default function middleware(req: NextRequest) {
   }
 
   // Sub-site names that have their own /sites/<name>/ folder
-  const subSites = ['coophub', 'applysmart', 'smarttax', 'swiftwheel', 'techlift', 'trustfix', 'naijapolis', 'househood'];
+  const subSites = ['coophub', 'applysmart', 'olowo', 'smarttax', 'swiftwheel', 'techlift', 'trustfix', 'naijapolis', 'househood'];
 
   // On the main domain, if the path starts with a sub-site name, let Next.js
   // route it to the (main) route group which has the full page content

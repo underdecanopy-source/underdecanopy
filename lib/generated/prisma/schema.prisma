@@ -5,9 +5,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -24,6 +24,56 @@ model User {
 enum Role {
   USER
   ADMIN
+}
+
+enum BusinessRole {
+  OWNER
+  ADMINISTRATOR
+  MANAGER
+  ACCOUNTANT
+  SALES_STAFF
+  INVENTORY_STAFF
+  HR_PAYROLL
+  EMPLOYEE
+}
+
+model Business {
+  id           String               @id @default(cuid())
+  name         String
+  businessType String?
+  currency     String               @default("NGN")
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  memberships  BusinessMembership[]
+  auditLogs    AuditLog[]
+}
+
+model BusinessMembership {
+  id         String       @id @default(cuid())
+  businessId String
+  authUserId String
+  role       BusinessRole @default(OWNER)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  business   Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, authUserId])
+  @@index([authUserId, businessId])
+}
+
+model AuditLog {
+  id              String   @id @default(cuid())
+  businessId      String
+  actorAuthUserId String
+  action          String
+  entity          String
+  entityId        String
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Restrict)
+
+  @@index([businessId, createdAt])
+  @@index([actorAuthUserId, createdAt])
 }
 
 model Service {

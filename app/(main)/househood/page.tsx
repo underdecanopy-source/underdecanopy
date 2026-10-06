@@ -78,7 +78,7 @@ export default function HousehoodPage() {
                 Househood Portals brings resident access, manager workflows, and operations delivery into one calm interface.
                 It has been integrated into the main repository as a contained service so the existing platform remains stable.
               </p>
-              <div className="mt-8 flex flex-wrap gap-4">
+              <div className="mt-8 flex flex-wrap gap-4">K
                 <Link
                   href="/househood/demo"
                   className="rounded-full bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"

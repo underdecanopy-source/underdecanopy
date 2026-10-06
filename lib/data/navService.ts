@@ -31,13 +31,17 @@ export const navItems = {
         { href: '#how-it-works', label: 'How It Works' },
         { href: '#get-started', label: 'Get Started' },
     ],
-    '/smarttax': [
-        { href: '/smarttax', label: 'Home' },
+    '/olowo': [
+        { href: '/olowo', label: 'Home' },
         { href: '#features', label: 'Features' },
         { href: '#compliance', label: 'Compliance' },
         { href: '#pricing', label: 'Pricing' },
         { href: '#faq', label: 'FAQ' },
         { href: '#demo', label: 'Demo' },
+    ],
+    '/olowo/businesses': [
+        { href: '/olowo', label: 'Olowo' },
+        { href: '/olowo/businesses', label: 'Businesses' },
     ],
     '/naijapolis': [
         { href: '/naijapolis', label: 'Home' },

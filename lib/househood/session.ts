@@ -13,12 +13,14 @@ type HousehoodSessionPayload = {
 };
 
 function getSessionSecret() {
-  return (
+  const secret =
     process.env.HOUSEHOOD_SESSION_SECRET ||
     process.env.AUTH_SECRET ||
-    process.env.NEXTAUTH_SECRET ||
-    'underdecanopy-househood-dev-secret'
-  );
+    process.env.NEXTAUTH_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error('Configure a Househood session secret with at least 32 characters.');
+  }
+  return secret;
 }
 
 function sign(encodedPayload: string) {
@@ -49,21 +51,31 @@ export function verifyHousehoodSessionToken(token: string | undefined | null): H
     return null;
   }
 
-  const expectedSignature = sign(encodedPayload);
-  const providedBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expectedSignature);
-
-  if (providedBuffer.length !== expectedBuffer.length) {
-    return null;
-  }
-
-  if (!timingSafeEqual(providedBuffer, expectedBuffer)) {
-    return null;
-  }
-
   try {
+    const expectedSignature = sign(encodedPayload);
+    const providedBuffer = Buffer.from(signature);
+    const expectedBuffer = Buffer.from(expectedSignature);
+
+    if (providedBuffer.length !== expectedBuffer.length) {
+      return null;
+    }
+
+    if (!timingSafeEqual(providedBuffer, expectedBuffer)) {
+      return null;
+    }
+
     const payload = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8')) as HousehoodSessionPayload;
-    if (!payload.userId || !payload.email || !payload.role || payload.exp <= Date.now()) {
+    if (
+      typeof payload.userId !== 'string' ||
+      !payload.userId ||
+      typeof payload.email !== 'string' ||
+      !payload.email ||
+      typeof payload.role !== 'string' ||
+      !payload.role ||
+      typeof payload.exp !== 'number' ||
+      !Number.isFinite(payload.exp) ||
+      payload.exp <= Date.now()
+    ) {
       return null;
     }
     return payload;

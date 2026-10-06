@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs';
+import { randomUUID } from 'node:crypto';
 import path from 'path';
 
 export interface FiledReturnRecord {
@@ -29,11 +30,23 @@ function getStoreRoot(): string {
 }
 
 function getFilePath(ref: string): string {
+    assertValidRef(ref);
     return path.join(getStoreRoot(), `${ref}.pdf`);
 }
 
 function getMetadataPath(ref: string): string {
+    assertValidRef(ref);
     return path.join(getStoreRoot(), `${ref}.json`);
+}
+
+function assertValidRef(ref: string): void {
+    if (!/^[A-Za-z0-9_-]{1,100}$/.test(ref)) {
+        throw new Error('Invalid filed-return reference.');
+    }
+}
+
+function isMissingFile(error: unknown): boolean {
+    return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
 
 async function ensureStore(): Promise<void> {
@@ -41,6 +54,7 @@ async function ensureStore(): Promise<void> {
 }
 
 export async function saveFiledReturn(input: SaveFiledReturnInput): Promise<FiledReturnRecord> {
+    assertValidRef(input.record.ref);
     await ensureStore();
     const filePath = getFilePath(input.record.ref);
     const metadataPath = getMetadataPath(input.record.ref);
@@ -49,25 +63,41 @@ export async function saveFiledReturn(input: SaveFiledReturnInput): Promise<File
         size: input.fileBuffer.byteLength,
     };
 
-    await fs.writeFile(filePath, input.fileBuffer);
-    await fs.writeFile(metadataPath, JSON.stringify(storedRecord, null, 2), 'utf8');
+    await fs.writeFile(filePath, input.fileBuffer, { flag: 'wx' });
+    await fs.writeFile(metadataPath, JSON.stringify(storedRecord, null, 2), { encoding: 'utf8', flag: 'wx' });
 
     return storedRecord;
 }
 
 export async function getFiledReturnRecord(ref: string): Promise<FiledReturnRecord | null> {
     try {
-        const raw = await fs.readFile(getMetadataPath(ref), 'utf8');
-        return JSON.parse(raw) as FiledReturnRecord;
+        assertValidRef(ref);
     } catch {
         return null;
     }
+
+    let raw: string;
+    try {
+        raw = await fs.readFile(getMetadataPath(ref), 'utf8');
+    } catch (error) {
+        if (isMissingFile(error)) return null;
+        throw error;
+    }
+
+    return JSON.parse(raw) as FiledReturnRecord;
 }
 
 export async function getFiledReturnFile(ref: string): Promise<Buffer | null> {
     try {
-        return await fs.readFile(getFilePath(ref));
+        assertValidRef(ref);
     } catch {
         return null;
+    }
+
+    try {
+        return await fs.readFile(getFilePath(ref));
+    } catch (error) {
+        if (isMissingFile(error)) return null;
+        throw error;
     }
 }

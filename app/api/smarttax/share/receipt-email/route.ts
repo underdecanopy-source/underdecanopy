@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { buildReceiptEmailHtml, buildReceiptShareText } from '@/app/(main)/smarttax/demo/_lib/receiptContent';
+import { buildReceiptEmailHtml, buildReceiptShareText } from '@/app/(main)/olowo/demo/_lib/receiptContent';
 import { createSmtpTransport, hasSmtpConfig } from '@/lib/mail/smtp';
-import { resolveTaxIdentity } from '@/app/(main)/smarttax/demo/_lib/identity';
+import { resolveTaxIdentity } from '@/app/(main)/olowo/demo/_lib/identity';
 
 const profileSchema = z.object({
     name: z.string(),
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Validation failed', details: error.issues }, { status: 400 });
         }
 
-        console.error('SmartTax receipt email error', error);
+        console.error('Olowo receipt email error', error);
         return NextResponse.json({ error: 'Failed to send receipt email' }, { status: 500 });
     }
 }

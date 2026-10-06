@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Olowo
+
+Olowo is the target multi-tenant Business Operating System for SMEs. The current repository still contains legacy applications and browser-based demos; the presence of a screen or demo workflow does not mean that capability is backed by production persistence or is production-ready.
+
+Copy `.env.example` to `.env.local` and configure the database and Supabase values before using the authenticated business workspace API. `DIRECT_URL` is used for direct database/migration connections. Configure `HOUSEHOOD_SESSION_SECRET` and `SMARTTAX_DEMO_FILE_SECRET` as independent random secrets of at least 32 characters before using those signed-token features. Do not commit `.env.local` or production secrets.
+
+The business workspace foundation currently exposes authenticated business creation and membership-scoped listing through Prisma; its migration must be applied before these endpoints can persist records. The existing Olowo receipt/tax demo remains browser-local and must not be used as a source of production business records. Filed-return files are still stored on local disk or temporary server storage, not durable tenant-scoped object storage.
+
+The checked-in Prisma migration history does not yet reconstruct every model in the current Prisma schema on a clean database. Reconcile and verify the migration baseline against the target database before deployment; do not assume the current migrations are safe for a fresh production install or apply destructive schema changes without a verified backup.

@@ -6,10 +6,12 @@ export interface SecureDownloadTokenPayload {
     exp: number;
 }
 
-const DEFAULT_SECRET = 'smarttax-demo-local-secret';
-
 function getSecret(): string {
-    return process.env.SMARTTAX_DEMO_FILE_SECRET || process.env.JWT_SECRET || DEFAULT_SECRET;
+    const secret = process.env.SMARTTAX_DEMO_FILE_SECRET || process.env.JWT_SECRET;
+    if (!secret || secret.length < 32) {
+        throw new Error('Configure SMARTTAX_DEMO_FILE_SECRET or JWT_SECRET with at least 32 characters.');
+    }
+    return secret;
 }
 
 function toBase64Url(value: Buffer | string): string {
@@ -52,16 +54,23 @@ export function verifySecureDownloadToken(token: string): SecureDownloadTokenPay
         return null;
     }
 
-    const expectedSignature = sign(encodedPayload);
-    const provided = Buffer.from(encodedSignature);
-    const expected = Buffer.from(expectedSignature);
-    if (provided.length !== expected.length || !crypto.timingSafeEqual(provided, expected)) {
-        return null;
-    }
-
     try {
+        const expectedSignature = sign(encodedPayload);
+        const provided = Buffer.from(encodedSignature);
+        const expected = Buffer.from(expectedSignature);
+        if (provided.length !== expected.length || !crypto.timingSafeEqual(provided, expected)) {
+            return null;
+        }
+
         const payload = JSON.parse(fromBase64Url(encodedPayload).toString('utf8')) as SecureDownloadTokenPayload;
-        if (!payload.ref || !payload.taxId || !payload.exp) {
+        if (
+            typeof payload.ref !== 'string' ||
+            !payload.ref ||
+            typeof payload.taxId !== 'string' ||
+            !payload.taxId ||
+            typeof payload.exp !== 'number' ||
+            !Number.isFinite(payload.exp)
+        ) {
             return null;
         }
         if (payload.exp < Math.floor(Date.now() / 1000)) {

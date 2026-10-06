@@ -59,10 +59,10 @@ export const coreServices = [
     },
     {
       icon: <HandCoins size={40} />,
-      title: 'SmartTax Receipts',
+      title: 'Olowo',
       description:
-        'Our digital receipt system not only makes receiving receipts more convenient for your customers, it takes the stress out of customers having to hold onto their receipts when tax time rolls around.',
-      link: '/smarttax',
+        'A multi-tenant Business Operating System for SMEs, designed to connect sales, customers, inventory, purchases, expenses, receipts, and tax workflows in one place.',
+      link: '/olowo',
     },
     {
       icon: <Map size={40} />,
