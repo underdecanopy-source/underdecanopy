@@ -36,14 +36,14 @@ export default function OlowoPage() {
                                         <span className="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">1</span>
                                         <div>
                                             <h4 className="font-semibold text-gray-800">Eliminate Paper Waste</h4>
-                                            <p className="text-gray-600 text-sm">No more lost or faded paper receipts. Digital receipts are stored securely and accessible at any time for both you and your customers.</p>
+                                            <p className="text-gray-600 text-sm">Preview digital receipts generated from demo transactions. Records currently stay in this browser and are not a durable cloud archive.</p>
                                         </div>
                                     </li>
                                     <li className="flex items-start gap-3">
                                         <span className="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">2</span>
                                         <div>
-                                            <h4 className="font-semibold text-gray-800">Instant Delivery</h4>
-                                            <p className="text-gray-600 text-sm">Send receipts to customers instantly via WhatsApp, email, or SMS the moment a transaction is completed.</p>
+                                            <h4 className="font-semibold text-gray-800">Receipt Sharing Preview</h4>
+                                            <p className="text-gray-600 text-sm">Explore the receipt-sharing workflow in the demo. Delivery depends on configuration and is not guaranteed by the preview.</p>
                                         </div>
                                     </li>
                                     <li className="flex items-start gap-3">
@@ -71,8 +71,8 @@ export default function OlowoPage() {
                                         <p className="text-gray-600 text-sm">Automatically calculate and prepare monthly VAT returns based on your sales and purchase records.</p>
                                     </div>
                                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                                        <h4 className="font-semibold text-gray-800 mb-1">Income Tax Filing</h4>
-                                        <p className="text-gray-600 text-sm">Generate annual income tax returns for individuals and companies with all deductions properly accounted for.</p>
+                                        <h4 className="font-semibold text-gray-800 mb-1">Income Tax Return Preparation</h4>
+                                        <p className="text-gray-600 text-sm">Prepare tax-return documents for review. The demo does not submit returns to tax authorities.</p>
                                     </div>
                                     <div className="bg-white p-4 rounded-lg shadow-sm">
                                         <h4 className="font-semibold text-gray-800 mb-1">Withholding Tax</h4>

@@ -5,12 +5,12 @@ export const Features = () => {
         {
             icon: <Receipt size={48} className="text-blue-500" />,
             title: 'Professional Digital Receipts',
-            description: 'Generate branded, professional digital receipts instantly for every transaction. Send receipts via email, SMS, or WhatsApp to your customers with your business name, logo, and transaction details.',
+            description: 'Preview branded digital receipts from demo transactions. The current demo stores records in this browser; it is not a durable cloud archive.',
         },
         {
             icon: <FileText size={48} className="text-blue-500" />,
-            title: 'Tax Filing & Returns',
-            description: 'File your annual tax returns with ease. Olowo organizes income, expenses, and deductions, then prepares the required forms for NRS and state tax authorities.',
+            title: 'Tax Records & Return Preparation',
+            description: 'The current demo organizes income and expenses and prepares tax returns for review. It does not submit filings to tax authorities.',
         },
         {
             icon: <Calculator size={48} className="text-blue-500" />,
@@ -19,13 +19,13 @@ export const Features = () => {
         },
         {
             icon: <Shield size={48} className="text-blue-500" />,
-            title: 'Compliance & Audit-Ready Records',
-            description: 'Maintain organized financial records. Olowo keeps receipts and tax documents together to support compliance workflows.',
+            title: 'Organized Demo Records',
+            description: 'Explore how receipt and tax information is organized in the current preview. These browser-local records are not a complete audit archive.',
         },
         {
             icon: <BarChart size={48} className="text-blue-500" />,
             title: 'Financial Reports & Analytics',
-            description: 'Access detailed reports showing your income trends, tax obligations, and receipt history. Gain insights into your business finances with clear charts and summaries.',
+            description: 'Explore summary reports generated from demo transactions. These figures are not connected to your business workspaces or production financial records.',
         },
         {
             icon: <Clock size={48} className="text-blue-500" />,

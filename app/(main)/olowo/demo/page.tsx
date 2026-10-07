@@ -30,7 +30,7 @@ export default function DashboardPage() {
         <>
             <PageHeader
                 title={`Welcome, ${state.profile.businessName || state.profile.name}`}
-                description="CAC-focused financial metrics designed to simplify and streamline your annual returns."
+                description="Receipt and tax capability preview. Demo data is stored in this browser and is not connected to your Olowo business workspaces."
                 actions={
                     <>
                         <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1">
@@ -73,7 +73,7 @@ export default function DashboardPage() {
                         <div className="mb-6 rounded-lg border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-5 flex flex-col md:flex-row md:items-center gap-4">
                             <div className="flex-1">
                                 <p className="font-semibold text-amber-900 flex items-center gap-2">
-                                    <Sparkles className="h-4 w-4" /> Populate the accounting demo
+                                    <Sparkles className="h-4 w-4" /> Populate the receipt and tax demo
                                 </p>
                                 <p className="text-sm text-amber-800 mt-1">
                                     Load sample revenue and expense transactions to see profit, tax, and receipt flows update instantly.

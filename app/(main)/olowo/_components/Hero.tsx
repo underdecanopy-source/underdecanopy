@@ -10,7 +10,7 @@ export const Hero = () => {
                         Get Started with Olowo
                     </a>
                     <a href="/olowo/businesses" className="bg-orange-500 text-white py-3 px-8 rounded-full text-lg hover:bg-orange-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95 inline-block">
-                        Set Up a Business
+                        Preview Business Setup
                     </a>
                     <a href="#features" className="bg-white text-blue-900 py-3 px-8 rounded-full text-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 active:scale-95 inline-block">
                         Explore the Platform

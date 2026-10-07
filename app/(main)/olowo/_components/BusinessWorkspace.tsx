@@ -112,10 +112,13 @@ export function BusinessWorkspace() {
             <main id="main-content" className="min-h-screen bg-slate-50 py-12">
                 <div className="page-container max-w-5xl">
                     <div className="mb-8">
-                        <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Olowo Business OS</p>
+                        <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Olowo Business Setup Preview</p>
                         <h1 className="mt-2 text-3xl font-bold text-slate-900">Your businesses</h1>
                         <p className="mt-2 max-w-2xl text-slate-600">
                             Set up a business workspace. Business access is derived from your signed-in account, not from a user ID supplied by the browser.
+                        </p>
+                        <p className="mt-3 max-w-2xl rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                            This early foundation lets you create and view business workspaces. Connected products, inventory, sales, purchases, payments, and finance workflows are not available yet.
                         </p>
                     </div>
 
@@ -145,6 +148,12 @@ export function BusinessWorkspace() {
                                                 <p className="mt-1 text-sm text-slate-600">
                                                     {business.businessType || 'Business type not set'} · {role} · {business.currency}
                                                 </p>
+                                                <Link
+                                                    href={`/olowo/businesses/${encodeURIComponent(business.id)}/inventory`}
+                                                    className="mt-3 inline-flex rounded-md border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
+                                                >
+                                                    Open inventory preview
+                                                </Link>
                                             </li>
                                         ))}
                                     </ul>
@@ -204,9 +213,6 @@ export function BusinessWorkspace() {
                         </p>
                     )}
 
-                    <p className="mt-8 text-sm text-slate-500">
-                        This is the Olowo workspace foundation. Connected sales, product, inventory, and finance workflows are not yet available here.
-                    </p>
                 </div>
             </main>
         </>
