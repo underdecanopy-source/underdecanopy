@@ -11,19 +11,27 @@ datasource db {
 }
 
 model User {
-  id                    String                 @id @default("uuid")
+  id                    String                 @id @default(uuid())
   email                 String                 @unique
-  password              String
+  password              String?
   role                  Role                   @default(USER)
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
+  notes                 Note[]
   serviceRequests       ServiceRequest[]
   businessRegistrations BusinessRegistration[]
+  househoodAccount      HousehoodAccount?
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum HousehoodRole {
+  resident
+  manager
+  operations
 }
 
 enum BusinessRole {
@@ -48,6 +56,32 @@ enum StockMovementType {
   DAMAGE
 }
 
+enum SaleStatus {
+  COMPLETED
+  VOIDED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  POS
+  OTHER
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
 model Business {
   id             String               @id @default(cuid())
   name           String
@@ -57,10 +91,17 @@ model Business {
   updatedAt      DateTime             @updatedAt
   memberships    BusinessMembership[]
   auditLogs      AuditLog[]
+  events         BusinessEvent[]
   categories     ProductCategory[]
   products       Product[]
   warehouses     Warehouse[]
   stockMovements StockMovement[]
+  customers      Customer[]
+  sales          Sale[]
+  payments       Payment[]
+  accounts       Account[]
+  journalEntries JournalEntry[]
+  journalLines   JournalLine[]
 }
 
 model BusinessMembership {
@@ -89,6 +130,23 @@ model AuditLog {
 
   @@index([businessId, createdAt])
   @@index([actorAuthUserId, createdAt])
+}
+
+// Business events record operational activity for reporting and auditability.
+// They deliberately remain separate from the future double-entry journal.
+model BusinessEvent {
+  id              String   @id @default(cuid())
+  businessId      String
+  eventType       String
+  entityType      String
+  entityId        String
+  actorAuthUserId String
+  data            Json?
+  occurredAt      DateTime @default(now())
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Restrict)
+
+  @@index([businessId, occurredAt])
+  @@index([businessId, entityType, entityId])
 }
 
 model ProductCategory {
@@ -121,6 +179,7 @@ model Product {
   business       Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
   category       ProductCategory? @relation("BusinessProductCategory", fields: [businessId, categoryId], references: [businessId, id], onDelete: Restrict)
   stockMovements StockMovement[]
+  saleItems      SaleItem[]
 
   @@unique([businessId, sku])
   @@unique([businessId, id])
@@ -138,6 +197,7 @@ model Warehouse {
   updatedAt      DateTime        @updatedAt
   business       Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
   stockMovements StockMovement[]
+  sales          Sale[]
 
   @@unique([businessId, name])
   @@unique([businessId, id])
@@ -165,8 +225,159 @@ model StockMovement {
   @@index([businessId, createdAt])
 }
 
+model Customer {
+  id         String   @id @default(cuid())
+  businessId String
+  name       String
+  email      String?
+  phone      String?
+  address    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  sales      Sale[]
+
+  @@unique([businessId, id])
+  @@index([businessId, name])
+  @@index([businessId, email])
+}
+
+model Sale {
+  id                 String        @id @default(cuid())
+  businessId         String
+  customerId         String?
+  warehouseId        String
+  reference          String
+  status             SaleStatus    @default(COMPLETED)
+  paymentStatus      PaymentStatus @default(UNPAID)
+  subtotal           Decimal       @db.Decimal(12, 2)
+  discountAmount     Decimal       @default(0) @db.Decimal(12, 2)
+  taxAmount          Decimal       @default(0) @db.Decimal(12, 2)
+  totalAmount        Decimal       @db.Decimal(12, 2)
+  idempotencyKey     String
+  requestFingerprint String
+  actorAuthUserId    String
+  occurredAt         DateTime      @default(now())
+  voidedAt           DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  business           Business      @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  customer           Customer?     @relation(fields: [businessId, customerId], references: [businessId, id], onDelete: Restrict)
+  warehouse          Warehouse     @relation(fields: [businessId, warehouseId], references: [businessId, id], onDelete: Restrict)
+  items              SaleItem[]
+  payments           Payment[]
+
+  @@unique([businessId, id])
+  @@unique([businessId, reference])
+  @@unique([businessId, idempotencyKey])
+  @@index([businessId, occurredAt])
+  @@index([businessId, customerId, occurredAt])
+}
+
+model SaleItem {
+  id          String   @id @default(cuid())
+  businessId  String
+  saleId      String
+  productId   String
+  description String
+  quantity    Decimal  @db.Decimal(12, 3)
+  unitPrice   Decimal  @db.Decimal(12, 2)
+  unitCost    Decimal  @db.Decimal(12, 2)
+  lineTotal   Decimal  @db.Decimal(12, 2)
+  createdAt   DateTime @default(now())
+  sale        Sale     @relation(fields: [businessId, saleId], references: [businessId, id], onDelete: Restrict)
+  product     Product  @relation(fields: [businessId, productId], references: [businessId, id], onDelete: Restrict)
+
+  @@index([businessId, saleId])
+  @@index([businessId, productId])
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  businessId      String
+  saleId          String
+  amount          Decimal       @db.Decimal(12, 2)
+  method          PaymentMethod
+  receivedAt      DateTime      @default(now())
+  actorAuthUserId String
+  createdAt       DateTime      @default(now())
+  sale            Sale          @relation(fields: [businessId, saleId], references: [businessId, id], onDelete: Restrict)
+  business        Business      @relation(fields: [businessId], references: [id], onDelete: Restrict)
+
+  @@index([businessId, saleId, receivedAt])
+}
+
+model Account {
+  id           String        @id @default(cuid())
+  businessId   String
+  code         String
+  name         String
+  type         AccountType
+  isSystem     Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  journalLines JournalLine[]
+
+  @@unique([businessId, id])
+  @@unique([businessId, code])
+  @@index([businessId, type])
+}
+
+model JournalEntry {
+  id              String        @id @default(cuid())
+  businessId      String
+  sourceType      String
+  sourceId        String
+  memo            String?
+  actorAuthUserId String
+  occurredAt      DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+  business        Business      @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  lines           JournalLine[]
+
+  @@unique([businessId, id])
+  @@unique([businessId, sourceType, sourceId])
+  @@index([businessId, occurredAt])
+}
+
+model JournalLine {
+  id             String       @id @default(cuid())
+  businessId     String
+  journalEntryId String
+  accountId      String
+  debit          Decimal      @default(0) @db.Decimal(12, 2)
+  credit         Decimal      @default(0) @db.Decimal(12, 2)
+  createdAt      DateTime     @default(now())
+  business       Business     @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  journalEntry   JournalEntry @relation(fields: [businessId, journalEntryId], references: [businessId, id], onDelete: Restrict)
+  account        Account      @relation(fields: [businessId, accountId], references: [businessId, id], onDelete: Restrict)
+
+  @@index([businessId, accountId, createdAt])
+  @@index([businessId, journalEntryId])
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  text      String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+}
+
+model HousehoodAccount {
+  userId    String        @id
+  role      HousehoodRole
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now()) @updatedAt
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([role])
+}
+
 model Service {
-  id              String           @id @default("uuid")
+  id              String           @id @default(uuid())
   name            String           @unique
   description     String
   createdAt       DateTime         @default(now())
@@ -175,7 +386,7 @@ model Service {
 }
 
 model ServiceRequest {
-  id        String   @id @default("uuid")
+  id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   serviceId String
@@ -187,7 +398,7 @@ model ServiceRequest {
 }
 
 model TrainingCourse {
-  id          String   @id @default("uuid")
+  id          String   @id @default(uuid())
   name        String
   description String
   duration    String
@@ -197,7 +408,7 @@ model TrainingCourse {
 }
 
 model BusinessRegistration {
-  id           String   @id @default("uuid")
+  id           String   @id @default(uuid())
   userId       String
   user         User     @relation(fields: [userId], references: [id])
   businessName String
@@ -208,7 +419,7 @@ model BusinessRegistration {
 }
 
 model CafeMenuItem {
-  id          String   @id @default("uuid")
+  id          String   @id @default(uuid())
   name        String
   description String
   price       Float
@@ -218,7 +429,7 @@ model CafeMenuItem {
 }
 
 model NewsletterSubscription {
-  id           String   @id @default("uuid")
+  id           String   @id @default(uuid())
   email        String   @unique
   subscribedAt DateTime @default(now())
   isActive     Boolean  @default(true)

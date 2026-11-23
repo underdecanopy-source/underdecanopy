@@ -60,7 +60,7 @@ export async function authenticateHousehoodUser(email: string, password: string)
     },
   });
 
-  if (!user) {
+  if (!user || !user.password) {
     return null;
   }
 

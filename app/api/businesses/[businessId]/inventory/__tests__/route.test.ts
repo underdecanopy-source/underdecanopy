@@ -112,6 +112,7 @@ describe('Olowo inventory API', () => {
             productCategory: { upsert: jest.fn().mockResolvedValue({ id: 'category-1' }) },
             product: { create: jest.fn().mockResolvedValue(product) },
             auditLog: { create: jest.fn().mockResolvedValue({}) },
+            businessEvent: { create: jest.fn().mockResolvedValue({}) },
         };
         setTransaction(tx);
 
@@ -139,6 +140,9 @@ describe('Olowo inventory API', () => {
         expect(tx.auditLog.create).toHaveBeenCalledWith(expect.objectContaining({
             data: expect.objectContaining({ businessId, action: 'PRODUCT_CREATED' }),
         }));
+        expect(tx.businessEvent.create).toHaveBeenCalledWith(expect.objectContaining({
+            data: expect.objectContaining({ businessId, eventType: 'PRODUCT_CREATED', entityId: 'product-1' }),
+        }));
     });
 
     it('validates product prices before opening a database transaction', async () => {
@@ -156,6 +160,7 @@ describe('Olowo inventory API', () => {
         const tx = {
             warehouse: { create: jest.fn().mockResolvedValue({ id: 'warehouse-1', name: 'Main' }) },
             auditLog: { create: jest.fn().mockResolvedValue({}) },
+            businessEvent: { create: jest.fn().mockResolvedValue({}) },
         };
         setTransaction(tx);
 
@@ -167,6 +172,9 @@ describe('Olowo inventory API', () => {
         });
         expect(tx.auditLog.create).toHaveBeenCalledWith(expect.objectContaining({
             data: expect.objectContaining({ action: 'WAREHOUSE_CREATED' }),
+        }));
+        expect(tx.businessEvent.create).toHaveBeenCalledWith(expect.objectContaining({
+            data: expect.objectContaining({ businessId, eventType: 'WAREHOUSE_CREATED', entityId: 'warehouse-1' }),
         }));
     });
 
@@ -181,6 +189,7 @@ describe('Olowo inventory API', () => {
             product: { findFirst: jest.fn().mockResolvedValue({ id: 'product-1' }) },
             warehouse: { findFirst: jest.fn().mockResolvedValue({ id: 'warehouse-1' }) },
             auditLog: { create: jest.fn().mockResolvedValue({}) },
+            businessEvent: { create: jest.fn().mockResolvedValue({}) },
         };
         setTransaction(tx);
 
@@ -208,6 +217,9 @@ describe('Olowo inventory API', () => {
         }));
         expect(tx.auditLog.create).toHaveBeenCalledWith(expect.objectContaining({
             data: expect.objectContaining({ action: 'INVENTORY_ADJUSTED', entityId: 'movement-1' }),
+        }));
+        expect(tx.businessEvent.create).toHaveBeenCalledWith(expect.objectContaining({
+            data: expect.objectContaining({ businessId, eventType: 'STOCK_ADJUSTED', entityId: 'movement-1' }),
         }));
     });
 

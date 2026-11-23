@@ -191,7 +191,7 @@ export function InventoryWorkspace({ businessId }: { businessId: string }) {
                 </header>
 
                 <p className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                    This is the first inventory slice, not a complete Business OS workflow. Sales, purchases, supplier/customer balances and accounting journals are not connected yet; stock adjustments do not post financial entries.
+                    This is the inventory workspace, not a complete Business OS workflow. The persisted sales API now posts stock movements and balanced accounting entries, but the sales workspace, purchases, supplier/customer statements and financial reports are still being built. Stock adjustments do not post financial entries.
                 </p>
 
                 {error && <p className="mt-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{error}</p>}

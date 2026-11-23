@@ -102,7 +102,6 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
             return NextResponse.json({ error: 'Validation failed', details: parsed.error.issues }, { status: 400 });
         }
         requestForReplay = parsed.data;
-        requestForReplay = parsed.data;
         const { productId, warehouseId, direction, quantity, reason, idempotencyKey } = parsed.data;
         const signedQuantity = new Prisma.Decimal(direction === 'IN' ? quantity : -quantity);
         const movement = await db.$transaction(async (tx) => {
@@ -165,6 +164,16 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
                     entity: 'StockMovement',
                     entityId: created.id,
                     metadata: { direction, quantity, reason, productId, warehouseId },
+                },
+            });
+            await tx.businessEvent.create({
+                data: {
+                    businessId: params.businessId,
+                    eventType: 'STOCK_ADJUSTED',
+                    entityType: 'StockMovement',
+                    entityId: created.id,
+                    actorAuthUserId: access.user.id,
+                    data: { direction, quantity, reason, productId, warehouseId },
                 },
             });
             return { movement: created, replayed: false };

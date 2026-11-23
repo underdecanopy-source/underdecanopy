@@ -87,6 +87,16 @@ export async function POST(request: NextRequest) {
           entityId: created.id,
         },
       });
+      await tx.businessEvent.create({
+        data: {
+          businessId: created.id,
+          eventType: 'BUSINESS_CREATED',
+          entityType: 'Business',
+          entityId: created.id,
+          actorAuthUserId: user.id,
+          data: { businessType: created.businessType },
+        },
+      });
 
       return created;
     });

@@ -70,6 +70,16 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
                     metadata: { sku: created.sku, category: categoryName || null },
                 },
             });
+            await tx.businessEvent.create({
+                data: {
+                    businessId: params.businessId,
+                    eventType: 'PRODUCT_CREATED',
+                    entityType: 'Product',
+                    entityId: created.id,
+                    actorAuthUserId: access.user.id,
+                    data: { sku: created.sku, category: categoryName || null },
+                },
+            });
             return created;
         });
 

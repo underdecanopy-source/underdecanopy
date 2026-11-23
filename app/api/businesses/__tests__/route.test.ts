@@ -85,6 +85,7 @@ describe('/api/businesses', () => {
       business: { create: jest.fn().mockResolvedValue(business) },
       businessMembership: { create: jest.fn().mockResolvedValue({}) },
       auditLog: { create: jest.fn().mockResolvedValue({}) },
+      businessEvent: { create: jest.fn().mockResolvedValue({}) },
     };
     mockedDb.$transaction.mockImplementation(async (callback) => {
       if (typeof callback !== 'function') throw new Error('Expected transaction callback');
@@ -114,6 +115,16 @@ describe('/api/businesses', () => {
         action: 'BUSINESS_CREATED',
         entity: 'Business',
         entityId: 'business-1',
+      },
+    });
+    expect(tx.businessEvent.create).toHaveBeenCalledWith({
+      data: {
+        businessId: 'business-1',
+        eventType: 'BUSINESS_CREATED',
+        entityType: 'Business',
+        entityId: 'business-1',
+        actorAuthUserId: 'auth-user-1',
+        data: { businessType: undefined },
       },
     });
   });

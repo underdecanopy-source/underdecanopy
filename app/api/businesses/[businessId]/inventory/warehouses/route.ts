@@ -45,6 +45,16 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
                     entityId: created.id,
                 },
             });
+            await tx.businessEvent.create({
+                data: {
+                    businessId: params.businessId,
+                    eventType: 'WAREHOUSE_CREATED',
+                    entityType: 'Warehouse',
+                    entityId: created.id,
+                    actorAuthUserId: access.user.id,
+                    data: { name: created.name },
+                },
+            });
             return created;
         });
 
