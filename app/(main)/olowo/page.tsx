@@ -49,8 +49,8 @@ export default function OlowoPage() {
                                     <li className="flex items-start gap-3">
                                         <span className="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">3</span>
                                         <div>
-                                            <h4 className="font-semibold text-gray-800">Automatic Tax Tracking</h4>
-                                            <p className="text-gray-600 text-sm">Every receipt automatically feeds into your tax records. VAT, withholding tax, and income are tracked in real time so you are always prepared for filing.</p>
+                                            <h4 className="font-semibold text-gray-800">Tax Records Preview</h4>
+                                            <p className="text-gray-600 text-sm">The demo organizes receipt and tax information for review. Persisted, tenant-scoped tax records are not yet connected to sales.</p>
                                         </div>
                                     </li>
                                     <li className="flex items-start gap-3">

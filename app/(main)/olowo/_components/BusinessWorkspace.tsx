@@ -118,7 +118,7 @@ export function BusinessWorkspace() {
                             Set up a business workspace. Business access is derived from your signed-in account, not from a user ID supplied by the browser.
                         </p>
                         <p className="mt-3 max-w-2xl rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                            This early foundation lets you create and view business workspaces. Connected products, inventory, sales, purchases, payments, and finance workflows are not available yet.
+                            This workspace provides persisted business setup, inventory, customers, and completed sales. Purchases, expenses, payroll, document storage, and operational reports remain unavailable.
                         </p>
                     </div>
 
@@ -148,12 +148,20 @@ export function BusinessWorkspace() {
                                                 <p className="mt-1 text-sm text-slate-600">
                                                     {business.businessType || 'Business type not set'} · {role} · {business.currency}
                                                 </p>
-                                                <Link
-                                                    href={`/olowo/businesses/${encodeURIComponent(business.id)}/inventory`}
-                                                    className="mt-3 inline-flex rounded-md border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
-                                                >
-                                                    Open inventory preview
-                                                </Link>
+                                                <span className="mt-3 flex flex-wrap gap-2">
+                                                    <Link
+                                                        href={`/olowo/businesses/${encodeURIComponent(business.id)}/inventory`}
+                                                        className="inline-flex rounded-md border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
+                                                    >
+                                                        Open inventory
+                                                    </Link>
+                                                    <Link
+                                                        href={`/olowo/businesses/${encodeURIComponent(business.id)}/sales`}
+                                                        className="inline-flex rounded-md border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50"
+                                                    >
+                                                        Open sales
+                                                    </Link>
+                                                </span>
                                             </li>
                                         ))}
                                     </ul>

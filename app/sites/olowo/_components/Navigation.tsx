@@ -20,7 +20,7 @@ export const Navigation = () => {
             <div className="page-container">
                 <div className="flex h-16 items-center justify-between">
                     <Link href="/sites/olowo" className="text-xl font-bold text-white transition-all duration-300 hover:scale-105 hover:text-lime-300 flex-shrink-0 drop-shadow-lg">
-                        Smart<span className="text-lime-400">Tax</span>
+                        Olowo
                     </Link>
 
                     <nav className="hidden items-center gap-8 md:flex ml-auto">

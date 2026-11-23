@@ -29,8 +29,8 @@ export const Features = () => {
         },
         {
             icon: <Clock size={48} className="text-blue-500" />,
-            title: 'Deadline Reminders & Tracking',
-            description: 'Keep track of VAT returns, annual tax filings, and other compliance deadlines with Olowo.',
+            title: 'Deadline Information',
+            description: 'Explore compliance deadline information in the demo. Olowo does not yet send filed, authoritative, or guaranteed reminders.',
         },
     ];
 

@@ -191,7 +191,11 @@ export function InventoryWorkspace({ businessId }: { businessId: string }) {
                 </header>
 
                 <p className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                    This is the inventory workspace, not a complete Business OS workflow. The persisted sales API now posts stock movements and balanced accounting entries, but the sales workspace, purchases, supplier/customer statements and financial reports are still being built. Stock adjustments do not post financial entries.
+                    This workspace persists products, warehouses, stock movements, and adjustments. Purchases and stock counts remain unavailable.
+                    {' '}
+                    <Link href={`/olowo/businesses/${encodeURIComponent(businessId)}/sales`} className="font-semibold underline">
+                        Record a persisted sale
+                    </Link>
                 </p>
 
                 {error && <p className="mt-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{error}</p>}
