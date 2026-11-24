@@ -46,6 +46,11 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Authentication pages are shared app routes, not site-specific content.
+  if (url.pathname === '/login' || url.pathname === '/signup') {
+    return NextResponse.next();
+  }
+
   // Sub-site names that have their own /sites/<name>/ folder
   const subSites = ['coophub', 'applysmart', 'olowo', 'smarttax', 'swiftwheel', 'techlift', 'trustfix', 'naijapolis', 'househood'];
 
