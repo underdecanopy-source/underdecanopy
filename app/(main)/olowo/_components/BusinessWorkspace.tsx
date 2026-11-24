@@ -126,7 +126,7 @@ export function BusinessWorkspace() {
                         <section className="rounded-xl border border-blue-200 bg-white p-6 shadow-sm">
                             <h2 className="text-lg font-semibold text-slate-900">Sign in to continue</h2>
                             <p className="mt-2 text-slate-600">Sign in or create an account before setting up a business.</p>
-                            <Link href="/login" className="mt-4 inline-flex rounded-md bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800">
+                            <Link href="/login?next=%2Folowo%2Fbusinesses" className="mt-4 inline-flex rounded-md bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800">
                                 Go to sign in
                             </Link>
                         </section>

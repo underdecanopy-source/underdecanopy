@@ -2,7 +2,13 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import React from 'react'
 import LoginForm from '../_components/LoginForm'
 
-export default function page() {
+type LoginPageProps = {
+  searchParams: {
+    next?: string
+  }
+}
+
+export default function page({ searchParams }: LoginPageProps) {
   return (
     <div className='mt-20 flex flex-col flex-1 items-center'>
       <Card className='w-full max-w-md'>
@@ -11,7 +17,7 @@ export default function page() {
             Login
           </CardTitle>
         </CardHeader>
-        <LoginForm />
+        <LoginForm redirectTo={searchParams.next} />
       </Card>
     </div>
   )

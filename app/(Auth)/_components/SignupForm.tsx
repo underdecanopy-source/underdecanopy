@@ -4,6 +4,7 @@ import { CardContent, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { signUp } from '@/lib/actions/auth'
+import { getSafeRedirectPath } from '@/lib/auth/redirect'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -21,7 +22,11 @@ function SubmitButton() {
     )
 }
 
-export default function SignupForm() {
+type SignupFormProps = {
+    redirectTo?: string
+}
+
+export default function SignupForm({ redirectTo }: SignupFormProps) {
     const router = useRouter()
     const [state, signUpAction] = useFormState(signUp, null)
 
@@ -32,10 +37,10 @@ export default function SignupForm() {
             }
             else if (state?.errorMessage === null) {
                 toast.success("Signed Up, Please check your email")
-                router.replace("/")
+                router.replace(`/login?next=${encodeURIComponent(getSafeRedirectPath(redirectTo))}`)
             }
         }
-    }, [state, router])
+    }, [state, router, redirectTo])
 
     return (
         <form action={signUpAction}>
@@ -59,7 +64,7 @@ export default function SignupForm() {
             <CardFooter className='flex flex-col gap-6 mt-4'>
                 <SubmitButton />
                 <p className='text-xs'>
-                    Already have an account? <Link href="/login" className='text-blue-500 cursor-pointer'>Login</Link>
+                    Already have an account? <Link href={`/login?next=${encodeURIComponent(getSafeRedirectPath(redirectTo))}`} className='text-blue-500 cursor-pointer'>Login</Link>
                 </p>
             </CardFooter>
         </form>
