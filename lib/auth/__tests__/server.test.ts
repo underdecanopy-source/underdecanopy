@@ -1,4 +1,4 @@
-import { getSupabaseAuthConfig } from '../server'
+import { getSupabaseAuthConfig } from '../config'
 
 describe('getSupabaseAuthConfig', () => {
     const originalEnv = process.env
