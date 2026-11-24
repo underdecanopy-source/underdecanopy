@@ -68,7 +68,14 @@ export async function signUp(prevState: unknown, formData: FormData) {
         return { errorMessage: null }
     }
     catch (error) {
-        console.log(error)
+        if (error instanceof Error && /fetch failed/i.test(error.message)) {
+            console.error('[auth] Supabase sign-up request could not reach the configured auth service')
+            return {
+                errorMessage: "We couldn't reach the account service. Please try again shortly. If this continues, contact support."
+            }
+        }
+
+        console.error('[auth] Sign-up failed', error instanceof Error ? error.message : 'Unknown error')
         if (error instanceof Error) {
             return { errorMessage: error.message }
         }
