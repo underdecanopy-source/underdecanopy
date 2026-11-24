@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     ]);
 
     if (!record || !fileBuffer || typeof record.fileName !== 'string') {
-        return NextResponse.json({ error: 'Filed return not found' }, { status: 404 });
+        return NextResponse.json({ error: 'Prepared return document not found' }, { status: 404 });
     }
 
     if (record.taxId !== payload.taxId) {

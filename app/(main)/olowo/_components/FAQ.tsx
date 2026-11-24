@@ -11,28 +11,28 @@ export const FAQ = () => {
 
     const faqData = [
         {
-            question: 'What types of receipts can I generate with Olowo?',
-            answer: 'Olowo supports sales receipts, service invoices, payment confirmations, and VAT receipts. Each receipt includes your business name, customer details, itemized list of products or services, tax breakdown, and a unique receipt number for tracking.'
+            question: 'What can I use in the current business workspace?',
+            answer: 'After signing in, the current workspace supports business setup, products, warehouses, stock movements, customers, and completed sales. The deployment must have working authentication and database configuration. Later payment collection, returns, refunds, purchases, expenses, and reports are not yet available.'
         },
         {
-            question: 'How does Olowo help with tax filing?',
-            answer: 'Olowo tracks transactions, calculates tax obligations (including VAT, withholding tax, and personal/company income tax), and prepares forms for filing with NRS or your state tax authority. You review and submit the prepared returns.'
+            question: 'Does OLÓWÒ file tax returns?',
+            answer: 'No. The separate browser demo can calculate illustrative tax amounts and prepare draft documents from demo data. It does not submit returns to a tax authority, and its tax records are not connected to persisted business sales.'
         },
         {
-            question: 'Can I send receipts directly to my customers?',
-            answer: 'Yes. Olowo lets you send digital receipts to customers via email, SMS, or WhatsApp after a transaction. Customers receive a branded receipt with transaction details.'
+            question: 'Can I send a receipt from the demo?',
+            answer: 'A signed-in user can attempt email through a configured mail service; without authentication or SMTP, the demo requests a local email draft instead. WhatsApp opens a share composer for you to complete. OLÓWÒ does not confirm that a recipient received or read a message.'
         },
         {
-            question: 'Is Olowo suitable for my type of business?',
-            answer: 'Olowo is being built for SMEs. This demo focuses on digital receipts and tax workflows; the wider Business OS is intended to connect more of a business’s operations over time.'
+            question: 'Are the demo tax rates current and configurable?',
+            answer: 'The demo uses tax values encoded in its current implementation. They are not business-configurable or versioned and may not reflect current law. Verify applicable rules with the relevant authority or a qualified professional.'
         },
         {
-            question: 'How do I get my tax records if I am audited?',
-            answer: 'The demo provides document and data export options for its receipts and tax records. Production data portability and audit capabilities are platform requirements for Olowo.'
+            question: 'Are demo records a durable business archive?',
+            answer: 'No. Demo transactions, receipts, and reminders are stored in this browser, and generated draft PDFs use a separate demo file workflow. This is not a complete, tenant-scoped audit archive or a backup.'
         },
         {
-            question: 'What tax rates does Olowo use?',
-            answer: 'Olowo uses the Nigerian tax rates configured in the product. Verify applicable rates with the relevant tax authority or a qualified professional.'
+            question: 'Which business modules are still pending?',
+            answer: 'Purchases, suppliers, expense workflows, later payment collection, returns and refunds, complete accounting and reports, payroll, configurable tax rules, secure business documents, approvals, imports, exports, and backups are not yet implemented in the persisted workspace.'
         }
     ];
 

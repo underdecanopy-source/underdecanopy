@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { saveFiledReturn } from '@/lib/smarttax/fileStore';
 import { createSecureDownloadToken } from '@/lib/smarttax/secureLinks';
+import { getUser } from '@/lib/auth/server';
 
 const filedReturnSchema = z.object({
     fileName: z.string().trim().min(1).max(120).regex(/^[A-Za-z0-9][A-Za-z0-9 ._-]*\.pdf$/i),
@@ -23,6 +24,11 @@ const filedReturnSchema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
+        const user = await getUser();
+        if (!user) {
+            return NextResponse.json({ error: 'Authentication required to store a return document' }, { status: 401 });
+        }
+
         const body = filedReturnSchema.parse(await request.json());
         const ref = `OLW-${randomUUID()}`;
         const fileBuffer = Buffer.from(body.pdfBase64, 'base64');
@@ -63,7 +69,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Validation failed', details: error.issues }, { status: 400 });
         }
 
-        console.error('SmartTax filed return save error', error);
-        return NextResponse.json({ error: 'Failed to save filed return' }, { status: 500 });
+        console.error('Olowo prepared return save error', error);
+        return NextResponse.json({ error: 'Failed to save prepared return document' }, { status: 500 });
     }
 }

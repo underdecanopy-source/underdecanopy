@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Check, Mail, MessageCircle, Printer, X } from 'lucide-react';
+import { Check, Info, Mail, MessageCircle, Printer, X } from 'lucide-react';
 import { EmptyState, PageHeader } from '../_components/ui';
 import { ReceiptPreview } from '../_components/ReceiptPreview';
 import { resolveTaxIdentity } from '../_lib/identity';
@@ -15,7 +15,7 @@ function ReceiptsInner() {
     const params = useSearchParams();
     const focusId = params.get('id');
     const [selectedId, setSelectedId] = useState<string | null>(focusId);
-    const [actionStatus, setActionStatus] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [actionStatus, setActionStatus] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
     const [busyChannel, setBusyChannel] = useState<'email' | 'whatsapp' | null>(null);
 
     const selected = useMemo(() => {
@@ -32,7 +32,7 @@ function ReceiptsInner() {
         return document.getElementById('receipt-print-area');
     }
 
-    function showActionStatus(message: string, type: 'success' | 'error') {
+    function showActionStatus(message: string, type: 'success' | 'error' | 'info') {
         setActionStatus({ message, type });
         window.setTimeout(() => setActionStatus(null), 6000);
     }
@@ -96,12 +96,12 @@ function ReceiptsInner() {
                 }
 
                 markReceiptSent(selected.receipt.id, channel);
-                showActionStatus(`Receipt emailed successfully to ${recipient}.`, 'success');
+                showActionStatus('Email accepted by the configured mail service. Recipient delivery is not confirmed.', 'success');
             } catch (error) {
                 const subject = encodeURIComponent(`Receipt ${selected.receipt.receiptNumber} (Tax ID: ${identity.primaryValue || 'Missing'})`);
                 const body = encodeURIComponent(shareText);
                 window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
-                showActionStatus(`A local email draft has been opened for ${recipient}.`, 'success');
+                showActionStatus('Requested a local email draft. OLÓWÒ did not send this email.', 'info');
             } finally {
                 setBusyChannel(null);
             }
@@ -119,7 +119,7 @@ function ReceiptsInner() {
         }
 
         markReceiptSent(selected.receipt.id, channel);
-        showActionStatus(`Prepared WhatsApp share for ${selected.txn.customerName}.`, 'success');
+        showActionStatus(`Opened a WhatsApp share composer for ${selected.txn.customerName}. You still need to send the message; delivery is not confirmed.`, 'info');
         setBusyChannel(null);
     }
 
@@ -242,7 +242,7 @@ function ReceiptsInner() {
                             <div className="mt-4 flex flex-wrap gap-2 text-xs">
                                 {selected.receipt.sentViaEmail && (
                                     <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                                        <Check className="h-3 w-3" /> Email sent
+                                        <Check className="h-3 w-3" /> Email accepted; delivery unconfirmed
                                     </span>
                                 )}
                                 {selected.receipt.sentViaWhatsApp && (
@@ -290,9 +290,13 @@ function ReceiptsInner() {
                                         className={`mt-3 flex items-start gap-2 rounded-md px-3 py-2 text-xs ${
                                             actionStatus.type === 'success'
                                                 ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                                                : 'bg-rose-50 border border-rose-200 text-rose-800'
+                                                : actionStatus.type === 'info'
+                                                    ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                                                    : 'bg-rose-50 border border-rose-200 text-rose-800'
                                         }`}
+                                        role={actionStatus.type === 'error' ? 'alert' : 'status'}
                                     >
+                                        {actionStatus.type === 'info' && <Info className="h-3 w-3 flex-shrink-0" aria-hidden="true" />}
                                         <span className="flex-1">{actionStatus.message}</span>
                                         <button onClick={() => setActionStatus(null)} className="ml-auto">
                                             <X className="h-3 w-3" />

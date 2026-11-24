@@ -86,7 +86,7 @@ export function ReceiptPreview({
                 </div>
                 <div className="text-right flex-shrink-0">
                     <p className="text-[11px] font-semibold uppercase text-slate-500">Receipt</p>
-                    <p className="font-mono font-bold text-slate-900 text-sm">{data.receiptNumber || 'STX-PREVIEW'}</p>
+                    <p className="font-mono font-bold text-slate-900 text-sm">{data.receiptNumber || 'OLW-PREVIEW'}</p>
                     <p className="text-[11px] text-slate-500 mt-1">{dateLabel}</p>
                 </div>
             </div>

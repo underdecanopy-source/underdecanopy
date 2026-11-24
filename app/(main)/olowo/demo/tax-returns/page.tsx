@@ -1,19 +1,19 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { CheckCircle2, Download, FileText, Mail, MessageCircle, Plus } from 'lucide-react';
+import { CheckCircle2, Download, FileText, Info, Mail, MessageCircle, Plus } from 'lucide-react';
 import { EmptyState, PageHeader } from '../_components/ui';
 import { filterTransactionsByPeriod, summarizeTransactions } from '../_lib/financials';
 import { requireTaxIdentity } from '../_lib/identity';
 import { openPrintableDocument } from '../_lib/openDocument';
 import { useSmartTaxStore } from '../_lib/store';
 import { buildTaxReturnDocumentData, buildTaxReturnDocumentHtml, buildTaxReturnShareMessage } from '../_lib/taxReturnDocument';
-import { blobToBase64, generateTaxReturnPdfBlob } from '../_lib/taxReturnPdf';
+import { downloadBlob, generateTaxReturnPdfBlob } from '../_lib/taxReturnPdf';
 import { calculateCIT, calculatePIT, formatNaira } from '../_lib/taxCalculator';
 import type { TaxReturn, TaxReturnComputation } from '../_lib/types';
 
 type ReturnType = 'VAT' | 'PIT' | 'WHT' | 'CIT';
-type StatusMessage = { text: string; tone: 'success' | 'error' } | null;
+type StatusMessage = { text: string; tone: 'success' | 'error' | 'info' } | null;
 
 function parseNumericInput(value: string): number {
     const parsed = Number.parseFloat(value.replace(/,/g, '').trim());
@@ -30,7 +30,7 @@ export default function TaxReturnsPage() {
     const [selectedAuditReturnId, setSelectedAuditReturnId] = useState<string | null>(null);
     const [statusMessage, setStatusMessage] = useState<StatusMessage>(null);
     const [busyReturnId, setBusyReturnId] = useState<string | null>(null);
-    const now = new Date();
+    const [now] = useState(() => new Date());
     const [year, setYear] = useState<string>(String(now.getFullYear()));
     const [month, setMonth] = useState<string>(String(now.getMonth() + 1).padStart(2, '0'));
     const [pitForm, setPitForm] = useState({
@@ -152,7 +152,7 @@ export default function TaxReturnsPage() {
             .join('');
     }
 
-    function showStatus(text: string, tone: 'success' | 'error') {
+    function showStatus(text: string, tone: 'success' | 'error' | 'info') {
         setStatusMessage({ text, tone });
         window.setTimeout(() => setStatusMessage(null), 6000);
     }
@@ -194,7 +194,7 @@ export default function TaxReturnsPage() {
         });
     }
 
-    function buildDocumentForFiledReturn(taxReturn: TaxReturn) {
+    function buildDocumentForPreparedReturn(taxReturn: TaxReturn) {
         if (!taxReturn.computation) {
             return null;
         }
@@ -238,39 +238,8 @@ export default function TaxReturnsPage() {
             );
             const document = buildDocumentForComputation(summary, filingDate, verificationHash);
             const pdfBlob = await generateTaxReturnPdfBlob(document);
-            const pdfBase64 = await blobToBase64(pdfBlob);
             const downloadFileName = `${document.title.replace(/\s+/g, '-')}.pdf`;
-
-            const response = await fetch('/api/smarttax/filed-returns', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fileName: downloadFileName,
-                    mimeType: 'application/pdf',
-                    pdfBase64,
-                    metadata: {
-                        taxType: returnType,
-                        taxId: identity.primaryValue,
-                        tin: state.profile.tin,
-                        taxpayerName: document.taxpayerName,
-                        filingPeriod: document.filingPeriod,
-                        createdAt: filingDate,
-                        verificationHash,
-                        email: state.profile.email,
-                        phone: state.profile.phone,
-                    },
-                }),
-            });
-
-            if (!response.ok) {
-                const error = (await response.json().catch(() => null)) as { error?: string } | null;
-                throw new Error(error?.error || 'Unable to save the prepared return PDF.');
-            }
-
-            const payload = (await response.json()) as {
-                secureLink: string;
-                downloadRef: string;
-            };
+            downloadBlob(pdfBlob, downloadFileName);
 
             const taxReturn = addTaxReturn({
                 returnType,
@@ -288,9 +257,7 @@ export default function TaxReturnsPage() {
                 taxId: identity.primaryValue,
                 tin: state.profile.tin,
                 taxpayerName: document.taxpayerName,
-                downloadRef: payload.downloadRef,
                 downloadFileName,
-                secureLink: payload.secureLink,
                 sentViaEmail: false,
                 sentViaWhatsApp: false,
                 computation: summary,
@@ -307,7 +274,7 @@ export default function TaxReturnsPage() {
             });
 
             openPrintableDocument(buildTaxReturnDocumentHtml(document), document.title);
-            showStatus(`${returnType} return prepared and saved in this demo. It has not been submitted to a tax authority.`, 'success');
+            showStatus('Draft download requested and the record was saved in this browser demo. Download completion is not confirmed, and the return has not been submitted to a tax authority.', 'info');
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Failed to prepare the return.';
             showStatus(message, 'error');
@@ -315,7 +282,7 @@ export default function TaxReturnsPage() {
     }
 
     function handlePreviewReturnDocument(taxReturn: TaxReturn) {
-        const document = buildDocumentForFiledReturn(taxReturn);
+        const document = buildDocumentForPreparedReturn(taxReturn);
         if (!document) {
             showStatus('Unable to rebuild this return document because its computation snapshot is missing.', 'error');
             return;
@@ -325,9 +292,9 @@ export default function TaxReturnsPage() {
     }
 
     async function handleShareEmail(taxReturn: TaxReturn) {
-        const document = buildDocumentForFiledReturn(taxReturn);
-        if (!document || !taxReturn.secureLink) {
-            showStatus('This return does not yet have a secure file link.', 'error');
+        const document = buildDocumentForPreparedReturn(taxReturn);
+        if (!document) {
+            showStatus('Unable to prepare an email draft because the return computation snapshot is missing.', 'error');
             return;
         }
 
@@ -335,17 +302,10 @@ export default function TaxReturnsPage() {
         const subject = `Your ${taxReturn.returnType} Return (Tax ID: ${document.identity.primaryValue})`;
         const body = buildTaxReturnShareMessage(document, taxReturn.secureLink);
 
-        if (!recipient) {
-            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            markTaxReturnShared(taxReturn.id, 'email');
-            showStatus('Prepared an email draft because no Olowo email address is configured.', 'success');
-            return;
-        }
-
-        if (!taxReturn.downloadRef) {
-            window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            markTaxReturnShared(taxReturn.id, 'email');
-            showStatus('Prepared an email draft because this return has no stored PDF reference.', 'success');
+        if (!recipient || !taxReturn.secureLink || !taxReturn.downloadRef) {
+            const recipientPart = recipient ? encodeURIComponent(recipient) : '';
+            window.location.href = `mailto:${recipientPart}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            showStatus('Requested an email draft. Attach the downloaded PDF before sending; OLÓWÒ did not send this email.', 'info');
             return;
         }
 
@@ -369,20 +329,19 @@ export default function TaxReturnsPage() {
             }
 
             markTaxReturnShared(taxReturn.id, 'email');
-            showStatus(`Sent the ${taxReturn.returnType} return to ${recipient}.`, 'success');
+            showStatus('Email accepted by the configured mail service. Recipient delivery is not confirmed.', 'success');
         } catch {
             window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            markTaxReturnShared(taxReturn.id, 'email');
-            showStatus('Mail service is unavailable, so an email draft has been prepared locally.', 'success');
+            showStatus('Requested an email draft. Verify the attachment and send it yourself; OLÓWÒ did not send this email.', 'info');
         } finally {
             setBusyReturnId(null);
         }
     }
 
     function handleShareWhatsApp(taxReturn: TaxReturn) {
-        const document = buildDocumentForFiledReturn(taxReturn);
-        if (!document || !taxReturn.secureLink) {
-            showStatus('This return does not yet have a secure file link.', 'error');
+        const document = buildDocumentForPreparedReturn(taxReturn);
+        if (!document) {
+            showStatus('Unable to prepare a share message because the return computation snapshot is missing.', 'error');
             return;
         }
 
@@ -397,22 +356,23 @@ export default function TaxReturnsPage() {
         }
 
         markTaxReturnShared(taxReturn.id, 'whatsapp');
-        showStatus(`Prepared WhatsApp share for ${taxReturn.returnType} return.`, 'success');
+        showStatus(`Opened a WhatsApp share composer for the ${taxReturn.returnType} draft. You still need to send it; delivery is not confirmed.`, 'info');
     }
 
-    function handleDownloadReturn(taxReturn: TaxReturn) {
-        if (!taxReturn.secureLink) {
-            showStatus('This return does not yet have a secure file link.', 'error');
+    async function handleDownloadReturn(taxReturn: TaxReturn) {
+        const document = buildDocumentForPreparedReturn(taxReturn);
+        if (!document) {
+            showStatus('Unable to rebuild this PDF because the return computation snapshot is missing.', 'error');
             return;
         }
 
-        const anchor = document.createElement('a');
-        anchor.href = taxReturn.secureLink;
-        anchor.target = '_blank';
-        anchor.rel = 'noopener noreferrer';
-        document.body.appendChild(anchor);
-        anchor.click();
-        anchor.remove();
+        try {
+            const pdfBlob = await generateTaxReturnPdfBlob(document);
+            downloadBlob(pdfBlob, taxReturn.downloadFileName || `${document.title.replace(/\s+/g, '-')}.pdf`);
+            showStatus('PDF download requested. Browser download completion is not confirmed.', 'info');
+        } catch (error) {
+            showStatus(error instanceof Error ? error.message : 'Unable to generate the return PDF.', 'error');
+        }
     }
 
     function renderAuditTrail() {
@@ -622,10 +582,15 @@ export default function TaxReturnsPage() {
                     className={`mt-4 flex items-start gap-2 rounded-md px-4 py-3 text-sm ${
                         statusMessage.tone === 'success'
                             ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
-                            : 'bg-rose-50 border border-rose-200 text-rose-900'
+                            : statusMessage.tone === 'info'
+                                ? 'bg-blue-50 border border-blue-200 text-blue-900'
+                                : 'bg-rose-50 border border-rose-200 text-rose-900'
                     }`}
+                    role={statusMessage.tone === 'error' ? 'alert' : 'status'}
                 >
-                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                    {statusMessage.tone === 'info'
+                        ? <Info className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                        : <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden="true" />}
                     <span>{statusMessage.text}</span>
                 </div>
             )}
@@ -658,8 +623,8 @@ export default function TaxReturnsPage() {
                                             <td className="px-5 py-3 text-right text-slate-700">{formatNaira(taxReturn.totalIncome)}</td>
                                             <td className="px-5 py-3 text-right font-semibold text-slate-900">{formatNaira(taxReturn.taxPayable)}</td>
                                             <td className="px-5 py-3 text-xs text-slate-600 space-y-1">
-                                                <div>{taxReturn.sentViaEmail ? 'Email sent/prepared' : 'Email pending'}</div>
-                                                <div>{taxReturn.sentViaWhatsApp ? 'WhatsApp prepared' : 'WhatsApp pending'}</div>
+                                                <div>{taxReturn.sentViaEmail ? 'Email action recorded; send and delivery unverified' : 'No email sent'}</div>
+                                                <div>{taxReturn.sentViaWhatsApp ? 'WhatsApp share prepared; not sent' : 'No WhatsApp share prepared'}</div>
                                                 <div>Hash: {(taxReturn.verificationHash || taxReturn.pdfHash || 'n/a').slice(0, 12)}</div>
                                             </td>
                                             <td className="px-5 py-3">

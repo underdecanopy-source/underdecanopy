@@ -2,7 +2,7 @@ export const Hero = () => {
     return (
         <section className="bg-blue-900 text-white py-20">
             <div className="page-container text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4">Olowo</h1>
+                <h1 className="text-4xl md:text-5xl font-bold mb-4">OLÓWÒ</h1>
                 <p className="text-2xl md:text-3xl font-semibold mb-4">The Digital Operating System for Your Business</p>
                 <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Olowo is being built as a multi-tenant Business Operating System for SMEs, bringing digital receipts and tax workflows together with the rest of your business operations.</p>
                 <div className="flex flex-wrap justify-center gap-4">

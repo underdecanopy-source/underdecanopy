@@ -7,6 +7,7 @@ import { POST } from '../route';
 import { getFiledReturnFile, getFiledReturnRecord } from '@/lib/smarttax/fileStore';
 import { createSmtpTransport, hasSmtpConfig } from '@/lib/mail/smtp';
 import { verifySecureDownloadToken } from '@/lib/smarttax/secureLinks';
+import { getUser } from '@/lib/auth/server';
 
 jest.mock('@/lib/smarttax/fileStore', () => ({
     getFiledReturnFile: jest.fn(),
@@ -22,10 +23,15 @@ jest.mock('@/lib/smarttax/secureLinks', () => ({
     verifySecureDownloadToken: jest.fn(),
 }));
 
+jest.mock('@/lib/auth/server', () => ({
+    getUser: jest.fn(),
+}));
+
 const mockedGetFiledReturnFile = jest.mocked(getFiledReturnFile);
 const mockedGetFiledReturnRecord = jest.mocked(getFiledReturnRecord);
 const mockedHasSmtpConfig = jest.mocked(hasSmtpConfig);
 const mockedVerifyToken = jest.mocked(verifySecureDownloadToken);
+const mockedGetUser = jest.mocked(getUser);
 
 function createRequest(secureLink: string) {
     return new NextRequest('http://localhost/api/smarttax/share/email', {
@@ -44,6 +50,20 @@ describe('/api/smarttax/share/email', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockedHasSmtpConfig.mockReturnValue(true);
+        mockedGetUser.mockResolvedValue({ id: 'auth-user-1' } as Awaited<ReturnType<typeof getUser>>);
+    });
+
+    it('requires authentication before reading stored files or sending email', async () => {
+        mockedGetUser.mockResolvedValue(null);
+
+        const response = await POST(
+            createRequest('http://localhost/api/smarttax/download/OLW-123?token=invalid'),
+        );
+
+        expect(response.status).toBe(401);
+        expect(mockedGetFiledReturnRecord).not.toHaveBeenCalled();
+        expect(mockedGetFiledReturnFile).not.toHaveBeenCalled();
+        expect(createSmtpTransport).not.toHaveBeenCalled();
     });
 
     it('rejects external download links without reading or emailing stored files', async () => {

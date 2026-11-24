@@ -32,7 +32,7 @@ export const navItems = {
         { href: '#get-started', label: 'Get Started' },
     ],
     '/olowo': [
-        { href: '/olowo', label: 'Home' },
+        { href: '/olowo', label: 'OLÓWÒ' },
         { href: '#features', label: 'Features' },
         { href: '#compliance', label: 'Compliance' },
         { href: '#pricing', label: 'Pricing' },
@@ -40,7 +40,7 @@ export const navItems = {
         { href: '#demo', label: 'Demo' },
     ],
     '/olowo/businesses': [
-        { href: '/olowo', label: 'Olowo' },
+        { href: '/olowo', label: 'OLÓWÒ' },
         { href: '/olowo/businesses', label: 'Businesses' },
     ],
     '/naijapolis': [

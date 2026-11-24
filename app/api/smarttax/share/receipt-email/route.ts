@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { buildReceiptEmailHtml, buildReceiptShareText } from '@/app/(main)/olowo/demo/_lib/receiptContent';
 import { createSmtpTransport, hasSmtpConfig } from '@/lib/mail/smtp';
 import { resolveTaxIdentity } from '@/app/(main)/olowo/demo/_lib/identity';
+import { getUser } from '@/lib/auth/server';
 
 const profileSchema = z.object({
     name: z.string(),
@@ -59,6 +60,11 @@ const emailSchema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
+        const user = await getUser();
+        if (!user) {
+            return NextResponse.json({ error: 'Authentication required to send email' }, { status: 401 });
+        }
+
         const body = emailSchema.parse(await request.json());
 
         if (!hasSmtpConfig()) {
@@ -73,14 +79,14 @@ export async function POST(request: NextRequest) {
         const html = buildReceiptEmailHtml(body.profile, body.transaction, body.receipt);
 
         await transporter.sendMail({
-            from: `"SmartTax Demo" <${process.env.SMTP_USER}>`,
+            from: `"OLÓWÒ Demo" <${process.env.SMTP_USER}>`,
             to: body.to,
             subject,
             text,
             html,
         });
 
-        return NextResponse.json({ message: 'Receipt email sent successfully' }, { status: 200 });
+        return NextResponse.json({ message: 'Email accepted by the configured mail service; recipient delivery is not confirmed' }, { status: 200 });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json({ error: 'Validation failed', details: error.issues }, { status: 400 });

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getFiledReturnFile, getFiledReturnRecord } from '@/lib/smarttax/fileStore';
 import { createSmtpTransport, hasSmtpConfig } from '@/lib/mail/smtp';
 import { verifySecureDownloadToken } from '@/lib/smarttax/secureLinks';
+import { getUser } from '@/lib/auth/server';
 
 const emailSchema = z.object({
     ref: z.string().regex(/^[A-Za-z0-9_-]{1,100}$/),
@@ -23,6 +24,11 @@ function escapeHtml(value: string): string {
 
 export async function POST(request: NextRequest) {
     try {
+        const user = await getUser();
+        if (!user) {
+            return NextResponse.json({ error: 'Authentication required to send email' }, { status: 401 });
+        }
+
         const body = emailSchema.parse(await request.json());
 
         if (!hasSmtpConfig()) {
@@ -48,7 +54,7 @@ export async function POST(request: NextRequest) {
         ]);
 
         if (!record || !fileBuffer) {
-            return NextResponse.json({ error: 'Filed return not found' }, { status: 404 });
+            return NextResponse.json({ error: 'Prepared return document not found' }, { status: 404 });
         }
 
         if (record.taxId !== token.taxId) {
@@ -63,15 +69,15 @@ export async function POST(request: NextRequest) {
         const subject = body.subject || `Your Tax Return (Tax ID: ${body.taxId})`;
 
         await transporter.sendMail({
-            from: `"Olowo" <${process.env.SMTP_USER}>`,
+            from: `"OLÓWÒ" <${process.env.SMTP_USER}>`,
             to: body.to,
             subject,
-            text: `Tax ID: ${body.taxId}\nTaxpayer: ${record.taxpayerName}\nDownload your filed return: ${body.secureLink}`,
-            html: `<p><strong>Tax ID:</strong> ${safeTaxId}</p><p><strong>Taxpayer:</strong> ${safeName}</p><p>Your filed return is attached. You can also download it here: <a href="${safeLink}">${safeLink}</a></p>`,
+            text: `Tax ID: ${body.taxId}\nTaxpayer: ${record.taxpayerName}\nDownload your prepared tax return draft (not submitted to a tax authority): ${body.secureLink}`,
+            html: `<p><strong>Tax ID:</strong> ${safeTaxId}</p><p><strong>Taxpayer:</strong> ${safeName}</p><p>Your prepared tax return draft is attached. It has not been submitted to a tax authority. You can also download it here: <a href="${safeLink}">${safeLink}</a></p>`,
             attachments: [{ filename: record.fileName, content: fileBuffer }],
         });
 
-        return NextResponse.json({ message: 'Return email sent successfully' }, { status: 200 });
+        return NextResponse.json({ message: 'Email accepted by the configured mail service; recipient delivery is not confirmed' }, { status: 200 });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json({ error: 'Validation failed', details: error.issues }, { status: 400 });

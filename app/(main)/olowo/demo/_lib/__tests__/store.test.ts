@@ -72,6 +72,30 @@ describe('Olowo demo state migration', () => {
         expect(state.profile.taxId).toBe('CUSTOM-TAX-ID');
     });
 
+    it('rebrands generated legacy receipt numbers while preserving their sequence', () => {
+        window.localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                profile: defaultProfile,
+                transactions: [],
+                receipts: [
+                    {
+                        id: 'receipt-1',
+                        receiptNumber: 'STX-2026-01234',
+                        transactionId: 'transaction-1',
+                        createdAt: new Date().toISOString(),
+                    },
+                ],
+                taxReturns: [],
+                reminders: [],
+                auditTrail: [],
+                settings: {},
+            }),
+        );
+
+        expect(loadState().receipts[0].receiptNumber).toBe('OLW-2026-01234');
+    });
+
     it('relabels legacy demo returns as prepared rather than authority-filed', () => {
         window.localStorage.setItem(
             storageKey,

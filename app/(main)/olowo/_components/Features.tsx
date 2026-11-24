@@ -1,36 +1,36 @@
-import { Receipt, FileText, Calculator, Shield, BarChart, Clock } from 'lucide-react';
+import { Building2, Package, ShoppingCart, Receipt, Calculator, FileText } from 'lucide-react';
 
 export const Features = () => {
     const features = [
         {
-            icon: <Receipt size={48} className="text-blue-500" />,
-            title: 'Professional Digital Receipts',
-            description: 'Preview branded digital receipts from demo transactions. The current demo stores records in this browser; it is not a durable cloud archive.',
+            icon: <Building2 size={48} className="text-blue-500" />,
+            title: 'Business workspaces',
+            description: 'The signed-in workspace supports business setup and owner membership. It requires working authentication and database configuration.',
         },
         {
-            icon: <FileText size={48} className="text-blue-500" />,
-            title: 'Tax Records & Return Preparation',
-            description: 'The current demo organizes income and expenses and prepares tax returns for review. It does not submit filings to tax authorities.',
+            icon: <Package size={48} className="text-blue-500" />,
+            title: 'Products & inventory',
+            description: 'The workspace stores business-scoped products, warehouses and stock movements; on-hand quantities are derived from movement history.',
+        },
+        {
+            icon: <ShoppingCart size={48} className="text-blue-500" />,
+            title: 'Completed sales foundation',
+            description: 'A completed sale records payment or receivable, stock movements, balanced journal entries, audit history and business events transactionally. Later payments, returns and refunds are not available yet.',
+        },
+        {
+            icon: <Receipt size={48} className="text-blue-500" />,
+            title: 'Receipt preview',
+            description: 'The separate receipt demo uses browser-local transactions. Its sample receipts are not generated from persisted business sales.',
         },
         {
             icon: <Calculator size={48} className="text-blue-500" />,
-            title: 'Automated Tax Calculations',
-            description: 'Olowo calculates VAT, withholding tax, and personal income tax based on the tax rates configured for your business.',
+            title: 'Tax calculation & document demo',
+            description: 'The browser-only demo uses code-defined illustrative tax rules and can prepare draft documents. Rules are not business-configurable or versioned, and returns are not filed.',
         },
         {
-            icon: <Shield size={48} className="text-blue-500" />,
-            title: 'Organized Demo Records',
-            description: 'Explore how receipt and tax information is organized in the current preview. These browser-local records are not a complete audit archive.',
-        },
-        {
-            icon: <BarChart size={48} className="text-blue-500" />,
-            title: 'Financial Reports & Analytics',
-            description: 'Explore summary reports generated from demo transactions. These figures are not connected to your business workspaces or production financial records.',
-        },
-        {
-            icon: <Clock size={48} className="text-blue-500" />,
-            title: 'Deadline Information',
-            description: 'Explore compliance deadline information in the demo. Olowo does not yet send filed, authoritative, or guaranteed reminders.',
+            icon: <FileText size={48} className="text-blue-500" />,
+            title: 'Other business operations',
+            description: 'Purchasing, expenses, payment collection, financial reports, payroll, approvals, document storage, imports, exports and backups are not yet available in the persisted workspace.',
         },
     ];
 
@@ -38,8 +38,8 @@ export const Features = () => {
         <section className="py-20" id="features">
             <div className="page-container">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-gray-800">Connected business operations, all in Olowo</h2>
-                    <p className="text-gray-600 mt-2 max-w-3xl mx-auto">Olowo is the Business OS for SMEs, bringing digital receipts and tax workflows into the wider platform.</p>
+                    <h2 className="text-3xl font-bold text-gray-800">A connected foundation, with more in development</h2>
+                    <p className="text-gray-600 mt-2 max-w-3xl mx-auto">The current persisted workspace covers business setup, inventory and completed sales. The receipt and tax preview remains separate browser-local demo data.</p>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {features.map((feature) => (

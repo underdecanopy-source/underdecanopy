@@ -211,16 +211,22 @@ export function buildTaxReturnDocumentHtml(document: TaxReturnDocumentData): str
     `;
 }
 
-export function buildTaxReturnShareMessage(document: TaxReturnDocumentData, secureLink: string): string {
+export function buildTaxReturnShareMessage(document: TaxReturnDocumentData, secureLink?: string): string {
     const lines = [
-        `Olowo ${document.taxType} Return`,
+        `OLÓWÒ ${document.taxType} Return Draft`,
         `${document.identity.primaryLabel}: ${document.identity.primaryValue || 'Missing'}`,
         `Taxpayer: ${document.taxpayerName}`,
         `Filing Period: ${document.filingPeriod}`,
         `Tax Payable: ${formatNaira(document.taxPayable)}`,
         `Verification ID: ${document.verificationHash}`,
-        `Download: ${secureLink}`,
+        'Status: Draft only; not submitted to a tax authority.',
     ];
+
+    if (secureLink) {
+        lines.push(`Download: ${secureLink}`);
+    } else {
+        lines.push('Attach the PDF downloaded from the demo before sending.');
+    }
 
     if (document.identity.secondaryValue) {
         lines.splice(2, 0, `${document.identity.secondaryLabel}: ${document.identity.secondaryValue}`);

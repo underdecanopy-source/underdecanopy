@@ -145,6 +145,9 @@ export function loadState(): SmartTaxState {
         });
         const migratedReceipts = (parsed.receipts || []).map((receipt) => ({
             ...receipt,
+            receiptNumber: typeof receipt.receiptNumber === 'string'
+                ? receipt.receiptNumber.replace(/^STX-(\d{4}-\d{5})$/, 'OLW-$1')
+                : receipt.receiptNumber,
             sentViaEmail: !!receipt.sentViaEmail,
             sentViaWhatsApp: !!receipt.sentViaWhatsApp,
         }));
@@ -246,7 +249,7 @@ export function useSmartTaxStore() {
     const addTransaction = useCallback((input: Omit<Transaction, 'id' | 'receiptId' | 'date'> & { date?: string }) => {
         const id = `txn_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
         const receiptId = `rcpt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-        const receiptNumber = `STX-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
+        const receiptNumber = `OLW-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
         const date = input.date ?? new Date().toISOString();
         const transaction: Transaction = { ...input, id, receiptId, date };
         const receipt: Receipt = {
@@ -513,10 +516,10 @@ export function useSmartTaxStore() {
                 });
                 newReceipts.push({
                     id: receiptId,
-                    receiptNumber: `STX-${new Date(date).getFullYear()}-${String(10000 + index).padStart(5, '0')}`,
+                    receiptNumber: `OLW-${new Date(date).getFullYear()}-${String(10000 + index).padStart(5, '0')}`,
                     transactionId: id,
                     createdAt: date,
-                    sentViaEmail: index % 2 === 0,
+                    sentViaEmail: false,
                     sentViaWhatsApp: false,
                 });
             });
