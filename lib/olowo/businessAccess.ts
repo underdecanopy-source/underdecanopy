@@ -5,8 +5,16 @@ import db from '@/lib/prisma';
 
 const inventoryWriteRoles: BusinessRole[] = ['OWNER', 'ADMINISTRATOR', 'MANAGER', 'INVENTORY_STAFF'];
 const salesWriteRoles: BusinessRole[] = ['OWNER', 'ADMINISTRATOR', 'MANAGER', 'SALES_STAFF'];
+const purchaseWriteRoles: BusinessRole[] = ['OWNER', 'ADMINISTRATOR', 'MANAGER', 'ACCOUNTANT', 'INVENTORY_STAFF'];
+const expenseWriteRoles: BusinessRole[] = ['OWNER', 'ADMINISTRATOR', 'MANAGER', 'ACCOUNTANT'];
+const approvalRoles: BusinessRole[] = ['OWNER', 'ADMINISTRATOR', 'MANAGER', 'ACCOUNTANT'];
 
-export type BusinessWritePermission = 'inventory:write' | 'sales:write';
+export type BusinessWritePermission =
+    | 'inventory:write'
+    | 'sales:write'
+    | 'purchases:write'
+    | 'expenses:write'
+    | 'approvals:resolve';
 
 type BusinessAccess =
     | { ok: true; user: NonNullable<Awaited<ReturnType<typeof getUser>>>; role: BusinessRole }
@@ -48,7 +56,13 @@ export async function requireBusinessAccess(
         ? inventoryWriteRoles
         : requestedPermission === 'sales:write'
             ? salesWriteRoles
-            : null;
+            : requestedPermission === 'purchases:write'
+                ? purchaseWriteRoles
+                : requestedPermission === 'expenses:write'
+                    ? expenseWriteRoles
+                    : requestedPermission === 'approvals:resolve'
+                        ? approvalRoles
+                        : null;
 
     if (allowedRoles && !allowedRoles.includes(membership.role)) {
         return {
@@ -56,7 +70,13 @@ export async function requireBusinessAccess(
             response: NextResponse.json({
                 error: requestedPermission === 'inventory:write'
                     ? 'You do not have permission to change inventory'
-                    : 'You do not have permission to record sales or manage customers',
+                    : requestedPermission === 'sales:write'
+                        ? 'You do not have permission to record sales or manage customers'
+                        : requestedPermission === 'purchases:write'
+                            ? 'You do not have permission to record purchases'
+                            : requestedPermission === 'expenses:write'
+                                ? 'You do not have permission to record or pay expenses'
+                                : 'You do not have permission to resolve approvals',
             }, { status: 403 }),
         };
     }
