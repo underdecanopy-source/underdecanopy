@@ -1,5 +1,6 @@
 "use server"
 import { createClient } from "../auth/server";
+import { getAuthErrorMessage } from "../auth/errors";
 
 
 export async function login(prevState: unknown, formData: FormData) {
@@ -13,22 +14,16 @@ export async function login(prevState: unknown, formData: FormData) {
         const { error } = await auth.signInWithPassword(data)
 
         if (error) {
-            return { errorMessage: error.message }
+            return { errorMessage: getAuthErrorMessage(error) }
         }
         return { errorMessage: null }
     }
     catch (error) {
         if (error instanceof Error && /fetch failed/i.test(error.message)) {
             console.error('[auth] Login request could not reach the configured auth service')
-            return {
-                errorMessage: "We couldn't reach the account service. Please try again shortly."
-            }
         }
         console.error('[auth] Login failed', error instanceof Error ? error.message : 'Unknown error')
-        if (error instanceof Error) {
-            return { errorMessage: error.message }
-        }
-        else return { errorMessage: "An error occured" }
+        return { errorMessage: getAuthErrorMessage(error) }
     }
 }
 
@@ -39,16 +34,13 @@ export async function logout() {
         const { error } = await auth.signOut()
 
         if (error) {
-            return { errorMessage: error.message }
+            return { errorMessage: getAuthErrorMessage(error) }
         }
         return { errorMessage: null }
     }
     catch (error) {
         console.log(error)
-        if (error instanceof Error) {
-            return { errorMessage: error.message }
-        }
-        else return { errorMessage: "An error occured" }
+        return { errorMessage: getAuthErrorMessage(error) }
     }
 }
 
@@ -66,7 +58,7 @@ export async function signUp(prevState: unknown, formData: FormData) {
         const { data, error } = await auth.signUp({ email, password })
 
         if (error) {
-            return { errorMessage: error.message }
+            return { errorMessage: getAuthErrorMessage(error) }
         }
 
         const userId = data.user?.id
@@ -76,15 +68,9 @@ export async function signUp(prevState: unknown, formData: FormData) {
     catch (error) {
         if (error instanceof Error && /fetch failed/i.test(error.message)) {
             console.error('[auth] Supabase sign-up request could not reach the configured auth service')
-            return {
-                errorMessage: "We couldn't reach the account service. Please try again shortly. If this continues, contact support."
-            }
         }
 
         console.error('[auth] Sign-up failed', error instanceof Error ? error.message : 'Unknown error')
-        if (error instanceof Error) {
-            return { errorMessage: error.message }
-        }
-        else return { errorMessage: "An error occured" }
+        return { errorMessage: getAuthErrorMessage(error) }
     }
 }
