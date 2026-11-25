@@ -45,6 +45,9 @@ export function SalesWorkspace({ businessId }: { businessId: string }) {
     const [discountAmount, setDiscountAmount] = useState('0');
     const [paymentAmount, setPaymentAmount] = useState('0');
     const [paymentMethod, setPaymentMethod] = useState('CASH');
+    const [collectingSaleId, setCollectingSaleId] = useState('');
+    const [collectionAmount, setCollectionAmount] = useState('');
+    const [collectionMethod, setCollectionMethod] = useState('CASH');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -101,6 +104,45 @@ export function SalesWorkspace({ businessId }: { businessId: string }) {
         setLines((current) => current.length === 1 ? current : current.filter((_, lineIndex) => lineIndex !== index));
     }
 
+    async function recordFollowOnPayment(sale: Sale) {
+        const amount = Number(collectionAmount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+            setError('Enter a valid payment amount.');
+            return;
+        }
+        setSaving(true);
+        setError('');
+        setNotice('');
+        try {
+            const response = await fetch(
+                `/api/businesses/${encodeURIComponent(businessId)}/sales/${encodeURIComponent(sale.id)}/payments`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount,
+                        method: collectionMethod,
+                        idempotencyKey: crypto.randomUUID(),
+                    }),
+                },
+            );
+            const payload = await response.json() as {
+                paymentStatus?: string;
+                replayed?: boolean;
+                error?: string;
+            };
+            if (!response.ok) throw new Error(payload.error || 'Unable to record payment.');
+            await loadWorkspace();
+            setCollectingSaleId('');
+            setCollectionAmount('');
+            setNotice(`Payment recorded successfully. Payment status: ${payload.paymentStatus}.`);
+        } catch (paymentError) {
+            setError(paymentError instanceof Error ? paymentError.message : 'Unable to record payment.');
+        } finally {
+            setSaving(false);
+        }
+    }
+
     async function recordSale(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setError('');
@@ -111,6 +153,7 @@ export function SalesWorkspace({ businessId }: { businessId: string }) {
             setError('Select a customer for an unpaid or partially paid sale.');
             return;
         }
+
         setSaving(true);
         try {
             const idempotencyKey = crypto.randomUUID();
@@ -286,6 +329,50 @@ export function SalesWorkspace({ businessId }: { businessId: string }) {
                                                     <td className="py-3 pr-4 text-slate-700">₦{Number(sale.totalAmount).toLocaleString()}</td>
                                                     <td className="py-3 pr-4">
                                                         <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">{sale.paymentStatus}</span>
+                                                        {sale.status === 'COMPLETED' && sale.paymentStatus !== 'PAID' && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setCollectingSaleId((current) => current === sale.id ? '' : sale.id);
+                                                                    setCollectionAmount('');
+                                                                }}
+                                                                className="ml-2 rounded-md border border-emerald-200 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+                                                            >
+                                                                Record payment
+                                                            </button>
+                                                        )}
+                                                        {collectingSaleId === sale.id && (
+                                                            <span className="mt-2 flex items-center gap-2">
+                                                                <input
+                                                                    aria-label={`Payment amount for ${sale.reference}`}
+                                                                    type="number"
+                                                                    min="0.01"
+                                                                    step="0.01"
+                                                                    value={collectionAmount}
+                                                                    onChange={(event) => setCollectionAmount(event.target.value)}
+                                                                    className="w-28 rounded-md border border-slate-300 px-2 py-1"
+                                                                />
+                                                                <select
+                                                                    aria-label={`Payment method for ${sale.reference}`}
+                                                                    value={collectionMethod}
+                                                                    onChange={(event) => setCollectionMethod(event.target.value)}
+                                                                    className="rounded-md border border-slate-300 px-2 py-1"
+                                                                >
+                                                                    <option value="CASH">Cash</option>
+                                                                    <option value="BANK_TRANSFER">Bank transfer</option>
+                                                                    <option value="POS">POS</option>
+                                                                    <option value="OTHER">Other</option>
+                                                                </select>
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={saving}
+                                                                    onClick={() => void recordFollowOnPayment(sale)}
+                                                                    className="rounded-md bg-emerald-700 px-2 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                                                                >
+                                                                    Save
+                                                                </button>
+                                                            </span>
+                                                        )}
                                                     </td>
                                                     <td className="py-3 text-slate-600">{new Date(sale.occurredAt).toLocaleString()}</td>
                                                 </tr>

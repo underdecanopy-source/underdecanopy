@@ -8,7 +8,7 @@ import { getSafeRedirectPath } from '@/lib/auth/redirect'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { toast } from 'sonner'
 
@@ -29,11 +29,13 @@ type SignupFormProps = {
 export default function SignupForm({ redirectTo }: SignupFormProps) {
     const router = useRouter()
     const [state, signUpAction] = useFormState(signUp, null)
+    const [formError, setFormError] = useState('')
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
             if (state?.errorMessage) {
                 toast.error(state.errorMessage)
+                setFormError(state.errorMessage)
             }
             else if (state?.errorMessage === null) {
                 toast.success("Signed Up, Please check your email")
@@ -43,8 +45,22 @@ export default function SignupForm({ redirectTo }: SignupFormProps) {
     }, [state, router, redirectTo])
 
     return (
-        <form action={signUpAction}>
+        <form action={signUpAction} onSubmit={(event) => {
+            const form = new FormData(event.currentTarget)
+            if (form.get('password') !== form.get('confirmPassword')) {
+                event.preventDefault()
+                setFormError('Passwords do not match')
+                toast.error('Passwords do not match')
+            } else {
+                setFormError('')
+            }
+        }}>
             <CardContent className='grid w-full items-center gap-4'>
+                {formError && (
+                    <p role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                        {formError}
+                    </p>
+                )}
                 <div className='flex flex-col space-y-1.5'>
                     <Label htmlFor='email'>Email</Label>
                     <Input type='email' name='email' placeholder='Enter your email' required />
@@ -52,12 +68,12 @@ export default function SignupForm({ redirectTo }: SignupFormProps) {
 
                 <div className='flex flex-col space-y-1.5'>
                     <Label htmlFor='password'>Password</Label>
-                    <Input type='password' name='password' placeholder='Enter your password' required />
+                    <Input type='password' name='password' placeholder='Enter your password' minLength={6} required />
                 </div>
 
                 <div className='flex flex-col space-y-1.5'>
                     <Label htmlFor='confirmPassword'>Confirm Password</Label>
-                    <Input type='password' name='confirmPassword' placeholder='Confirm your password' required />
+                    <Input type='password' name='confirmPassword' placeholder='Confirm your password' minLength={6} required />
                 </div>
 
             </CardContent>

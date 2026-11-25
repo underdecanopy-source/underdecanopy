@@ -17762,6 +17762,8 @@ export namespace Prisma {
     saleId: string | null
     amount: Decimal | null
     method: $Enums.PaymentMethod | null
+    idempotencyKey: string | null
+    requestFingerprint: string | null
     receivedAt: Date | null
     actorAuthUserId: string | null
     createdAt: Date | null
@@ -17773,6 +17775,8 @@ export namespace Prisma {
     saleId: string | null
     amount: Decimal | null
     method: $Enums.PaymentMethod | null
+    idempotencyKey: string | null
+    requestFingerprint: string | null
     receivedAt: Date | null
     actorAuthUserId: string | null
     createdAt: Date | null
@@ -17784,6 +17788,8 @@ export namespace Prisma {
     saleId: number
     amount: number
     method: number
+    idempotencyKey: number
+    requestFingerprint: number
     receivedAt: number
     actorAuthUserId: number
     createdAt: number
@@ -17805,6 +17811,8 @@ export namespace Prisma {
     saleId?: true
     amount?: true
     method?: true
+    idempotencyKey?: true
+    requestFingerprint?: true
     receivedAt?: true
     actorAuthUserId?: true
     createdAt?: true
@@ -17816,6 +17824,8 @@ export namespace Prisma {
     saleId?: true
     amount?: true
     method?: true
+    idempotencyKey?: true
+    requestFingerprint?: true
     receivedAt?: true
     actorAuthUserId?: true
     createdAt?: true
@@ -17827,6 +17837,8 @@ export namespace Prisma {
     saleId?: true
     amount?: true
     method?: true
+    idempotencyKey?: true
+    requestFingerprint?: true
     receivedAt?: true
     actorAuthUserId?: true
     createdAt?: true
@@ -17925,6 +17937,8 @@ export namespace Prisma {
     saleId: string
     amount: Decimal
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt: Date
     actorAuthUserId: string
     createdAt: Date
@@ -17955,6 +17969,8 @@ export namespace Prisma {
     saleId?: boolean
     amount?: boolean
     method?: boolean
+    idempotencyKey?: boolean
+    requestFingerprint?: boolean
     receivedAt?: boolean
     actorAuthUserId?: boolean
     createdAt?: boolean
@@ -17968,6 +17984,8 @@ export namespace Prisma {
     saleId?: boolean
     amount?: boolean
     method?: boolean
+    idempotencyKey?: boolean
+    requestFingerprint?: boolean
     receivedAt?: boolean
     actorAuthUserId?: boolean
     createdAt?: boolean
@@ -17981,6 +17999,8 @@ export namespace Prisma {
     saleId?: boolean
     amount?: boolean
     method?: boolean
+    idempotencyKey?: boolean
+    requestFingerprint?: boolean
     receivedAt?: boolean
     actorAuthUserId?: boolean
     createdAt?: boolean
@@ -17994,12 +18014,14 @@ export namespace Prisma {
     saleId?: boolean
     amount?: boolean
     method?: boolean
+    idempotencyKey?: boolean
+    requestFingerprint?: boolean
     receivedAt?: boolean
     actorAuthUserId?: boolean
     createdAt?: boolean
   }
 
-  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "businessId" | "saleId" | "amount" | "method" | "receivedAt" | "actorAuthUserId" | "createdAt", ExtArgs["result"]["payment"]>
+  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "businessId" | "saleId" | "amount" | "method" | "idempotencyKey" | "requestFingerprint" | "receivedAt" | "actorAuthUserId" | "createdAt", ExtArgs["result"]["payment"]>
   export type PaymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sale?: boolean | SaleDefaultArgs<ExtArgs>
     business?: boolean | BusinessDefaultArgs<ExtArgs>
@@ -18025,6 +18047,8 @@ export namespace Prisma {
       saleId: string
       amount: Prisma.Decimal
       method: $Enums.PaymentMethod
+      idempotencyKey: string
+      requestFingerprint: string
       receivedAt: Date
       actorAuthUserId: string
       createdAt: Date
@@ -18458,6 +18482,8 @@ export namespace Prisma {
     readonly saleId: FieldRef<"Payment", 'String'>
     readonly amount: FieldRef<"Payment", 'Decimal'>
     readonly method: FieldRef<"Payment", 'PaymentMethod'>
+    readonly idempotencyKey: FieldRef<"Payment", 'String'>
+    readonly requestFingerprint: FieldRef<"Payment", 'String'>
     readonly receivedAt: FieldRef<"Payment", 'DateTime'>
     readonly actorAuthUserId: FieldRef<"Payment", 'String'>
     readonly createdAt: FieldRef<"Payment", 'DateTime'>
@@ -30931,6 +30957,8 @@ export namespace Prisma {
     saleId: 'saleId',
     amount: 'amount',
     method: 'method',
+    idempotencyKey: 'idempotencyKey',
+    requestFingerprint: 'requestFingerprint',
     receivedAt: 'receivedAt',
     actorAuthUserId: 'actorAuthUserId',
     createdAt: 'createdAt'
@@ -32329,6 +32357,8 @@ export namespace Prisma {
     saleId?: StringFilter<"Payment"> | string
     amount?: DecimalFilter<"Payment"> | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFilter<"Payment"> | $Enums.PaymentMethod
+    idempotencyKey?: StringFilter<"Payment"> | string
+    requestFingerprint?: StringFilter<"Payment"> | string
     receivedAt?: DateTimeFilter<"Payment"> | Date | string
     actorAuthUserId?: StringFilter<"Payment"> | string
     createdAt?: DateTimeFilter<"Payment"> | Date | string
@@ -32342,6 +32372,8 @@ export namespace Prisma {
     saleId?: SortOrder
     amount?: SortOrder
     method?: SortOrder
+    idempotencyKey?: SortOrder
+    requestFingerprint?: SortOrder
     receivedAt?: SortOrder
     actorAuthUserId?: SortOrder
     createdAt?: SortOrder
@@ -32351,6 +32383,8 @@ export namespace Prisma {
 
   export type PaymentWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    businessId_idempotencyKey?: PaymentBusinessIdIdempotencyKeyCompoundUniqueInput
+    businessId_id?: PaymentBusinessIdIdCompoundUniqueInput
     AND?: PaymentWhereInput | PaymentWhereInput[]
     OR?: PaymentWhereInput[]
     NOT?: PaymentWhereInput | PaymentWhereInput[]
@@ -32358,12 +32392,14 @@ export namespace Prisma {
     saleId?: StringFilter<"Payment"> | string
     amount?: DecimalFilter<"Payment"> | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFilter<"Payment"> | $Enums.PaymentMethod
+    idempotencyKey?: StringFilter<"Payment"> | string
+    requestFingerprint?: StringFilter<"Payment"> | string
     receivedAt?: DateTimeFilter<"Payment"> | Date | string
     actorAuthUserId?: StringFilter<"Payment"> | string
     createdAt?: DateTimeFilter<"Payment"> | Date | string
     sale?: XOR<SaleScalarRelationFilter, SaleWhereInput>
     business?: XOR<BusinessScalarRelationFilter, BusinessWhereInput>
-  }, "id">
+  }, "id" | "businessId_idempotencyKey" | "businessId_id">
 
   export type PaymentOrderByWithAggregationInput = {
     id?: SortOrder
@@ -32371,6 +32407,8 @@ export namespace Prisma {
     saleId?: SortOrder
     amount?: SortOrder
     method?: SortOrder
+    idempotencyKey?: SortOrder
+    requestFingerprint?: SortOrder
     receivedAt?: SortOrder
     actorAuthUserId?: SortOrder
     createdAt?: SortOrder
@@ -32390,6 +32428,8 @@ export namespace Prisma {
     saleId?: StringWithAggregatesFilter<"Payment"> | string
     amount?: DecimalWithAggregatesFilter<"Payment"> | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodWithAggregatesFilter<"Payment"> | $Enums.PaymentMethod
+    idempotencyKey?: StringWithAggregatesFilter<"Payment"> | string
+    requestFingerprint?: StringWithAggregatesFilter<"Payment"> | string
     receivedAt?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
     actorAuthUserId?: StringWithAggregatesFilter<"Payment"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
@@ -34168,6 +34208,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -34181,6 +34223,8 @@ export namespace Prisma {
     saleId: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -34190,6 +34234,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34203,6 +34249,8 @@ export namespace Prisma {
     saleId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34214,6 +34262,8 @@ export namespace Prisma {
     saleId: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -34223,6 +34273,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34234,6 +34286,8 @@ export namespace Prisma {
     saleId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36030,12 +36084,24 @@ export namespace Prisma {
     not?: NestedEnumPaymentMethodFilter<$PrismaModel> | $Enums.PaymentMethod
   }
 
+  export type PaymentBusinessIdIdempotencyKeyCompoundUniqueInput = {
+    businessId: string
+    idempotencyKey: string
+  }
+
+  export type PaymentBusinessIdIdCompoundUniqueInput = {
+    businessId: string
+    id: string
+  }
+
   export type PaymentCountOrderByAggregateInput = {
     id?: SortOrder
     businessId?: SortOrder
     saleId?: SortOrder
     amount?: SortOrder
     method?: SortOrder
+    idempotencyKey?: SortOrder
+    requestFingerprint?: SortOrder
     receivedAt?: SortOrder
     actorAuthUserId?: SortOrder
     createdAt?: SortOrder
@@ -36051,6 +36117,8 @@ export namespace Prisma {
     saleId?: SortOrder
     amount?: SortOrder
     method?: SortOrder
+    idempotencyKey?: SortOrder
+    requestFingerprint?: SortOrder
     receivedAt?: SortOrder
     actorAuthUserId?: SortOrder
     createdAt?: SortOrder
@@ -36062,6 +36130,8 @@ export namespace Prisma {
     saleId?: SortOrder
     amount?: SortOrder
     method?: SortOrder
+    idempotencyKey?: SortOrder
+    requestFingerprint?: SortOrder
     receivedAt?: SortOrder
     actorAuthUserId?: SortOrder
     createdAt?: SortOrder
@@ -39063,6 +39133,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -39074,6 +39146,8 @@ export namespace Prisma {
     saleId: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -39487,6 +39561,8 @@ export namespace Prisma {
     saleId?: StringFilter<"Payment"> | string
     amount?: DecimalFilter<"Payment"> | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFilter<"Payment"> | $Enums.PaymentMethod
+    idempotencyKey?: StringFilter<"Payment"> | string
+    requestFingerprint?: StringFilter<"Payment"> | string
     receivedAt?: DateTimeFilter<"Payment"> | Date | string
     actorAuthUserId?: StringFilter<"Payment"> | string
     createdAt?: DateTimeFilter<"Payment"> | Date | string
@@ -41067,6 +41143,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -41077,6 +41155,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -42691,6 +42771,8 @@ export namespace Prisma {
     saleId: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -43048,6 +43130,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43059,6 +43143,8 @@ export namespace Prisma {
     saleId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43069,6 +43155,8 @@ export namespace Prisma {
     saleId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43541,6 +43629,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     method: $Enums.PaymentMethod
+    idempotencyKey: string
+    requestFingerprint: string
     receivedAt?: Date | string
     actorAuthUserId: string
     createdAt?: Date | string
@@ -43583,6 +43673,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43593,6 +43685,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43602,6 +43696,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    idempotencyKey?: StringFieldUpdateOperationsInput | string
+    requestFingerprint?: StringFieldUpdateOperationsInput | string
     receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAuthUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

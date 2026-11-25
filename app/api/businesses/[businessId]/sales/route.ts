@@ -184,6 +184,8 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
                         create: {
                             amount: paymentAmount,
                             method: input!.paymentMethod,
+                            idempotencyKey: `sale-${input!.idempotencyKey}-initial`,
+                            requestFingerprint: fingerprint,
                             actorAuthUserId: access.user.id,
                         },
                     } : undefined,

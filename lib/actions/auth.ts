@@ -18,7 +18,13 @@ export async function login(prevState: unknown, formData: FormData) {
         return { errorMessage: null }
     }
     catch (error) {
-        console.log(error)
+        if (error instanceof Error && /fetch failed/i.test(error.message)) {
+            console.error('[auth] Login request could not reach the configured auth service')
+            return {
+                errorMessage: "We couldn't reach the account service. Please try again shortly."
+            }
+        }
+        console.error('[auth] Login failed', error instanceof Error ? error.message : 'Unknown error')
         if (error instanceof Error) {
             return { errorMessage: error.message }
         }

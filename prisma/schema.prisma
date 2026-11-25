@@ -293,17 +293,21 @@ model SaleItem {
 }
 
 model Payment {
-  id              String        @id @default(cuid())
-  businessId      String
-  saleId          String
-  amount          Decimal       @db.Decimal(12, 2)
-  method          PaymentMethod
-  receivedAt      DateTime      @default(now())
-  actorAuthUserId String
-  createdAt       DateTime      @default(now())
-  sale            Sale          @relation(fields: [businessId, saleId], references: [businessId, id], onDelete: Restrict)
-  business        Business      @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  id                 String        @id @default(cuid())
+  businessId         String
+  saleId             String
+  amount             Decimal       @db.Decimal(12, 2)
+  method             PaymentMethod
+  idempotencyKey     String
+  requestFingerprint String
+  receivedAt         DateTime      @default(now())
+  actorAuthUserId    String
+  createdAt          DateTime      @default(now())
+  sale               Sale          @relation(fields: [businessId, saleId], references: [businessId, id], onDelete: Restrict)
+  business           Business      @relation(fields: [businessId], references: [id], onDelete: Restrict)
 
+  @@unique([businessId, idempotencyKey])
+  @@unique([businessId, id])
   @@index([businessId, saleId, receivedAt])
 }
 
