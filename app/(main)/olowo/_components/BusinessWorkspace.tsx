@@ -161,6 +161,12 @@ export function BusinessWorkspace() {
                                                     >
                                                         Open sales
                                                     </Link>
+                                                    <Link
+                                                        href={`/olowo/businesses/${encodeURIComponent(business.id)}/operations`}
+                                                        className="inline-flex rounded-md border border-violet-200 px-3 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-50"
+                                                    >
+                                                        Open purchases and expenses
+                                                    </Link>
                                                 </span>
                                             </li>
                                         ))}
