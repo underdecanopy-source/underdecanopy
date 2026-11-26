@@ -30,7 +30,7 @@ export default function DashboardPage() {
         <>
             <PageHeader
                 title={`Welcome, ${state.profile.businessName || state.profile.name}`}
-                description="Receipt and tax capability preview. Demo data is stored in this browser and is not connected to your Olowo business workspaces."
+                description="Receipt and tax capability preview. Demo data is stored in this browser and is not connected to your OLÓWÒ business workspaces."
                 actions={
                     <>
                         <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1">

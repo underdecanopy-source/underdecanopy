@@ -182,7 +182,7 @@ export function InventoryWorkspace({ businessId }: { businessId: string }) {
                     ← Your businesses
                 </Link>
                 <header className="mt-5">
-                    <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Olowo inventory preview</p>
+                    <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">OLÓWÒ inventory preview</p>
                     <h1 className="mt-2 text-3xl font-bold text-slate-900">Products and stock</h1>
                     <p className="mt-2 max-w-3xl text-slate-600">
                         Manage this business’s product catalogue, warehouses and traceable stock adjustments. Stock on hand is calculated from the movement history.

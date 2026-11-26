@@ -5,7 +5,7 @@ const baseProfile = {
     name: 'Demo User',
     email: 'demo@smarttax.ng',
     phone: '+2348000000000',
-    businessName: 'Olowo Demo Business',
+    businessName: 'OLÓWÒ Demo Business',
     taxId: 'STX-DEMO-TAX-1001',
     tin: '12345678-0001',
     address: '1 Demo Street, Lagos',

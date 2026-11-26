@@ -11,7 +11,7 @@ export const defaultProfile: Profile = {
     name: 'Demo User',
     email: 'demo@olowo.ng',
     phone: '+234 800 000 0000',
-    businessName: 'Olowo Demo Business',
+    businessName: 'OLÓWÒ Demo Business',
     taxId: 'OLW-DEMO-TAX-1001',
     tin: '12345678-0001',
     address: '',
@@ -88,7 +88,8 @@ export function loadState(): SmartTaxState {
             ...legacyProfile,
             email: legacyProfile.email === 'demo@smarttax.ng' ? defaultProfile.email : legacyProfile.email || defaultProfile.email,
             businessName:
-                legacyProfile.businessName === 'SmartTax Demo Business'
+                legacyProfile.businessName === 'SmartTax Demo Business' ||
+                legacyProfile.businessName === 'Olowo Demo Business'
                     ? defaultProfile.businessName
                     : legacyProfile.businessName || defaultProfile.businessName,
             taxId:
@@ -183,7 +184,7 @@ export function loadState(): SmartTaxState {
             action: entry.resourceType === 'taxReturn' && entry.action === 'filed' ? 'create' as const : entry.action,
             note:
                 entry.resourceType === 'taxReturn' && entry.action === 'filed'
-                    ? 'Return prepared in the Olowo demo; tax-authority submission was not confirmed.'
+                    ? 'Return prepared in the OLÓWÒ demo; tax-authority submission was not confirmed.'
                     : entry.note,
             timestamp: entry.timestamp || new Date().toISOString(),
             recordHash: entry.recordHash ?? '',

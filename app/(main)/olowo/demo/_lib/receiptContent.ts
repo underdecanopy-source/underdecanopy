@@ -35,7 +35,7 @@ export function buildReceiptShareText(profile: Profile, transaction: Transaction
 
 export function buildReceiptEmailHtml(profile: Profile, transaction: Transaction, receipt: Receipt): string {
     const identity = resolveTaxIdentity(profile);
-    const businessName = escapeHtml(profile.businessName || profile.name || 'Olowo Business');
+    const businessName = escapeHtml(profile.businessName || profile.name || 'OLÓWÒ Business');
     const counterpartyLabel = transaction.type === 'revenue' ? 'Billed To' : 'Paid To';
     const transactionLabel = escapeHtml(getTransactionLabel(transaction));
     const receiptNumber = escapeHtml(receipt.receiptNumber);

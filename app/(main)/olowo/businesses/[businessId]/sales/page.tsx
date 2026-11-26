@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { SalesWorkspace } from '../../../_components/SalesWorkspace';
 
 export const metadata: Metadata = {
-    title: 'Sales | Olowo',
+    title: 'Sales | OLÓWÒ',
     description: 'Record tenant-scoped sales, stock movements, payments, receivables, and accounting entries.',
 };
 

@@ -98,7 +98,7 @@ export default function OlowoPage() {
                         { value: "Other", label: "Other" },
                     ]}
                 />
-                <MobileOptimizedFooter serviceName="Olowo" showQuickContact={false} />
+                <MobileOptimizedFooter serviceName="OLÓWÒ" showQuickContact={false} />
             </main>
         </div>
     );

@@ -38,7 +38,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
                 <div className="flex items-center justify-between px-4 py-3">
                     <Link href="/olowo" className="flex items-center gap-2 text-blue-900 font-bold">
                         <ChevronLeft className="h-4 w-4" />
-                        <span className="text-sm">Olowo</span>
+                        <span className="text-sm">OLÓWÒ</span>
                     </Link>
                     <button
                         aria-label="Toggle menu"
@@ -63,7 +63,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
                     >
                         <ShieldCheck className="h-7 w-7 text-orange-400" />
                         <div>
-                            <div className="text-base font-bold leading-tight">Olowo</div>
+                            <div className="text-base font-bold leading-tight">OLÓWÒ</div>
                             <div className="text-xs text-blue-200 leading-tight">Business OS</div>
                         </div>
                     </Link>

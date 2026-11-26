@@ -98,7 +98,7 @@ export function BusinessWorkspace() {
             ]);
             setName('');
             setBusinessType('');
-            setNotice('Business created. Olowo saved your owner membership and audit record.');
+            setNotice('Business created. OLÓWÒ saved your owner membership and audit record.');
         } catch (createError) {
             setError(createError instanceof Error ? createError.message : 'Unable to create business.');
         } finally {
@@ -112,7 +112,7 @@ export function BusinessWorkspace() {
             <main id="main-content" className="min-h-screen bg-slate-50 py-12">
                 <div className="page-container max-w-5xl">
                     <div className="mb-8">
-                        <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Olowo Business Setup Preview</p>
+                        <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">OLÓWÒ Business Setup Preview</p>
                         <h1 className="mt-2 text-3xl font-bold text-slate-900">Your businesses</h1>
                         <p className="mt-2 max-w-2xl text-slate-600">
                             Set up a business workspace. Business access is derived from your signed-in account, not from a user ID supplied by the browser.

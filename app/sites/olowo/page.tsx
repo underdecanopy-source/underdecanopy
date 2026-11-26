@@ -6,8 +6,8 @@ export default function OlowoPage() {
   return (
     <main className="container mx-auto py-8 px-4">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-4">Olowo</h1>
-        <p className="text-gray-600">Digital receipt and tax workflows inside the Olowo Business Operating System.</p>
+        <h1 className="text-4xl font-bold mb-4">OLÓWÒ</h1>
+        <p className="text-gray-600">Digital receipt and tax workflows inside the OLÓWÒ Business Operating System.</p>
       </div>
       
       <div className="mb-16">

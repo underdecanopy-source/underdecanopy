@@ -5,9 +5,9 @@ export const Pricing = () => {
         <section className="bg-gray-100 py-20" id="pricing" aria-labelledby="pricing-heading">
             <div className="page-container">
                 <div className="mx-auto max-w-3xl rounded-xl bg-white p-8 text-center shadow-md md:p-12">
-                    <h2 id="pricing-heading" className="text-3xl font-bold text-gray-800">Olowo plans are in development</h2>
+                    <h2 id="pricing-heading" className="text-3xl font-bold text-gray-800">OLÓWÒ plans are in development</h2>
                     <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-                        Olowo is being built as a connected Business Operating System. Subscription plans and pricing will be published when the business workflows are ready; the current previews are not paid product plans.
+                        OLÓWÒ is being built as a connected Business Operating System. Subscription plans and pricing will be published when the business workflows are ready; the current previews are not paid product plans.
                     </p>
                     <div className="mt-8 flex flex-wrap justify-center gap-4">
                         <Link

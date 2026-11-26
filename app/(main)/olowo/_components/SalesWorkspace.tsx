@@ -201,7 +201,7 @@ export function SalesWorkspace({ businessId }: { businessId: string }) {
                     ← Your businesses
                 </Link>
                 <header className="mt-5">
-                    <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Olowo sales workspace</p>
+                    <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">OLÓWÒ sales workspace</p>
                     <h1 className="mt-2 text-3xl font-bold text-slate-900">Sales and receipts</h1>
                     {businessName && <p className="mt-2 text-sm font-medium text-slate-700">Business: {businessName}</p>}
                 </header>

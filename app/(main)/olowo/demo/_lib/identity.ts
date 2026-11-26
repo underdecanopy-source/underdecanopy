@@ -48,7 +48,7 @@ export function resolveTaxIdentity(profile: Pick<Profile, 'taxId' | 'tin'>): Res
 export function requireTaxIdentity(profile: Pick<Profile, 'taxId' | 'tin'>): ResolvedTaxIdentity {
     const identity = resolveTaxIdentity(profile);
     if (!identity.primaryValue) {
-        throw new Error('Missing Tax ID or TIN. Update your Olowo business settings before generating a receipt or return.');
+        throw new Error('Missing Tax ID or TIN. Update your OLÓWÒ business settings before generating a receipt or return.');
     }
     return identity;
 }

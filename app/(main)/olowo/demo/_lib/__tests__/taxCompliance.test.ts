@@ -24,7 +24,7 @@ describe('resolveTaxIdentity', () => {
 
     it('throws when both Tax ID and TIN are missing', () => {
         expect(() => requireTaxIdentity({ taxId: '', tin: '' })).toThrow(
-            'Missing Tax ID or TIN. Update your Olowo business settings before generating a receipt or return.'
+            'Missing Tax ID or TIN. Update your OLÓWÒ business settings before generating a receipt or return.'
         );
     });
 });

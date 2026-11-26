@@ -7,11 +7,11 @@ describe('Olowo demo state migration', () => {
         window.localStorage.clear();
     });
 
-    it('uses Olowo defaults for a new demo profile', () => {
+    it('uses OLÓWÒ defaults for a new demo profile', () => {
         const state = loadState();
 
         expect(state.profile).toEqual(defaultProfile);
-        expect(state.profile.businessName).toBe('Olowo Demo Business');
+        expect(state.profile.businessName).toBe('OLÓWÒ Demo Business');
         expect(state.profile.email).toBe('demo@olowo.ng');
     });
 
@@ -38,12 +38,32 @@ describe('Olowo demo state migration', () => {
         const state = loadState();
 
         expect(state.profile.email).toBe('demo@olowo.ng');
-        expect(state.profile.businessName).toBe('Olowo Demo Business');
+        expect(state.profile.businessName).toBe('OLÓWÒ Demo Business');
         expect(state.profile.taxId).toBe('OLW-DEMO-TAX-1001');
         expect(state.profile.address).toBe('12 Market Road');
 
         const storedState = JSON.parse(window.localStorage.getItem(storageKey) || '{}');
-        expect(storedState.profile.businessName).toBe('Olowo Demo Business');
+        expect(storedState.profile.businessName).toBe('OLÓWÒ Demo Business');
+    });
+
+    it('rebrands existing untoned demo business names', () => {
+        window.localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                profile: {
+                    ...defaultProfile,
+                    businessName: 'Olowo Demo Business',
+                },
+                transactions: [],
+                receipts: [],
+                taxReturns: [],
+                reminders: [],
+                auditTrail: [],
+                settings: {},
+            }),
+        );
+
+        expect(loadState().profile.businessName).toBe('OLÓWÒ Demo Business');
     });
 
     it('preserves a user-customized business identity', () => {

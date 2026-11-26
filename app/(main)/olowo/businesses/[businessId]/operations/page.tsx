@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { OperationsWorkspace } from '../../../_components/OperationsWorkspace';
 
 export const metadata: Metadata = {
-    title: 'Purchases and Expenses | Olowo',
+    title: 'Purchases and Expenses | OLÓWÒ',
     description: 'Manage tenant-scoped suppliers, purchases, and expenses.',
 };
 

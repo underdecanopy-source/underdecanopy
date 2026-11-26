@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { InventoryWorkspace } from '../../../_components/InventoryWorkspace';
 
 export const metadata: Metadata = {
-    title: 'Inventory | Olowo',
+    title: 'Inventory | OLÓWÒ',
     description: 'Manage products, warehouses, and stock movement records for your business.',
 };
 

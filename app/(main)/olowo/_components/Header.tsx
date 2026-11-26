@@ -9,7 +9,7 @@ export const Header = () => {
 
     const navLinks = [
         { href: '/', label: 'Home' },
-        { href: '/olowo', label: 'Olowo' },
+        { href: '/olowo', label: 'OLÓWÒ' },
         { href: '/olowo#features', label: 'Features' },
         { href: '/olowo#compliance', label: 'Compliance' },
         { href: '/olowo#pricing', label: 'Pricing' },
@@ -22,7 +22,7 @@ export const Header = () => {
             <div className="page-container">
                 <div className="flex h-16 items-center justify-between">
                     <Link href="/" className="text-xl font-bold text-white transition-all duration-300 hover:scale-105 hover:text-lime-300 flex-shrink-0 drop-shadow-lg">
-                        Olowo
+                        OLÓWÒ
                     </Link>
 
                     <nav className="hidden items-center gap-8 md:flex ml-auto">
